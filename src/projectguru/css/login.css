@@ -1,0 +1,13 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.mainFxmlClass {
+
+}
+#mainPane {
+    -fx-background-color: greenyellow;
+}
+#logPane {
+    -fx-background-color: red;
+}

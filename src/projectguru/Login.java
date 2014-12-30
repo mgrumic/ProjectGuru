@@ -6,36 +6,52 @@
 
 package projectguru;
 
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import projectguru.entities.User;
 
 /**
  *
  * @author marko
  */
-public class ProjectGuru extends Application {
+public class Login extends Application {
     
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws IOException {
         Button btn = new Button();
         btn.setText("Say 'Hello World'");
         btn.setOnAction(new EventHandler<ActionEvent>() {
             
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
+                EntityManagerFactory factory = Persistence.createEntityManagerFactory("ProjectGuruPU");
+                EntityManager em = factory.createEntityManager();
+                
+                User admin = new User("admin","admin", "God", "");
+                em.getTransaction().begin();
+                em.persist(admin);
+                em.getTransaction().commit();
+                
             }
         });
         
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
+        Parent root = FXMLLoader.load(getClass().getResource("/projectguru/fxml/Login.fxml"));
         
-        Scene scene = new Scene(root, 300, 250);
+       // StackPane root = new StackPane();
+        //root.getChildren().add(btn);
+        
+        Scene scene = new Scene(root);
         
         primaryStage.setTitle("Hello World!");
         primaryStage.setScene(scene);
