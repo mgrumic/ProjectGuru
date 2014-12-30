@@ -9,6 +9,7 @@ import projectguru.entities.Activity;
 import projectguru.entities.Task;
 import projectguru.entities.Timetable;
 import projectguru.entities.User;
+import projectguru.handlers.LoggedUser;
 import projectguru.handlers.TaskHandler;
 
 /**
@@ -17,6 +18,12 @@ import projectguru.handlers.TaskHandler;
  */
 public class JpaTaskHandler implements TaskHandler{
 
+    private LoggedUser user;
+    
+    public JpaTaskHandler(LoggedUser user) {
+        this.user = user;
+    }
+    
     @Override
     public boolean checkTaskChefPrivileges(Task task) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

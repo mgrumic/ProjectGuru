@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.net.*?>
 <?import java.util.*?>
@@ -7,19 +8,26 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="mainPane" prefHeight="398.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="projectguru.controllers.LoginController">
+<AnchorPane id="mainPane" prefHeight="551.0" prefWidth="698.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.LoginController">
     <stylesheets>
         <URL value="@/projectguru/css/login.css" />
     </stylesheets>
    <children>
-      <Pane id="logPane" layoutX="138.0" layoutY="78.0" prefHeight="199.0" prefWidth="325.0">
+      <Pane id="logPane" layoutX="187.0" layoutY="146.0" prefHeight="199.0" prefWidth="325.0">
          <children>
-            <Label layoutX="29.0" layoutY="47.0" text="Username:" />
-            <TextField layoutX="29.0" layoutY="64.0" prefHeight="17.0" prefWidth="267.0" />
-            <Label layoutX="29.0" layoutY="89.0" text="Password:" />
-            <TextField layoutX="29.0" layoutY="107.0" prefHeight="25.0" prefWidth="267.0" />
-            <Button layoutX="227.0" layoutY="149.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="69.0" text="Exit" />
-            <Button layoutX="139.0" layoutY="149.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Login" />
+            <Label layoutX="29.0" layoutY="44.0" text="Username:" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <TextField fx:id="tfUsername" layoutX="29.0" layoutY="64.0" prefHeight="17.0" prefWidth="267.0" />
+            <Label layoutX="29.0" layoutY="89.0" text="Password:" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <TextField fx:id="tfPassword" layoutX="29.0" layoutY="109.0" prefHeight="25.0" prefWidth="267.0" />
+            <Button fx:id="btnExit" layoutX="218.0" layoutY="149.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Exit" />
+            <Button fx:id="btnLogin" layoutX="130.0" layoutY="149.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Login" />
+            <Label fx:id="lblWarning" layoutX="29.0" layoutY="14.0" prefHeight="17.0" prefWidth="267.0" text="Wrong username or password" textFill="WHITE" />
          </children>
       </Pane>
    </children>

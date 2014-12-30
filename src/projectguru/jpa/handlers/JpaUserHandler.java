@@ -6,6 +6,7 @@
 package projectguru.jpa.handlers;
 
 import projectguru.entities.User;
+import projectguru.handlers.LoggedUser;
 import projectguru.handlers.UserHandler;
 
 /**
@@ -14,6 +15,12 @@ import projectguru.handlers.UserHandler;
  */
 public class JpaUserHandler implements UserHandler {
 
+    private LoggedUser user;
+    
+    public JpaUserHandler(LoggedUser user) {
+        this.user = user;
+    }
+    
     @Override
     public boolean hasAdminPrivileges() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

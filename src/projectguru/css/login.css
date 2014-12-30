@@ -6,8 +6,8 @@
 
 }
 #mainPane {
-    -fx-background-color: greenyellow;
+    -fx-background-color: #353377;
 }
 #logPane {
-    -fx-background-color: red;
+    -fx-background-color: #565595;
 }

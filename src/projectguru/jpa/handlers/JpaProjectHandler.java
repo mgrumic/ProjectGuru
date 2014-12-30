@@ -11,6 +11,7 @@ import projectguru.entities.Expense;
 import projectguru.entities.Income;
 import projectguru.entities.Project;
 import projectguru.entities.User;
+import projectguru.handlers.LoggedUser;
 import projectguru.handlers.ProjectHandler;
 
 /**
@@ -19,6 +20,11 @@ import projectguru.handlers.ProjectHandler;
  */
 public class JpaProjectHandler implements ProjectHandler{
 
+    private LoggedUser user;
+    
+    public JpaProjectHandler(LoggedUser user) {
+        this.user = user;
+    }
     @Override
     public boolean checkProjectChefPrivileges(Project project) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

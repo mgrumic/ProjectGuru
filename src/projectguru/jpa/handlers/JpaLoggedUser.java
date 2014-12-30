@@ -5,42 +5,50 @@
  */
 package projectguru.jpa.handlers;
 
-import java.util.List;
-import projectguru.entities.Document;
-import projectguru.entities.DocumentRevision;
+import projectguru.entities.User;
+import projectguru.handlers.ActivityHandler;
 import projectguru.handlers.DocumentHandler;
 import projectguru.handlers.LoggedUser;
+import projectguru.handlers.ProjectHandler;
+import projectguru.handlers.TaskHandler;
+import projectguru.handlers.UserHandler;
 
 /**
  *
  * @author ZM
  */
-public class JpaDocumentHandler implements DocumentHandler {
+public class JpaLoggedUser implements LoggedUser {
 
-    private LoggedUser user;
+    private User user;
     
-    public JpaDocumentHandler(LoggedUser user) {
+    public JpaLoggedUser(User user) {
         this.user = user;
     }
     
     @Override
-    public boolean addRevision(Document original, DocumentRevision revision) {
+    public ProjectHandler getProjectHandler() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean editDocument(Document document) {
+    public TaskHandler getTaskHandler() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean editRevision(DocumentRevision revision) {
+    public UserHandler getUserHandler() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public List<DocumentRevision> getRevisions(Document document) {
+    public ActivityHandler getActivityHandler() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public DocumentHandler getDocumentHandler() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     
 }

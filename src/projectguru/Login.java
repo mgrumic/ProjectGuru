@@ -29,31 +29,12 @@ public class Login extends Application {
     
     @Override
     public void start(Stage primaryStage) throws IOException {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                EntityManagerFactory factory = Persistence.createEntityManagerFactory("ProjectGuruPU");
-                EntityManager em = factory.createEntityManager();
-                
-                User admin = new User("admin","admin", "God", "");
-                em.getTransaction().begin();
-                em.persist(admin);
-                em.getTransaction().commit();
-                
-            }
-        });
         
         Parent root = FXMLLoader.load(getClass().getResource("/projectguru/fxml/Login.fxml"));
         
-       // StackPane root = new StackPane();
-        //root.getChildren().add(btn);
-        
         Scene scene = new Scene(root);
         
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("Login");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

@@ -10,6 +10,7 @@ import projectguru.entities.Expense;
 import projectguru.entities.Income;
 import projectguru.entities.Task;
 import projectguru.handlers.ActivityHandler;
+import projectguru.handlers.LoggedUser;
 
 /**
  *
@@ -17,6 +18,13 @@ import projectguru.handlers.ActivityHandler;
  */
 public class JpaActivityHandler implements ActivityHandler {
 
+    private LoggedUser user;
+    
+    public JpaActivityHandler(LoggedUser user)
+    {
+        this.user = user;
+    }
+    
     @Override
     public boolean addActivity(Task task, Activity activity) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
