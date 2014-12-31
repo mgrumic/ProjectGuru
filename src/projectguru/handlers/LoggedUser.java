@@ -5,16 +5,44 @@
  */
 package projectguru.handlers;
 
+import projectguru.entities.User;
+
 /**
  *
  * @author ZM
  */
-public interface LoggedUser {
+//TODO: razmisliti da ovo bude apstaktna klasa koja ce u sebi sadrzavati User objekat.
+// Ja sav to vec uradio, ali prepravite ako mislite da nije dobro iz nekog razloga.
+//Ili meni recite pa cu ja prepraviti. Marko Ivanovic.
+public abstract class LoggedUser {
     
-    public ProjectHandler getProjectHandler();
-    public TaskHandler getTaskHandler();
-    public UserHandler getUserHandler();
-    public ActivityHandler getActivityHandler();
-    public DocumentHandler getDocumentHandler();
+    
+    protected boolean loggedIn;
+    protected User user;
+    
+    public abstract ProjectHandler getProjectHandler();
+    public abstract TaskHandler getTaskHandler();
+    public abstract UserHandler getUserHandler();
+    public abstract ActivityHandler getActivityHandler();
+    public abstract DocumentHandler getDocumentHandler();
+    public abstract boolean startWorkSession();
+    public abstract boolean endWorkSession();
+    
+     public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
+    
     
 }

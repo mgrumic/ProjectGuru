@@ -25,10 +25,11 @@ public class JpaActivityHandler implements ActivityHandler {
         this.user = user;
     }
     
-    @Override
-    public boolean addActivity(Task task, Activity activity) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
+    //@Override
+    //public boolean addActivity(Task task, Activity activity) {
+    //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    //}
 
     @Override
     public boolean editActivity(Activity activity) {

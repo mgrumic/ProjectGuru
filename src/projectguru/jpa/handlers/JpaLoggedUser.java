@@ -17,36 +17,66 @@ import projectguru.handlers.UserHandler;
  *
  * @author ZM
  */
-public class JpaLoggedUser implements LoggedUser {
+public class JpaLoggedUser extends LoggedUser {
 
-    private User user;
+    protected ProjectHandler projectHandler;
+    protected TaskHandler taskHandler;
+    protected UserHandler userHandler;
+    protected ActivityHandler activityHandler;
+    protected DocumentHandler documentHandler;
+    
     
     public JpaLoggedUser(User user) {
         this.user = user;
+        
+        projectHandler = new JpaProjectHandler(this);
+        taskHandler = new JpaTaskHandler(this);
+        userHandler = new JpaUserHandler(this);
+        activityHandler = new JpaActivityHandler(this);
+        documentHandler = new JpaDocumentHandler(this);
+        
+        loggedIn = false;
+        
     }
     
+    public JpaLoggedUser(User user, boolean isLoggedIn){
+        this(user);
+        this.loggedIn = isLoggedIn;
+    }
+       
+
     @Override
     public ProjectHandler getProjectHandler() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return projectHandler;
     }
 
     @Override
     public TaskHandler getTaskHandler() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return taskHandler;
     }
 
     @Override
     public UserHandler getUserHandler() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return userHandler;
     }
 
     @Override
     public ActivityHandler getActivityHandler() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return activityHandler;
     }
 
     @Override
     public DocumentHandler getDocumentHandler() {
+        return documentHandler;
+    }
+
+    @Override
+    public boolean startWorkSession() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean endWorkSession() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
