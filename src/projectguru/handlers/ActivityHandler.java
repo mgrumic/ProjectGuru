@@ -22,6 +22,7 @@ public interface ActivityHandler {
     //metode. Ispravite me ako grijesim. Marko Ivanovic.
     //P.S. treba razmisliti i o delte. A i o edit, jer treba onemoguciti da
     //se preko edita promjeni povezani Task svojevoljno.
+    
     //public boolean addActivity(Task task, Activity activity);
 
     public boolean editActivity(Activity activity);
