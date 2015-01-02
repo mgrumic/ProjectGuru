@@ -304,7 +304,26 @@ public class JpaTaskHandler implements TaskHandler{
 
     @Override
     public Double getWorkedManHoursOfTaskSubtree(Task task) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        double base  = task.getClosureTasksChildren()
+                .stream()
+                .map(ClosureTasks::getChild)
+                .map(Task::getWorksOnTaskList)
+                .flatMap((list)-> list.stream())
+                .map(WorksOnTask::getTimetableList)
+                .flatMap((list)->list.stream())
+                .mapToDouble((t)-> (t.getTimetablePK().getStartTime().getTime()
+                                    - t.getEndTime().getTime()) / 1000.0*60.0*60.0 )
+                .sum();
+        
+        //izracunati su sati za pod stablo, jos korjen da uracunamo
+        return base + task.getWorksOnTaskList()
+                .stream()
+                .map(WorksOnTask::getTimetableList)
+                .flatMap((list) -> list.stream())
+                .mapToDouble((t) -> (t.getTimetablePK().getStartTime().getTime()
+                                    - t.getEndTime().getTime()) / 1000.0*60.0*60.0)
+                .sum();
     }
 
     @Override

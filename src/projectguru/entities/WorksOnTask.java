@@ -57,8 +57,6 @@ public class WorksOnTask implements Serializable {
         @JoinColumn(name = "IDProject", referencedColumnName = "IDProject", insertable = false, updatable = false)})
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private WorksOnProject worksOnProject;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "worksOnTask", fetch = FetchType.LAZY)
-    private Timetable timetable;
 
     public WorksOnTask() {
     }
@@ -125,13 +123,6 @@ public class WorksOnTask implements Serializable {
         this.worksOnProject = worksOnProject;
     }
 
-    public Timetable getTimetable() {
-        return timetable;
-    }
-
-    public void setTimetable(Timetable timetable) {
-        this.timetable = timetable;
-    }
 
     @Override
     public int hashCode() {
