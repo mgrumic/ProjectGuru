@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package projectguru.entities;
 
 import java.io.Serializable;
@@ -14,22 +15,22 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 /**
  *
- * @author ZM
+ * @author marko
  */
 @Entity
 @Table(name = "timetable")
 @NamedQueries({
     @NamedQuery(name = "Timetable.findAll", query = "SELECT t FROM Timetable t"),
-    @NamedQuery(name = "Timetable.findByStartTime", query = "SELECT t FROM Timetable t WHERE t.startTime = :startTime"),
+    @NamedQuery(name = "Timetable.findByStartTime", query = "SELECT t FROM Timetable t WHERE t.timetablePK.startTime = :startTime"),
     @NamedQuery(name = "Timetable.findByEndTime", query = "SELECT t FROM Timetable t WHERE t.endTime = :endTime"),
     @NamedQuery(name = "Timetable.findByIDTask", query = "SELECT t FROM Timetable t WHERE t.timetablePK.iDTask = :iDTask"),
     @NamedQuery(name = "Timetable.findByUsername", query = "SELECT t FROM Timetable t WHERE t.timetablePK.username = :username"),
@@ -39,10 +40,6 @@ public class Timetable implements Serializable {
     @EmbeddedId
     protected TimetablePK timetablePK;
     @Basic(optional = false)
-    @Column(name = "StartTime")
-    @Temporal(TemporalType.DATE)
-    private Date startTime;
-    @Basic(optional = false)
     @Column(name = "EndTime")
     @Temporal(TemporalType.DATE)
     private Date endTime;
@@ -50,7 +47,7 @@ public class Timetable implements Serializable {
         @JoinColumn(name = "IDTask", referencedColumnName = "IDTask", insertable = false, updatable = false),
         @JoinColumn(name = "Username", referencedColumnName = "Username", insertable = false, updatable = false),
         @JoinColumn(name = "IDProject", referencedColumnName = "IDProject", insertable = false, updatable = false)})
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private WorksOnTask worksOnTask;
 
     public Timetable() {
@@ -60,14 +57,13 @@ public class Timetable implements Serializable {
         this.timetablePK = timetablePK;
     }
 
-    public Timetable(TimetablePK timetablePK, Date startTime, Date endTime) {
+    public Timetable(TimetablePK timetablePK, Date endTime) {
         this.timetablePK = timetablePK;
-        this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    public Timetable(int iDTask, String username, int iDProject) {
-        this.timetablePK = new TimetablePK(iDTask, username, iDProject);
+    public Timetable(Date startTime, int iDTask, String username, int iDProject) {
+        this.timetablePK = new TimetablePK(startTime, iDTask, username, iDProject);
     }
 
     public TimetablePK getTimetablePK() {
@@ -76,14 +72,6 @@ public class Timetable implements Serializable {
 
     public void setTimetablePK(TimetablePK timetablePK) {
         this.timetablePK = timetablePK;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
     }
 
     public Date getEndTime() {

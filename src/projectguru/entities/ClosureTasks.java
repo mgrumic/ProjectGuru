@@ -37,10 +37,10 @@ public class ClosureTasks implements Serializable {
     private int depth;
     @JoinColumn(name = "IDParent", referencedColumnName = "ID", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Task task;
+    private Task parent;
     @JoinColumn(name = "IDChild", referencedColumnName = "ID", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Task task1;
+    private Task child;
 
     public ClosureTasks() {
     }
@@ -74,20 +74,20 @@ public class ClosureTasks implements Serializable {
         this.depth = depth;
     }
 
-    public Task getTask() {
-        return task;
+    public Task getParent() {
+        return parent;
     }
 
-    public void setTask(Task task) {
-        this.task = task;
+    public void setParent(Task parent) {
+        this.parent = parent;
     }
 
-    public Task getTask1() {
-        return task1;
+    public Task getChild() {
+        return child;
     }
 
-    public void setTask1(Task task1) {
-        this.task1 = task1;
+    public void setChild(Task child) {
+        this.child = child;
     }
 
     @Override

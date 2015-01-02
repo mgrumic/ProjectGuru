@@ -67,10 +67,10 @@ public class Task implements Serializable {
     private Date deadline;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "task", fetch = FetchType.LAZY)
     private List<WorksOnTask> worksOnTaskList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "task", fetch = FetchType.LAZY)
-    private List<ClosureTasks> closureTasksList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "task1", fetch = FetchType.LAZY)
-    private List<ClosureTasks> closureTasksList1;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent", fetch = FetchType.LAZY)
+    private List<ClosureTasks> closureTasksChildren;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "child", fetch = FetchType.LAZY)
+    private List<ClosureTasks> closureTasksParents;
     @OneToMany(mappedBy = "iDRootTask", fetch = FetchType.LAZY)
     private List<Project> projectList;
 
@@ -154,20 +154,20 @@ public class Task implements Serializable {
         this.worksOnTaskList = worksOnTaskList;
     }
 
-    public List<ClosureTasks> getClosureTasksList() {
-        return closureTasksList;
+    public List<ClosureTasks> getClosureTasksChildren() {
+        return closureTasksChildren;
     }
 
-    public void setClosureTasksList(List<ClosureTasks> closureTasksList) {
-        this.closureTasksList = closureTasksList;
+    public void setClosureTasksChildren(List<ClosureTasks> closureTasksChildren) {
+        this.closureTasksChildren = closureTasksChildren;
     }
 
-    public List<ClosureTasks> getClosureTasksList1() {
-        return closureTasksList1;
+    public List<ClosureTasks> getClosureTasksParents() {
+        return closureTasksParents;
     }
 
-    public void setClosureTasksList1(List<ClosureTasks> closureTasksList1) {
-        this.closureTasksList1 = closureTasksList1;
+    public void setClosureTasksParents(List<ClosureTasks> closureTasksParents) {
+        this.closureTasksParents = closureTasksParents;
     }
 
     public List<Project> getProjectList() {

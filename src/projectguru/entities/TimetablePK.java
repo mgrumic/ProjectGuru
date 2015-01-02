@@ -3,19 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package projectguru.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
- * @author ZM
+ * @author marko
  */
 @Embeddable
 public class TimetablePK implements Serializable {
+    @Basic(optional = false)
+    @Column(name = "StartTime")
+    @Temporal(TemporalType.DATE)
+    private Date startTime;
     @Basic(optional = false)
     @Column(name = "IDTask")
     private int iDTask;
@@ -29,10 +37,19 @@ public class TimetablePK implements Serializable {
     public TimetablePK() {
     }
 
-    public TimetablePK(int iDTask, String username, int iDProject) {
+    public TimetablePK(Date startTime, int iDTask, String username, int iDProject) {
+        this.startTime = startTime;
         this.iDTask = iDTask;
         this.username = username;
         this.iDProject = iDProject;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
     public int getIDTask() {
@@ -62,6 +79,7 @@ public class TimetablePK implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
+        hash += (startTime != null ? startTime.hashCode() : 0);
         hash += (int) iDTask;
         hash += (username != null ? username.hashCode() : 0);
         hash += (int) iDProject;
@@ -75,6 +93,9 @@ public class TimetablePK implements Serializable {
             return false;
         }
         TimetablePK other = (TimetablePK) object;
+        if ((this.startTime == null && other.startTime != null) || (this.startTime != null && !this.startTime.equals(other.startTime))) {
+            return false;
+        }
         if (this.iDTask != other.iDTask) {
             return false;
         }
@@ -89,7 +110,7 @@ public class TimetablePK implements Serializable {
 
     @Override
     public String toString() {
-        return "projectguru.entities.TimetablePK[ iDTask=" + iDTask + ", username=" + username + ", iDProject=" + iDProject + " ]";
+        return "projectguru.entities.TimetablePK[ startTime=" + startTime + ", iDTask=" + iDTask + ", username=" + username + ", iDProject=" + iDProject + " ]";
     }
     
 }

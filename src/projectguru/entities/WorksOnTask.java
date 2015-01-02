@@ -36,6 +36,8 @@ import javax.persistence.Table;
     @NamedQuery(name = "WorksOnTask.findByIDProject", query = "SELECT w FROM WorksOnTask w WHERE w.worksOnTaskPK.iDProject = :iDProject"),
     @NamedQuery(name = "WorksOnTask.findByWorking", query = "SELECT w FROM WorksOnTask w WHERE w.working = :working")})
 public class WorksOnTask implements Serializable {
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "worksOnTask", fetch = FetchType.LAZY)
+    private List<Timetable> timetableList;
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected WorksOnTaskPK worksOnTaskPK;
@@ -154,6 +156,14 @@ public class WorksOnTask implements Serializable {
     @Override
     public String toString() {
         return "projectguru.entities.WorksOnTask[ worksOnTaskPK=" + worksOnTaskPK + " ]";
+    }
+
+    public List<Timetable> getTimetableList() {
+        return timetableList;
+    }
+
+    public void setTimetableList(List<Timetable> timetableList) {
+        this.timetableList = timetableList;
     }
     
 }

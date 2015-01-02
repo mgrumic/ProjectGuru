@@ -25,13 +25,17 @@ public interface TaskHandler {
     public boolean deleteSubtask(Task task);
     
     public boolean setChef(Task task, User user);
+    public User getChef(Task task);
     public boolean addMember(Task task, User user);
     
     public boolean addActivity(Task task, Activity activity);
     
     public boolean addTimetable(Timetable timetable);
+    public boolean editTimetable(Timetable timetable);
     public Double getWorkedManHoursOfTaskSubtree(Task task);
     
+    public boolean isMember(Task task, User user);
+    public Task getActiveTask();
     
     
 }
