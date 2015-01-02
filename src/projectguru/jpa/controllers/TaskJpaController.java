@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package projectguru.jpa.controllers;
 
 import java.io.Serializable;
@@ -23,7 +24,7 @@ import projectguru.jpa.controllers.exceptions.NonexistentEntityException;
 
 /**
  *
- * @author ZM
+ * @author marko
  */
 public class TaskJpaController implements Serializable {
 
@@ -59,18 +60,18 @@ public class TaskJpaController implements Serializable {
                 attachedWorksOnTaskList.add(worksOnTaskListWorksOnTaskToAttach);
             }
             task.setWorksOnTaskList(attachedWorksOnTaskList);
-            List<ClosureTasks> attachedClosureTasksList = new ArrayList<ClosureTasks>();
-            for (ClosureTasks closureTasksListClosureTasksToAttach : task.getClosureTasksChildren()) {
-                closureTasksListClosureTasksToAttach = em.getReference(closureTasksListClosureTasksToAttach.getClass(), closureTasksListClosureTasksToAttach.getClosureTasksPK());
-                attachedClosureTasksList.add(closureTasksListClosureTasksToAttach);
+            List<ClosureTasks> attachedClosureTasksChildren = new ArrayList<ClosureTasks>();
+            for (ClosureTasks closureTasksChildrenClosureTasksToAttach : task.getClosureTasksChildren()) {
+                closureTasksChildrenClosureTasksToAttach = em.getReference(closureTasksChildrenClosureTasksToAttach.getClass(), closureTasksChildrenClosureTasksToAttach.getClosureTasksPK());
+                attachedClosureTasksChildren.add(closureTasksChildrenClosureTasksToAttach);
             }
-            task.setClosureTasksChildren(attachedClosureTasksList);
-            List<ClosureTasks> attachedClosureTasksList1 = new ArrayList<ClosureTasks>();
-            for (ClosureTasks closureTasksList1ClosureTasksToAttach : task.getClosureTasksParents()) {
-                closureTasksList1ClosureTasksToAttach = em.getReference(closureTasksList1ClosureTasksToAttach.getClass(), closureTasksList1ClosureTasksToAttach.getClosureTasksPK());
-                attachedClosureTasksList1.add(closureTasksList1ClosureTasksToAttach);
+            task.setClosureTasksChildren(attachedClosureTasksChildren);
+            List<ClosureTasks> attachedClosureTasksParents = new ArrayList<ClosureTasks>();
+            for (ClosureTasks closureTasksParentsClosureTasksToAttach : task.getClosureTasksParents()) {
+                closureTasksParentsClosureTasksToAttach = em.getReference(closureTasksParentsClosureTasksToAttach.getClass(), closureTasksParentsClosureTasksToAttach.getClosureTasksPK());
+                attachedClosureTasksParents.add(closureTasksParentsClosureTasksToAttach);
             }
-            task.setClosureTasksParents(attachedClosureTasksList1);
+            task.setClosureTasksParents(attachedClosureTasksParents);
             List<Project> attachedProjectList = new ArrayList<Project>();
             for (Project projectListProjectToAttach : task.getProjectList()) {
                 projectListProjectToAttach = em.getReference(projectListProjectToAttach.getClass(), projectListProjectToAttach.getId());
@@ -87,22 +88,22 @@ public class TaskJpaController implements Serializable {
                     oldTaskOfWorksOnTaskListWorksOnTask = em.merge(oldTaskOfWorksOnTaskListWorksOnTask);
                 }
             }
-            for (ClosureTasks closureTasksListClosureTasks : task.getClosureTasksChildren()) {
-                Task oldTaskOfClosureTasksListClosureTasks = closureTasksListClosureTasks.getParent();
-                closureTasksListClosureTasks.setParent(task);
-                closureTasksListClosureTasks = em.merge(closureTasksListClosureTasks);
-                if (oldTaskOfClosureTasksListClosureTasks != null) {
-                    oldTaskOfClosureTasksListClosureTasks.getClosureTasksChildren().remove(closureTasksListClosureTasks);
-                    oldTaskOfClosureTasksListClosureTasks = em.merge(oldTaskOfClosureTasksListClosureTasks);
+            for (ClosureTasks closureTasksChildrenClosureTasks : task.getClosureTasksChildren()) {
+                Task oldParentOfClosureTasksChildrenClosureTasks = closureTasksChildrenClosureTasks.getParent();
+                closureTasksChildrenClosureTasks.setParent(task);
+                closureTasksChildrenClosureTasks = em.merge(closureTasksChildrenClosureTasks);
+                if (oldParentOfClosureTasksChildrenClosureTasks != null) {
+                    oldParentOfClosureTasksChildrenClosureTasks.getClosureTasksChildren().remove(closureTasksChildrenClosureTasks);
+                    oldParentOfClosureTasksChildrenClosureTasks = em.merge(oldParentOfClosureTasksChildrenClosureTasks);
                 }
             }
-            for (ClosureTasks closureTasksList1ClosureTasks : task.getClosureTasksParents()) {
-                Task oldTask1OfClosureTasksList1ClosureTasks = closureTasksList1ClosureTasks.getChild();
-                closureTasksList1ClosureTasks.setChild(task);
-                closureTasksList1ClosureTasks = em.merge(closureTasksList1ClosureTasks);
-                if (oldTask1OfClosureTasksList1ClosureTasks != null) {
-                    oldTask1OfClosureTasksList1ClosureTasks.getClosureTasksParents().remove(closureTasksList1ClosureTasks);
-                    oldTask1OfClosureTasksList1ClosureTasks = em.merge(oldTask1OfClosureTasksList1ClosureTasks);
+            for (ClosureTasks closureTasksParentsClosureTasks : task.getClosureTasksParents()) {
+                Task oldChildOfClosureTasksParentsClosureTasks = closureTasksParentsClosureTasks.getChild();
+                closureTasksParentsClosureTasks.setChild(task);
+                closureTasksParentsClosureTasks = em.merge(closureTasksParentsClosureTasks);
+                if (oldChildOfClosureTasksParentsClosureTasks != null) {
+                    oldChildOfClosureTasksParentsClosureTasks.getClosureTasksParents().remove(closureTasksParentsClosureTasks);
+                    oldChildOfClosureTasksParentsClosureTasks = em.merge(oldChildOfClosureTasksParentsClosureTasks);
                 }
             }
             for (Project projectListProject : task.getProjectList()) {
@@ -130,10 +131,10 @@ public class TaskJpaController implements Serializable {
             Task persistentTask = em.find(Task.class, task.getId());
             List<WorksOnTask> worksOnTaskListOld = persistentTask.getWorksOnTaskList();
             List<WorksOnTask> worksOnTaskListNew = task.getWorksOnTaskList();
-            List<ClosureTasks> closureTasksListOld = persistentTask.getClosureTasksChildren();
-            List<ClosureTasks> closureTasksListNew = task.getClosureTasksChildren();
-            List<ClosureTasks> closureTasksList1Old = persistentTask.getClosureTasksParents();
-            List<ClosureTasks> closureTasksList1New = task.getClosureTasksParents();
+            List<ClosureTasks> closureTasksChildrenOld = persistentTask.getClosureTasksChildren();
+            List<ClosureTasks> closureTasksChildrenNew = task.getClosureTasksChildren();
+            List<ClosureTasks> closureTasksParentsOld = persistentTask.getClosureTasksParents();
+            List<ClosureTasks> closureTasksParentsNew = task.getClosureTasksParents();
             List<Project> projectListOld = persistentTask.getProjectList();
             List<Project> projectListNew = task.getProjectList();
             List<String> illegalOrphanMessages = null;
@@ -145,20 +146,20 @@ public class TaskJpaController implements Serializable {
                     illegalOrphanMessages.add("You must retain WorksOnTask " + worksOnTaskListOldWorksOnTask + " since its task field is not nullable.");
                 }
             }
-            for (ClosureTasks closureTasksListOldClosureTasks : closureTasksListOld) {
-                if (!closureTasksListNew.contains(closureTasksListOldClosureTasks)) {
+            for (ClosureTasks closureTasksChildrenOldClosureTasks : closureTasksChildrenOld) {
+                if (!closureTasksChildrenNew.contains(closureTasksChildrenOldClosureTasks)) {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain ClosureTasks " + closureTasksListOldClosureTasks + " since its task field is not nullable.");
+                    illegalOrphanMessages.add("You must retain ClosureTasks " + closureTasksChildrenOldClosureTasks + " since its parent field is not nullable.");
                 }
             }
-            for (ClosureTasks closureTasksList1OldClosureTasks : closureTasksList1Old) {
-                if (!closureTasksList1New.contains(closureTasksList1OldClosureTasks)) {
+            for (ClosureTasks closureTasksParentsOldClosureTasks : closureTasksParentsOld) {
+                if (!closureTasksParentsNew.contains(closureTasksParentsOldClosureTasks)) {
                     if (illegalOrphanMessages == null) {
                         illegalOrphanMessages = new ArrayList<String>();
                     }
-                    illegalOrphanMessages.add("You must retain ClosureTasks " + closureTasksList1OldClosureTasks + " since its task1 field is not nullable.");
+                    illegalOrphanMessages.add("You must retain ClosureTasks " + closureTasksParentsOldClosureTasks + " since its child field is not nullable.");
                 }
             }
             if (illegalOrphanMessages != null) {
@@ -171,20 +172,20 @@ public class TaskJpaController implements Serializable {
             }
             worksOnTaskListNew = attachedWorksOnTaskListNew;
             task.setWorksOnTaskList(worksOnTaskListNew);
-            List<ClosureTasks> attachedClosureTasksListNew = new ArrayList<ClosureTasks>();
-            for (ClosureTasks closureTasksListNewClosureTasksToAttach : closureTasksListNew) {
-                closureTasksListNewClosureTasksToAttach = em.getReference(closureTasksListNewClosureTasksToAttach.getClass(), closureTasksListNewClosureTasksToAttach.getClosureTasksPK());
-                attachedClosureTasksListNew.add(closureTasksListNewClosureTasksToAttach);
+            List<ClosureTasks> attachedClosureTasksChildrenNew = new ArrayList<ClosureTasks>();
+            for (ClosureTasks closureTasksChildrenNewClosureTasksToAttach : closureTasksChildrenNew) {
+                closureTasksChildrenNewClosureTasksToAttach = em.getReference(closureTasksChildrenNewClosureTasksToAttach.getClass(), closureTasksChildrenNewClosureTasksToAttach.getClosureTasksPK());
+                attachedClosureTasksChildrenNew.add(closureTasksChildrenNewClosureTasksToAttach);
             }
-            closureTasksListNew = attachedClosureTasksListNew;
-            task.setClosureTasksChildren(closureTasksListNew);
-            List<ClosureTasks> attachedClosureTasksList1New = new ArrayList<ClosureTasks>();
-            for (ClosureTasks closureTasksList1NewClosureTasksToAttach : closureTasksList1New) {
-                closureTasksList1NewClosureTasksToAttach = em.getReference(closureTasksList1NewClosureTasksToAttach.getClass(), closureTasksList1NewClosureTasksToAttach.getClosureTasksPK());
-                attachedClosureTasksList1New.add(closureTasksList1NewClosureTasksToAttach);
+            closureTasksChildrenNew = attachedClosureTasksChildrenNew;
+            task.setClosureTasksChildren(closureTasksChildrenNew);
+            List<ClosureTasks> attachedClosureTasksParentsNew = new ArrayList<ClosureTasks>();
+            for (ClosureTasks closureTasksParentsNewClosureTasksToAttach : closureTasksParentsNew) {
+                closureTasksParentsNewClosureTasksToAttach = em.getReference(closureTasksParentsNewClosureTasksToAttach.getClass(), closureTasksParentsNewClosureTasksToAttach.getClosureTasksPK());
+                attachedClosureTasksParentsNew.add(closureTasksParentsNewClosureTasksToAttach);
             }
-            closureTasksList1New = attachedClosureTasksList1New;
-            task.setClosureTasksParents(closureTasksList1New);
+            closureTasksParentsNew = attachedClosureTasksParentsNew;
+            task.setClosureTasksParents(closureTasksParentsNew);
             List<Project> attachedProjectListNew = new ArrayList<Project>();
             for (Project projectListNewProjectToAttach : projectListNew) {
                 projectListNewProjectToAttach = em.getReference(projectListNewProjectToAttach.getClass(), projectListNewProjectToAttach.getId());
@@ -204,25 +205,25 @@ public class TaskJpaController implements Serializable {
                     }
                 }
             }
-            for (ClosureTasks closureTasksListNewClosureTasks : closureTasksListNew) {
-                if (!closureTasksListOld.contains(closureTasksListNewClosureTasks)) {
-                    Task oldTaskOfClosureTasksListNewClosureTasks = closureTasksListNewClosureTasks.getParent();
-                    closureTasksListNewClosureTasks.setParent(task);
-                    closureTasksListNewClosureTasks = em.merge(closureTasksListNewClosureTasks);
-                    if (oldTaskOfClosureTasksListNewClosureTasks != null && !oldTaskOfClosureTasksListNewClosureTasks.equals(task)) {
-                        oldTaskOfClosureTasksListNewClosureTasks.getClosureTasksChildren().remove(closureTasksListNewClosureTasks);
-                        oldTaskOfClosureTasksListNewClosureTasks = em.merge(oldTaskOfClosureTasksListNewClosureTasks);
+            for (ClosureTasks closureTasksChildrenNewClosureTasks : closureTasksChildrenNew) {
+                if (!closureTasksChildrenOld.contains(closureTasksChildrenNewClosureTasks)) {
+                    Task oldParentOfClosureTasksChildrenNewClosureTasks = closureTasksChildrenNewClosureTasks.getParent();
+                    closureTasksChildrenNewClosureTasks.setParent(task);
+                    closureTasksChildrenNewClosureTasks = em.merge(closureTasksChildrenNewClosureTasks);
+                    if (oldParentOfClosureTasksChildrenNewClosureTasks != null && !oldParentOfClosureTasksChildrenNewClosureTasks.equals(task)) {
+                        oldParentOfClosureTasksChildrenNewClosureTasks.getClosureTasksChildren().remove(closureTasksChildrenNewClosureTasks);
+                        oldParentOfClosureTasksChildrenNewClosureTasks = em.merge(oldParentOfClosureTasksChildrenNewClosureTasks);
                     }
                 }
             }
-            for (ClosureTasks closureTasksList1NewClosureTasks : closureTasksList1New) {
-                if (!closureTasksList1Old.contains(closureTasksList1NewClosureTasks)) {
-                    Task oldTask1OfClosureTasksList1NewClosureTasks = closureTasksList1NewClosureTasks.getChild();
-                    closureTasksList1NewClosureTasks.setChild(task);
-                    closureTasksList1NewClosureTasks = em.merge(closureTasksList1NewClosureTasks);
-                    if (oldTask1OfClosureTasksList1NewClosureTasks != null && !oldTask1OfClosureTasksList1NewClosureTasks.equals(task)) {
-                        oldTask1OfClosureTasksList1NewClosureTasks.getClosureTasksParents().remove(closureTasksList1NewClosureTasks);
-                        oldTask1OfClosureTasksList1NewClosureTasks = em.merge(oldTask1OfClosureTasksList1NewClosureTasks);
+            for (ClosureTasks closureTasksParentsNewClosureTasks : closureTasksParentsNew) {
+                if (!closureTasksParentsOld.contains(closureTasksParentsNewClosureTasks)) {
+                    Task oldChildOfClosureTasksParentsNewClosureTasks = closureTasksParentsNewClosureTasks.getChild();
+                    closureTasksParentsNewClosureTasks.setChild(task);
+                    closureTasksParentsNewClosureTasks = em.merge(closureTasksParentsNewClosureTasks);
+                    if (oldChildOfClosureTasksParentsNewClosureTasks != null && !oldChildOfClosureTasksParentsNewClosureTasks.equals(task)) {
+                        oldChildOfClosureTasksParentsNewClosureTasks.getClosureTasksParents().remove(closureTasksParentsNewClosureTasks);
+                        oldChildOfClosureTasksParentsNewClosureTasks = em.merge(oldChildOfClosureTasksParentsNewClosureTasks);
                     }
                 }
             }
@@ -280,19 +281,19 @@ public class TaskJpaController implements Serializable {
                 }
                 illegalOrphanMessages.add("This Task (" + task + ") cannot be destroyed since the WorksOnTask " + worksOnTaskListOrphanCheckWorksOnTask + " in its worksOnTaskList field has a non-nullable task field.");
             }
-            List<ClosureTasks> closureTasksListOrphanCheck = task.getClosureTasksChildren();
-            for (ClosureTasks closureTasksListOrphanCheckClosureTasks : closureTasksListOrphanCheck) {
+            List<ClosureTasks> closureTasksChildrenOrphanCheck = task.getClosureTasksChildren();
+            for (ClosureTasks closureTasksChildrenOrphanCheckClosureTasks : closureTasksChildrenOrphanCheck) {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Task (" + task + ") cannot be destroyed since the ClosureTasks " + closureTasksListOrphanCheckClosureTasks + " in its closureTasksList field has a non-nullable task field.");
+                illegalOrphanMessages.add("This Task (" + task + ") cannot be destroyed since the ClosureTasks " + closureTasksChildrenOrphanCheckClosureTasks + " in its closureTasksChildren field has a non-nullable parent field.");
             }
-            List<ClosureTasks> closureTasksList1OrphanCheck = task.getClosureTasksParents();
-            for (ClosureTasks closureTasksList1OrphanCheckClosureTasks : closureTasksList1OrphanCheck) {
+            List<ClosureTasks> closureTasksParentsOrphanCheck = task.getClosureTasksParents();
+            for (ClosureTasks closureTasksParentsOrphanCheckClosureTasks : closureTasksParentsOrphanCheck) {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This Task (" + task + ") cannot be destroyed since the ClosureTasks " + closureTasksList1OrphanCheckClosureTasks + " in its closureTasksList1 field has a non-nullable task1 field.");
+                illegalOrphanMessages.add("This Task (" + task + ") cannot be destroyed since the ClosureTasks " + closureTasksParentsOrphanCheckClosureTasks + " in its closureTasksParents field has a non-nullable child field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);

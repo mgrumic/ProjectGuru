@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package projectguru.jpa.controllers;
 
 import java.io.Serializable;
@@ -19,7 +20,7 @@ import projectguru.jpa.controllers.exceptions.NonexistentEntityException;
 
 /**
  *
- * @author ZM
+ * @author marko
  */
 public class DocumentRevisionJpaController implements Serializable {
 

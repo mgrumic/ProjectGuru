@@ -5,8 +5,10 @@
  */
 package projectguru.jpa.handlers;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
@@ -30,6 +32,8 @@ import projectguru.jpa.controllers.UserJpaController;
 import projectguru.jpa.controllers.WorksOnTaskJpaController;
 import projectguru.jpa.controllers.exceptions.NonexistentEntityException;
 import projectguru.jpa.controllers.exceptions.PreexistingEntityException;
+import projectguru.tasktree.TaskNode;
+import projectguru.tasktree.TaskTree;
 
 /**
  *
@@ -407,5 +411,28 @@ public class JpaTaskHandler implements TaskHandler{
         }
         
         return false;
+    }
+
+    protected List<TaskNode> collectChildren(Task task){
+        List<TaskNode> children =  task.getClosureTasksChildren()
+                .stream()
+                .filter((e) -> e.getDepth() == 1)
+                .map(ClosureTasks::getChild)
+                .map((t) -> new TaskNode(t))
+                .collect(Collectors.toList());
+        
+        for(TaskNode tn : children){
+            tn.setChildren(collectChildren(tn.getTask()));
+        }
+        
+        return children;
+      
+    }
+    
+    @Override
+    public TaskTree getTaskTree(Task task) {
+        TaskNode root = new TaskNode(task);
+        root.setChildren(collectChildren(task));
+        return new TaskTree(root);
     }
 }

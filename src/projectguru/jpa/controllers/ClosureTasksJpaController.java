@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package projectguru.jpa.controllers;
 
 import java.io.Serializable;
@@ -21,7 +22,7 @@ import projectguru.jpa.controllers.exceptions.PreexistingEntityException;
 
 /**
  *
- * @author ZM
+ * @author marko
  */
 public class ClosureTasksJpaController implements Serializable {
 
@@ -38,30 +39,30 @@ public class ClosureTasksJpaController implements Serializable {
         if (closureTasks.getClosureTasksPK() == null) {
             closureTasks.setClosureTasksPK(new ClosureTasksPK());
         }
-        closureTasks.getClosureTasksPK().setIDParent(closureTasks.getParent().getId());
         closureTasks.getClosureTasksPK().setIDChild(closureTasks.getChild().getId());
+        closureTasks.getClosureTasksPK().setIDParent(closureTasks.getParent().getId());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
-            Task task = closureTasks.getParent();
-            if (task != null) {
-                task = em.getReference(task.getClass(), task.getId());
-                closureTasks.setParent(task);
+            Task parent = closureTasks.getParent();
+            if (parent != null) {
+                parent = em.getReference(parent.getClass(), parent.getId());
+                closureTasks.setParent(parent);
             }
-            Task task1 = closureTasks.getChild();
-            if (task1 != null) {
-                task1 = em.getReference(task1.getClass(), task1.getId());
-                closureTasks.setChild(task1);
+            Task child = closureTasks.getChild();
+            if (child != null) {
+                child = em.getReference(child.getClass(), child.getId());
+                closureTasks.setChild(child);
             }
             em.persist(closureTasks);
-            if (task != null) {
-                task.getClosureTasksChildren().add(closureTasks);
-                task = em.merge(task);
+            if (parent != null) {
+                parent.getClosureTasksChildren().add(closureTasks);
+                parent = em.merge(parent);
             }
-            if (task1 != null) {
-                task1.getClosureTasksChildren().add(closureTasks);
-                task1 = em.merge(task1);
+            if (child != null) {
+                child.getClosureTasksChildren().add(closureTasks);
+                child = em.merge(child);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -77,41 +78,41 @@ public class ClosureTasksJpaController implements Serializable {
     }
 
     public void edit(ClosureTasks closureTasks) throws NonexistentEntityException, Exception {
-        closureTasks.getClosureTasksPK().setIDParent(closureTasks.getParent().getId());
         closureTasks.getClosureTasksPK().setIDChild(closureTasks.getChild().getId());
+        closureTasks.getClosureTasksPK().setIDParent(closureTasks.getParent().getId());
         EntityManager em = null;
         try {
             em = getEntityManager();
             em.getTransaction().begin();
             ClosureTasks persistentClosureTasks = em.find(ClosureTasks.class, closureTasks.getClosureTasksPK());
-            Task taskOld = persistentClosureTasks.getParent();
-            Task taskNew = closureTasks.getParent();
-            Task task1Old = persistentClosureTasks.getChild();
-            Task task1New = closureTasks.getChild();
-            if (taskNew != null) {
-                taskNew = em.getReference(taskNew.getClass(), taskNew.getId());
-                closureTasks.setParent(taskNew);
+            Task parentOld = persistentClosureTasks.getParent();
+            Task parentNew = closureTasks.getParent();
+            Task childOld = persistentClosureTasks.getChild();
+            Task childNew = closureTasks.getChild();
+            if (parentNew != null) {
+                parentNew = em.getReference(parentNew.getClass(), parentNew.getId());
+                closureTasks.setParent(parentNew);
             }
-            if (task1New != null) {
-                task1New = em.getReference(task1New.getClass(), task1New.getId());
-                closureTasks.setChild(task1New);
+            if (childNew != null) {
+                childNew = em.getReference(childNew.getClass(), childNew.getId());
+                closureTasks.setChild(childNew);
             }
             closureTasks = em.merge(closureTasks);
-            if (taskOld != null && !taskOld.equals(taskNew)) {
-                taskOld.getClosureTasksChildren().remove(closureTasks);
-                taskOld = em.merge(taskOld);
+            if (parentOld != null && !parentOld.equals(parentNew)) {
+                parentOld.getClosureTasksChildren().remove(closureTasks);
+                parentOld = em.merge(parentOld);
             }
-            if (taskNew != null && !taskNew.equals(taskOld)) {
-                taskNew.getClosureTasksChildren().add(closureTasks);
-                taskNew = em.merge(taskNew);
+            if (parentNew != null && !parentNew.equals(parentOld)) {
+                parentNew.getClosureTasksChildren().add(closureTasks);
+                parentNew = em.merge(parentNew);
             }
-            if (task1Old != null && !task1Old.equals(task1New)) {
-                task1Old.getClosureTasksChildren().remove(closureTasks);
-                task1Old = em.merge(task1Old);
+            if (childOld != null && !childOld.equals(childNew)) {
+                childOld.getClosureTasksChildren().remove(closureTasks);
+                childOld = em.merge(childOld);
             }
-            if (task1New != null && !task1New.equals(task1Old)) {
-                task1New.getClosureTasksChildren().add(closureTasks);
-                task1New = em.merge(task1New);
+            if (childNew != null && !childNew.equals(childOld)) {
+                childNew.getClosureTasksChildren().add(closureTasks);
+                childNew = em.merge(childNew);
             }
             em.getTransaction().commit();
         } catch (Exception ex) {
@@ -142,15 +143,15 @@ public class ClosureTasksJpaController implements Serializable {
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The closureTasks with id " + id + " no longer exists.", enfe);
             }
-            Task task = closureTasks.getParent();
-            if (task != null) {
-                task.getClosureTasksChildren().remove(closureTasks);
-                task = em.merge(task);
+            Task parent = closureTasks.getParent();
+            if (parent != null) {
+                parent.getClosureTasksChildren().remove(closureTasks);
+                parent = em.merge(parent);
             }
-            Task task1 = closureTasks.getChild();
-            if (task1 != null) {
-                task1.getClosureTasksChildren().remove(closureTasks);
-                task1 = em.merge(task1);
+            Task child = closureTasks.getChild();
+            if (child != null) {
+                child.getClosureTasksChildren().remove(closureTasks);
+                child = em.merge(child);
             }
             em.remove(closureTasks);
             em.getTransaction().commit();

@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package projectguru.jpa.controllers;
 
 import java.io.Serializable;
@@ -12,12 +13,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import projectguru.entities.Task;
 import projectguru.entities.WorksOnProject;
-import projectguru.entities.Timetable;
 import projectguru.entities.Activity;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import projectguru.entities.Timetable;
 import projectguru.entities.WorksOnTask;
 import projectguru.entities.WorksOnTaskPK;
 import projectguru.jpa.controllers.exceptions.IllegalOrphanException;
@@ -26,7 +27,7 @@ import projectguru.jpa.controllers.exceptions.PreexistingEntityException;
 
 /**
  *
- * @author ZM
+ * @author marko
  */
 public class WorksOnTaskJpaController implements Serializable {
 
@@ -46,9 +47,12 @@ public class WorksOnTaskJpaController implements Serializable {
         if (worksOnTask.getActivityList() == null) {
             worksOnTask.setActivityList(new ArrayList<Activity>());
         }
+        if (worksOnTask.getTimetableList() == null) {
+            worksOnTask.setTimetableList(new ArrayList<Timetable>());
+        }
         worksOnTask.getWorksOnTaskPK().setIDTask(worksOnTask.getTask().getId());
-        worksOnTask.getWorksOnTaskPK().setUsername(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getUsername());
         worksOnTask.getWorksOnTaskPK().setIDProject(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getIDProject());
+        worksOnTask.getWorksOnTaskPK().setUsername(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getUsername());
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -63,17 +67,18 @@ public class WorksOnTaskJpaController implements Serializable {
                 worksOnProject = em.getReference(worksOnProject.getClass(), worksOnProject.getWorksOnProjectPK());
                 worksOnTask.setWorksOnProject(worksOnProject);
             }
-            Timetable timetable = worksOnTask.getTimetable();
-            if (timetable != null) {
-                timetable = em.getReference(timetable.getClass(), timetable.getTimetablePK());
-                worksOnTask.setTimetable(timetable);
-            }
             List<Activity> attachedActivityList = new ArrayList<Activity>();
             for (Activity activityListActivityToAttach : worksOnTask.getActivityList()) {
                 activityListActivityToAttach = em.getReference(activityListActivityToAttach.getClass(), activityListActivityToAttach.getId());
                 attachedActivityList.add(activityListActivityToAttach);
             }
             worksOnTask.setActivityList(attachedActivityList);
+            List<Timetable> attachedTimetableList = new ArrayList<Timetable>();
+            for (Timetable timetableListTimetableToAttach : worksOnTask.getTimetableList()) {
+                timetableListTimetableToAttach = em.getReference(timetableListTimetableToAttach.getClass(), timetableListTimetableToAttach.getTimetablePK());
+                attachedTimetableList.add(timetableListTimetableToAttach);
+            }
+            worksOnTask.setTimetableList(attachedTimetableList);
             em.persist(worksOnTask);
             if (task != null) {
                 task.getWorksOnTaskList().add(worksOnTask);
@@ -83,15 +88,6 @@ public class WorksOnTaskJpaController implements Serializable {
                 worksOnProject.getWorksOnTaskList().add(worksOnTask);
                 worksOnProject = em.merge(worksOnProject);
             }
-            if (timetable != null) {
-                WorksOnTask oldWorksOnTaskOfTimetable = timetable.getWorksOnTask();
-                if (oldWorksOnTaskOfTimetable != null) {
-                    oldWorksOnTaskOfTimetable.setTimetable(null);
-                    oldWorksOnTaskOfTimetable = em.merge(oldWorksOnTaskOfTimetable);
-                }
-                timetable.setWorksOnTask(worksOnTask);
-                timetable = em.merge(timetable);
-            }
             for (Activity activityListActivity : worksOnTask.getActivityList()) {
                 WorksOnTask oldWorksOnTaskOfActivityListActivity = activityListActivity.getWorksOnTask();
                 activityListActivity.setWorksOnTask(worksOnTask);
@@ -99,6 +95,15 @@ public class WorksOnTaskJpaController implements Serializable {
                 if (oldWorksOnTaskOfActivityListActivity != null) {
                     oldWorksOnTaskOfActivityListActivity.getActivityList().remove(activityListActivity);
                     oldWorksOnTaskOfActivityListActivity = em.merge(oldWorksOnTaskOfActivityListActivity);
+                }
+            }
+            for (Timetable timetableListTimetable : worksOnTask.getTimetableList()) {
+                WorksOnTask oldWorksOnTaskOfTimetableListTimetable = timetableListTimetable.getWorksOnTask();
+                timetableListTimetable.setWorksOnTask(worksOnTask);
+                timetableListTimetable = em.merge(timetableListTimetable);
+                if (oldWorksOnTaskOfTimetableListTimetable != null) {
+                    oldWorksOnTaskOfTimetableListTimetable.getTimetableList().remove(timetableListTimetable);
+                    oldWorksOnTaskOfTimetableListTimetable = em.merge(oldWorksOnTaskOfTimetableListTimetable);
                 }
             }
             em.getTransaction().commit();
@@ -116,8 +121,8 @@ public class WorksOnTaskJpaController implements Serializable {
 
     public void edit(WorksOnTask worksOnTask) throws IllegalOrphanException, NonexistentEntityException, Exception {
         worksOnTask.getWorksOnTaskPK().setIDTask(worksOnTask.getTask().getId());
-        worksOnTask.getWorksOnTaskPK().setUsername(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getUsername());
         worksOnTask.getWorksOnTaskPK().setIDProject(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getIDProject());
+        worksOnTask.getWorksOnTaskPK().setUsername(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getUsername());
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -127,16 +132,18 @@ public class WorksOnTaskJpaController implements Serializable {
             Task taskNew = worksOnTask.getTask();
             WorksOnProject worksOnProjectOld = persistentWorksOnTask.getWorksOnProject();
             WorksOnProject worksOnProjectNew = worksOnTask.getWorksOnProject();
-            Timetable timetableOld = persistentWorksOnTask.getTimetable();
-            Timetable timetableNew = worksOnTask.getTimetable();
             List<Activity> activityListOld = persistentWorksOnTask.getActivityList();
             List<Activity> activityListNew = worksOnTask.getActivityList();
+            List<Timetable> timetableListOld = persistentWorksOnTask.getTimetableList();
+            List<Timetable> timetableListNew = worksOnTask.getTimetableList();
             List<String> illegalOrphanMessages = null;
-            if (timetableOld != null && !timetableOld.equals(timetableNew)) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
+            for (Timetable timetableListOldTimetable : timetableListOld) {
+                if (!timetableListNew.contains(timetableListOldTimetable)) {
+                    if (illegalOrphanMessages == null) {
+                        illegalOrphanMessages = new ArrayList<String>();
+                    }
+                    illegalOrphanMessages.add("You must retain Timetable " + timetableListOldTimetable + " since its worksOnTask field is not nullable.");
                 }
-                illegalOrphanMessages.add("You must retain Timetable " + timetableOld + " since its worksOnTask field is not nullable.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);
@@ -149,10 +156,6 @@ public class WorksOnTaskJpaController implements Serializable {
                 worksOnProjectNew = em.getReference(worksOnProjectNew.getClass(), worksOnProjectNew.getWorksOnProjectPK());
                 worksOnTask.setWorksOnProject(worksOnProjectNew);
             }
-            if (timetableNew != null) {
-                timetableNew = em.getReference(timetableNew.getClass(), timetableNew.getTimetablePK());
-                worksOnTask.setTimetable(timetableNew);
-            }
             List<Activity> attachedActivityListNew = new ArrayList<Activity>();
             for (Activity activityListNewActivityToAttach : activityListNew) {
                 activityListNewActivityToAttach = em.getReference(activityListNewActivityToAttach.getClass(), activityListNewActivityToAttach.getId());
@@ -160,6 +163,13 @@ public class WorksOnTaskJpaController implements Serializable {
             }
             activityListNew = attachedActivityListNew;
             worksOnTask.setActivityList(activityListNew);
+            List<Timetable> attachedTimetableListNew = new ArrayList<Timetable>();
+            for (Timetable timetableListNewTimetableToAttach : timetableListNew) {
+                timetableListNewTimetableToAttach = em.getReference(timetableListNewTimetableToAttach.getClass(), timetableListNewTimetableToAttach.getTimetablePK());
+                attachedTimetableListNew.add(timetableListNewTimetableToAttach);
+            }
+            timetableListNew = attachedTimetableListNew;
+            worksOnTask.setTimetableList(timetableListNew);
             worksOnTask = em.merge(worksOnTask);
             if (taskOld != null && !taskOld.equals(taskNew)) {
                 taskOld.getWorksOnTaskList().remove(worksOnTask);
@@ -177,15 +187,6 @@ public class WorksOnTaskJpaController implements Serializable {
                 worksOnProjectNew.getWorksOnTaskList().add(worksOnTask);
                 worksOnProjectNew = em.merge(worksOnProjectNew);
             }
-            if (timetableNew != null && !timetableNew.equals(timetableOld)) {
-                WorksOnTask oldWorksOnTaskOfTimetable = timetableNew.getWorksOnTask();
-                if (oldWorksOnTaskOfTimetable != null) {
-                    oldWorksOnTaskOfTimetable.setTimetable(null);
-                    oldWorksOnTaskOfTimetable = em.merge(oldWorksOnTaskOfTimetable);
-                }
-                timetableNew.setWorksOnTask(worksOnTask);
-                timetableNew = em.merge(timetableNew);
-            }
             for (Activity activityListOldActivity : activityListOld) {
                 if (!activityListNew.contains(activityListOldActivity)) {
                     activityListOldActivity.setWorksOnTask(null);
@@ -200,6 +201,17 @@ public class WorksOnTaskJpaController implements Serializable {
                     if (oldWorksOnTaskOfActivityListNewActivity != null && !oldWorksOnTaskOfActivityListNewActivity.equals(worksOnTask)) {
                         oldWorksOnTaskOfActivityListNewActivity.getActivityList().remove(activityListNewActivity);
                         oldWorksOnTaskOfActivityListNewActivity = em.merge(oldWorksOnTaskOfActivityListNewActivity);
+                    }
+                }
+            }
+            for (Timetable timetableListNewTimetable : timetableListNew) {
+                if (!timetableListOld.contains(timetableListNewTimetable)) {
+                    WorksOnTask oldWorksOnTaskOfTimetableListNewTimetable = timetableListNewTimetable.getWorksOnTask();
+                    timetableListNewTimetable.setWorksOnTask(worksOnTask);
+                    timetableListNewTimetable = em.merge(timetableListNewTimetable);
+                    if (oldWorksOnTaskOfTimetableListNewTimetable != null && !oldWorksOnTaskOfTimetableListNewTimetable.equals(worksOnTask)) {
+                        oldWorksOnTaskOfTimetableListNewTimetable.getTimetableList().remove(timetableListNewTimetable);
+                        oldWorksOnTaskOfTimetableListNewTimetable = em.merge(oldWorksOnTaskOfTimetableListNewTimetable);
                     }
                 }
             }
@@ -233,12 +245,12 @@ public class WorksOnTaskJpaController implements Serializable {
                 throw new NonexistentEntityException("The worksOnTask with id " + id + " no longer exists.", enfe);
             }
             List<String> illegalOrphanMessages = null;
-            Timetable timetableOrphanCheck = worksOnTask.getTimetable();
-            if (timetableOrphanCheck != null) {
+            List<Timetable> timetableListOrphanCheck = worksOnTask.getTimetableList();
+            for (Timetable timetableListOrphanCheckTimetable : timetableListOrphanCheck) {
                 if (illegalOrphanMessages == null) {
                     illegalOrphanMessages = new ArrayList<String>();
                 }
-                illegalOrphanMessages.add("This WorksOnTask (" + worksOnTask + ") cannot be destroyed since the Timetable " + timetableOrphanCheck + " in its timetable field has a non-nullable worksOnTask field.");
+                illegalOrphanMessages.add("This WorksOnTask (" + worksOnTask + ") cannot be destroyed since the Timetable " + timetableListOrphanCheckTimetable + " in its timetableList field has a non-nullable worksOnTask field.");
             }
             if (illegalOrphanMessages != null) {
                 throw new IllegalOrphanException(illegalOrphanMessages);

@@ -9,6 +9,7 @@ import projectguru.entities.Activity;
 import projectguru.entities.Task;
 import projectguru.entities.Timetable;
 import projectguru.entities.User;
+import projectguru.tasktree.TaskTree;
 
 /**
  *
@@ -36,6 +37,8 @@ public interface TaskHandler {
     
     public boolean isMember(Task task, User user);
     public Task getActiveTask();
+    
+    public TaskTree getTaskTree(Task task);
     
     
 }

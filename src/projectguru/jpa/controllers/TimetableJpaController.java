@@ -7,18 +7,16 @@
 package projectguru.jpa.controllers;
 
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import projectguru.entities.WorksOnTask;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import projectguru.entities.Timetable;
 import projectguru.entities.TimetablePK;
-import projectguru.jpa.controllers.exceptions.IllegalOrphanException;
+import projectguru.entities.WorksOnTask;
 import projectguru.jpa.controllers.exceptions.NonexistentEntityException;
 import projectguru.jpa.controllers.exceptions.PreexistingEntityException;
 
@@ -37,27 +35,13 @@ public class TimetableJpaController implements Serializable {
         return emf.createEntityManager();
     }
 
-    public void create(Timetable timetable) throws IllegalOrphanException, PreexistingEntityException, Exception {
+    public void create(Timetable timetable) throws PreexistingEntityException, Exception {
         if (timetable.getTimetablePK() == null) {
             timetable.setTimetablePK(new TimetablePK());
         }
+        timetable.getTimetablePK().setIDTask(timetable.getWorksOnTask().getWorksOnTaskPK().getIDTask());
         timetable.getTimetablePK().setUsername(timetable.getWorksOnTask().getWorksOnTaskPK().getUsername());
         timetable.getTimetablePK().setIDProject(timetable.getWorksOnTask().getWorksOnTaskPK().getIDProject());
-        timetable.getTimetablePK().setIDTask(timetable.getWorksOnTask().getWorksOnTaskPK().getIDTask());
-        List<String> illegalOrphanMessages = null;
-        WorksOnTask worksOnTaskOrphanCheck = timetable.getWorksOnTask();
-        if (worksOnTaskOrphanCheck != null) {
-            Timetable oldTimetableOfWorksOnTask = worksOnTaskOrphanCheck.getTimetable();
-            if (oldTimetableOfWorksOnTask != null) {
-                if (illegalOrphanMessages == null) {
-                    illegalOrphanMessages = new ArrayList<String>();
-                }
-                illegalOrphanMessages.add("The WorksOnTask " + worksOnTaskOrphanCheck + " already has an item of type Timetable whose worksOnTask column cannot be null. Please make another selection for the worksOnTask field.");
-            }
-        }
-        if (illegalOrphanMessages != null) {
-            throw new IllegalOrphanException(illegalOrphanMessages);
-        }
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -69,7 +53,7 @@ public class TimetableJpaController implements Serializable {
             }
             em.persist(timetable);
             if (worksOnTask != null) {
-                worksOnTask.setTimetable(timetable);
+                worksOnTask.getTimetableList().add(timetable);
                 worksOnTask = em.merge(worksOnTask);
             }
             em.getTransaction().commit();
@@ -85,10 +69,10 @@ public class TimetableJpaController implements Serializable {
         }
     }
 
-    public void edit(Timetable timetable) throws IllegalOrphanException, NonexistentEntityException, Exception {
+    public void edit(Timetable timetable) throws NonexistentEntityException, Exception {
+        timetable.getTimetablePK().setIDTask(timetable.getWorksOnTask().getWorksOnTaskPK().getIDTask());
         timetable.getTimetablePK().setUsername(timetable.getWorksOnTask().getWorksOnTaskPK().getUsername());
         timetable.getTimetablePK().setIDProject(timetable.getWorksOnTask().getWorksOnTaskPK().getIDProject());
-        timetable.getTimetablePK().setIDTask(timetable.getWorksOnTask().getWorksOnTaskPK().getIDTask());
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -96,30 +80,17 @@ public class TimetableJpaController implements Serializable {
             Timetable persistentTimetable = em.find(Timetable.class, timetable.getTimetablePK());
             WorksOnTask worksOnTaskOld = persistentTimetable.getWorksOnTask();
             WorksOnTask worksOnTaskNew = timetable.getWorksOnTask();
-            List<String> illegalOrphanMessages = null;
-            if (worksOnTaskNew != null && !worksOnTaskNew.equals(worksOnTaskOld)) {
-                Timetable oldTimetableOfWorksOnTask = worksOnTaskNew.getTimetable();
-                if (oldTimetableOfWorksOnTask != null) {
-                    if (illegalOrphanMessages == null) {
-                        illegalOrphanMessages = new ArrayList<String>();
-                    }
-                    illegalOrphanMessages.add("The WorksOnTask " + worksOnTaskNew + " already has an item of type Timetable whose worksOnTask column cannot be null. Please make another selection for the worksOnTask field.");
-                }
-            }
-            if (illegalOrphanMessages != null) {
-                throw new IllegalOrphanException(illegalOrphanMessages);
-            }
             if (worksOnTaskNew != null) {
                 worksOnTaskNew = em.getReference(worksOnTaskNew.getClass(), worksOnTaskNew.getWorksOnTaskPK());
                 timetable.setWorksOnTask(worksOnTaskNew);
             }
             timetable = em.merge(timetable);
             if (worksOnTaskOld != null && !worksOnTaskOld.equals(worksOnTaskNew)) {
-                worksOnTaskOld.setTimetable(null);
+                worksOnTaskOld.getTimetableList().remove(timetable);
                 worksOnTaskOld = em.merge(worksOnTaskOld);
             }
             if (worksOnTaskNew != null && !worksOnTaskNew.equals(worksOnTaskOld)) {
-                worksOnTaskNew.setTimetable(timetable);
+                worksOnTaskNew.getTimetableList().add(timetable);
                 worksOnTaskNew = em.merge(worksOnTaskNew);
             }
             em.getTransaction().commit();
@@ -153,7 +124,7 @@ public class TimetableJpaController implements Serializable {
             }
             WorksOnTask worksOnTask = timetable.getWorksOnTask();
             if (worksOnTask != null) {
-                worksOnTask.setTimetable(null);
+                worksOnTask.getTimetableList().remove(timetable);
                 worksOnTask = em.merge(worksOnTask);
             }
             em.remove(timetable);
