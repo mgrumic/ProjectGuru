@@ -412,8 +412,9 @@ public class JpaTaskHandler implements TaskHandler{
         
         return false;
     }
-
-    protected List<TaskNode> collectChildren(Task task){
+    
+    @Override
+    public List<TaskNode> getTaskNodeChildren(Task task){
         List<TaskNode> children =  task.getClosureTasksChildren()
                 .stream()
                 .filter((e) -> e.getDepth() == 1)
@@ -421,18 +422,25 @@ public class JpaTaskHandler implements TaskHandler{
                 .map((t) -> new TaskNode(t))
                 .collect(Collectors.toList());
         
-        for(TaskNode tn : children){
-            tn.setChildren(collectChildren(tn.getTask()));
-        }
-        
         return children;
       
     }
+
     
     @Override
     public TaskTree getTaskTree(Task task) {
         TaskNode root = new TaskNode(task);
-        root.setChildren(collectChildren(task));
+        recursiveTreeGeneration(root);
         return new TaskTree(root);
     }
+    
+        
+    private  void recursiveTreeGeneration(TaskNode root){
+        List<TaskNode> children = getTaskNodeChildren(root.getTask());
+        root.setChildren(children);
+        for(TaskNode tn : children){
+            recursiveTreeGeneration(tn);
+        }
+    }
+    
 }

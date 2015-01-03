@@ -5,10 +5,12 @@
  */
 package projectguru.handlers;
 
+import java.util.List;
 import projectguru.entities.Activity;
 import projectguru.entities.Task;
 import projectguru.entities.Timetable;
 import projectguru.entities.User;
+import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
 
 /**
@@ -39,6 +41,7 @@ public interface TaskHandler {
     public Task getActiveTask();
     
     public TaskTree getTaskTree(Task task);
+    public List<TaskNode> getTaskNodeChildren(Task task);
     
     
 }
