@@ -5,12 +5,20 @@
  */
 package projectguru.jpa.handlers;
 
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.persistence.EntityManagerFactory;
+import projectguru.AccessManager;
 import projectguru.entities.Activity;
 import projectguru.entities.Expense;
 import projectguru.entities.Income;
 import projectguru.entities.Task;
 import projectguru.handlers.ActivityHandler;
 import projectguru.handlers.LoggedUser;
+import projectguru.jpa.JpaAccessManager;
+import projectguru.jpa.controllers.ActivityJpaController;
+import projectguru.jpa.controllers.exceptions.NonexistentEntityException;
 
 /**
  *
@@ -33,22 +41,44 @@ public class JpaActivityHandler implements ActivityHandler {
 
     @Override
     public boolean editActivity(Activity activity) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        ActivityJpaController actCtrl = new ActivityJpaController(emf);
+        try {
+            actCtrl.edit(activity);
+        } catch (Exception ex) {
+            Logger.getLogger(JpaActivityHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;
     }
 
     @Override
     public boolean deleteActivity(Activity activity) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        ActivityJpaController actCtrl = new ActivityJpaController(emf);
+        try {
+            actCtrl.destroy(activity.getId());
+        } catch (NonexistentEntityException ex) {
+            Logger.getLogger(JpaActivityHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return true;
     }
 
     @Override
     public boolean addExpense(Activity activity, Expense exp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<Expense> expenseList = activity.getExpenseList();
+        expenseList.add(exp);
+        activity.setExpenseList(expenseList);
+        exp.setIDActivity(activity);
+        return true;
     }
 
     @Override
     public boolean addIncome(Activity activity, Income inc) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<Income> incomeList = activity.getIncomeList();
+        incomeList.add(inc);
+        activity.setIncomeList(incomeList);
+        inc.setIDActivity(activity);
+        return true;
     }
     
 }
