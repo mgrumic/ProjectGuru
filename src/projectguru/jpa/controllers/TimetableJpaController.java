@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package projectguru.jpa.controllers;
 
 import java.io.Serializable;
@@ -39,8 +38,8 @@ public class TimetableJpaController implements Serializable {
         if (timetable.getTimetablePK() == null) {
             timetable.setTimetablePK(new TimetablePK());
         }
-        timetable.getTimetablePK().setIDTask(timetable.getWorksOnTask().getWorksOnTaskPK().getIDTask());
         timetable.getTimetablePK().setUsername(timetable.getWorksOnTask().getWorksOnTaskPK().getUsername());
+        timetable.getTimetablePK().setIDTask(timetable.getWorksOnTask().getWorksOnTaskPK().getIDTask());
         timetable.getTimetablePK().setIDProject(timetable.getWorksOnTask().getWorksOnTaskPK().getIDProject());
         EntityManager em = null;
         try {
@@ -70,8 +69,8 @@ public class TimetableJpaController implements Serializable {
     }
 
     public void edit(Timetable timetable) throws NonexistentEntityException, Exception {
-        timetable.getTimetablePK().setIDTask(timetable.getWorksOnTask().getWorksOnTaskPK().getIDTask());
         timetable.getTimetablePK().setUsername(timetable.getWorksOnTask().getWorksOnTaskPK().getUsername());
+        timetable.getTimetablePK().setIDTask(timetable.getWorksOnTask().getWorksOnTaskPK().getIDTask());
         timetable.getTimetablePK().setIDProject(timetable.getWorksOnTask().getWorksOnTaskPK().getIDProject());
         EntityManager em = null;
         try {

@@ -22,7 +22,7 @@ import javax.persistence.TemporalType;
 public class TimetablePK implements Serializable {
     @Basic(optional = false)
     @Column(name = "StartTime")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
     @Basic(optional = false)
     @Column(name = "IDTask")

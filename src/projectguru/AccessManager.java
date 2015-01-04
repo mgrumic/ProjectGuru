@@ -5,6 +5,8 @@
  */
 package projectguru;
 
+import projectguru.handlers.LoggedUser;
+
 /**
  *
  * @author ZM
@@ -23,5 +25,7 @@ public abstract class AccessManager {
     {
         return manager;
     }
+    
+    public abstract LoggedUser logUserIn(String username, String password);
     
 }

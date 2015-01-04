@@ -8,7 +8,6 @@ package projectguru.entities;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -39,9 +38,8 @@ public class Timetable implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected TimetablePK timetablePK;
-    @Basic(optional = false)
     @Column(name = "EndTime")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endTime;
     @JoinColumns({
         @JoinColumn(name = "IDTask", referencedColumnName = "IDTask", insertable = false, updatable = false),
@@ -55,11 +53,6 @@ public class Timetable implements Serializable {
 
     public Timetable(TimetablePK timetablePK) {
         this.timetablePK = timetablePK;
-    }
-
-    public Timetable(TimetablePK timetablePK, Date endTime) {
-        this.timetablePK = timetablePK;
-        this.endTime = endTime;
     }
 
     public Timetable(Date startTime, int iDTask, String username, int iDProject) {

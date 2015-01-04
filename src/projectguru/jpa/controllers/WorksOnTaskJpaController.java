@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package projectguru.jpa.controllers;
 
 import java.io.Serializable;
@@ -50,8 +49,8 @@ public class WorksOnTaskJpaController implements Serializable {
         if (worksOnTask.getTimetableList() == null) {
             worksOnTask.setTimetableList(new ArrayList<Timetable>());
         }
-        worksOnTask.getWorksOnTaskPK().setIDTask(worksOnTask.getTask().getId());
         worksOnTask.getWorksOnTaskPK().setIDProject(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getIDProject());
+        worksOnTask.getWorksOnTaskPK().setIDTask(worksOnTask.getTask().getId());
         worksOnTask.getWorksOnTaskPK().setUsername(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getUsername());
         EntityManager em = null;
         try {
@@ -120,8 +119,8 @@ public class WorksOnTaskJpaController implements Serializable {
     }
 
     public void edit(WorksOnTask worksOnTask) throws IllegalOrphanException, NonexistentEntityException, Exception {
-        worksOnTask.getWorksOnTaskPK().setIDTask(worksOnTask.getTask().getId());
         worksOnTask.getWorksOnTaskPK().setIDProject(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getIDProject());
+        worksOnTask.getWorksOnTaskPK().setIDTask(worksOnTask.getTask().getId());
         worksOnTask.getWorksOnTaskPK().setUsername(worksOnTask.getWorksOnProject().getWorksOnProjectPK().getUsername());
         EntityManager em = null;
         try {

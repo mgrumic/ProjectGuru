@@ -6,6 +6,8 @@
 package projectguru.entities;
 
 import java.io.Serializable;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
@@ -75,13 +77,19 @@ public class Task implements Serializable {
     private List<Project> projectList;
 
     public Task() {
+        //worksOnTaskList = new ArrayList<>();
+        //closureTasksChildren = new ArrayList<>();
+        //closureTasksParents = new ArrayList<>();
+        //projectList = new ArrayList<>();
     }
 
     public Task(Integer id) {
+        this();
         this.id = id;
     }
 
     public Task(Integer id, String name, int assumedManHours, Date startDate, Date endDate, Date deadline) {
+        this();
         this.id = id;
         this.name = name;
         this.assumedManHours = assumedManHours;
@@ -163,7 +171,7 @@ public class Task implements Serializable {
     }
 
     public List<ClosureTasks> getClosureTasksParents() {
-        return closureTasksParents;
+        return  closureTasksParents;
     }
 
     public void setClosureTasksParents(List<ClosureTasks> closureTasksParents) {

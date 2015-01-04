@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package projectguru.jpa.controllers;
 
 import java.io.Serializable;
@@ -46,8 +45,8 @@ public class WorksOnProjectJpaController implements Serializable {
         if (worksOnProject.getWorksOnTaskList() == null) {
             worksOnProject.setWorksOnTaskList(new ArrayList<WorksOnTask>());
         }
-        worksOnProject.getWorksOnProjectPK().setUsername(worksOnProject.getUser().getUsername());
         worksOnProject.getWorksOnProjectPK().setIDProject(worksOnProject.getProject().getId());
+        worksOnProject.getWorksOnProjectPK().setUsername(worksOnProject.getUser().getUsername());
         EntityManager em = null;
         try {
             em = getEntityManager();
@@ -100,8 +99,8 @@ public class WorksOnProjectJpaController implements Serializable {
     }
 
     public void edit(WorksOnProject worksOnProject) throws IllegalOrphanException, NonexistentEntityException, Exception {
-        worksOnProject.getWorksOnProjectPK().setUsername(worksOnProject.getUser().getUsername());
         worksOnProject.getWorksOnProjectPK().setIDProject(worksOnProject.getProject().getId());
+        worksOnProject.getWorksOnProjectPK().setUsername(worksOnProject.getUser().getUsername());
         EntityManager em = null;
         try {
             em = getEntityManager();

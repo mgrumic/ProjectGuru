@@ -6,6 +6,7 @@
 package projectguru.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -52,6 +53,19 @@ public class WorksOnTask implements Serializable {
     @JoinColumn(name = "IDTask", referencedColumnName = "ID", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Task task;
+    
+     @JoinColumn(name = "Username", referencedColumnName = "Username", insertable = false, updatable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private User user;
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
     @JoinColumns({
         @JoinColumn(name = "Username", referencedColumnName = "Username", insertable = false, updatable = false),
         @JoinColumn(name = "IDProject", referencedColumnName = "IDProject", insertable = false, updatable = false)})
@@ -59,19 +73,24 @@ public class WorksOnTask implements Serializable {
     private WorksOnProject worksOnProject;
 
     public WorksOnTask() {
+        //activityList = new ArrayList<>();
+        //timetableList = new ArrayList<>();
     }
 
     public WorksOnTask(WorksOnTaskPK worksOnTaskPK) {
+        this();
         this.worksOnTaskPK = worksOnTaskPK;
     }
 
     public WorksOnTask(WorksOnTaskPK worksOnTaskPK, int privileges, boolean working) {
+        this();
         this.worksOnTaskPK = worksOnTaskPK;
         this.privileges = privileges;
         this.working = working;
     }
 
     public WorksOnTask(int iDTask, String username, int iDProject) {
+        this();
         this.worksOnTaskPK = new WorksOnTaskPK(iDTask, username, iDProject);
     }
 
@@ -100,7 +119,7 @@ public class WorksOnTask implements Serializable {
     }
 
     public List<Activity> getActivityList() {
-        return activityList;
+        return (activityList);
     }
 
     public void setActivityList(List<Activity> activityList) {
@@ -150,7 +169,7 @@ public class WorksOnTask implements Serializable {
     }
 
     public List<Timetable> getTimetableList() {
-        return timetableList;
+        return (timetableList);
     }
 
     public void setTimetableList(List<Timetable> timetableList) {

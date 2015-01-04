@@ -19,7 +19,12 @@
       <property name="javax.persistence.jdbc.user" value="student"/>
       <property name="javax.persistence.jdbc.password" value="student"/>
       <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-      <property name="javax.persistence.jdbc.password" value=""/>
+      <property name="eclipselink.logging.file" value="output.log"/>
+      <property name="eclipselink.logging.logger" value="JavaLogger"/>
+      <property name="eclipselink.logging.level" value="FINE"/>
+      <property name="eclipselink.logging.level.sql" value="FINE"/>
+      <property name="eclipselink.logging.parameters" value="true"/>
+      
     </properties>
   </persistence-unit>
 </persistence>

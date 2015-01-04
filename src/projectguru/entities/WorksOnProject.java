@@ -6,6 +6,7 @@
 package projectguru.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -48,18 +49,22 @@ public class WorksOnProject implements Serializable {
     private List<WorksOnTask> worksOnTaskList;
 
     public WorksOnProject() {
+        worksOnTaskList = new ArrayList<>();
     }
 
     public WorksOnProject(WorksOnProjectPK worksOnProjectPK) {
+        this();
         this.worksOnProjectPK = worksOnProjectPK;
     }
 
     public WorksOnProject(WorksOnProjectPK worksOnProjectPK, int privileges) {
+        this();
         this.worksOnProjectPK = worksOnProjectPK;
         this.privileges = privileges;
     }
 
     public WorksOnProject(String username, int iDProject) {
+        this();
         this.worksOnProjectPK = new WorksOnProjectPK(username, iDProject);
     }
 
