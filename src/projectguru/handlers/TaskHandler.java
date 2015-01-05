@@ -5,6 +5,7 @@
  */
 package projectguru.handlers;
 
+import java.util.Date;
 import java.util.List;
 import projectguru.entities.Activity;
 import projectguru.entities.Task;
@@ -12,6 +13,7 @@ import projectguru.entities.Timetable;
 import projectguru.entities.User;
 import projectguru.handlers.exceptions.BusyWorkersException;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
+import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
@@ -26,7 +28,7 @@ public interface TaskHandler {
     public boolean checkMemberPrivileges(Task task);
     public boolean checkInsightPrivileges(Task task);
     
-    public boolean addSubtask(Task task, Task subtask) throws EntityDoesNotExistException, StoringException;
+    public boolean addSubtask(Task task, Task subtask) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException;
     public boolean editSubtask(Task task) throws EntityDoesNotExistException, StoringException;
     public boolean deleteSubtask(Task task) throws EntityDoesNotExistException;
     
@@ -49,7 +51,9 @@ public interface TaskHandler {
     public List<TaskNode> getTaskNodeChildren(Task task);
     
     public boolean startTask(Task task) throws EntityDoesNotExistException, BusyWorkersException, StoringException;
-    
+    public boolean endTask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
+    public boolean createNewTimetableEntry(Date startTime, Date endTime) throws StoringException;
+    public boolean updateActiveTime(Date endTime) throws StoringException;
     public Task getUpdatedTask(Task task);
     
 }

@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +31,7 @@ import projectguru.handlers.LoggedUser;
 import projectguru.handlers.TaskHandler;
 import projectguru.handlers.exceptions.BusyWorkersException;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
+import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.jpa.JpaAccessManager;
 import projectguru.jpa.controllers.ActivityJpaController;
@@ -103,7 +105,7 @@ public class JpaTaskHandler implements TaskHandler {
     }
 
     @Override
-    public boolean addSubtask(Task task, Task subtask) throws EntityDoesNotExistException, StoringException {
+    public boolean addSubtask(Task task, Task subtask) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException {
 
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
@@ -120,64 +122,69 @@ public class JpaTaskHandler implements TaskHandler {
 
             //moramo provjeriti da li trenutni korisnik ima pravo da uradi ovo
             if (checkTaskChefPrivileges(task)) {
-                //Kad je sve spremno otvorimo try-catch blok da bi sprijecili na neodgovarajuca greska ode u GUI
-                try {
-                    //Unutar try-catch bloka otvorimo transakciju, a zatvaramo je kad sve uspjesno zavrsi, jer nema smisla da se zavrsi parcijalno
-                    em.getTransaction().begin();
+                throw new InsuficientPrivilegesException();
+            }
+            
+            //Kad je sve spremno otvorimo try-catch blok da bi sprijecili na neodgovarajuca greska ode u GUI
+            try {
+                //Unutar try-catch bloka otvorimo transakciju, a zatvaramo je kad sve uspjesno zavrsi, jer nema smisla da se zavrsi parcijalno
+                em.getTransaction().begin();
 
-                    //ako podzadatak ne postji u bazi (to provjeravamo ovako), onda ima smisla da ga dodamo, to ova metoda radi
-                    if (subtask.getId() == null || em.find(Task.class, subtask.getId()) == null) {
+                //ako podzadatak ne postji u bazi (to provjeravamo ovako), onda ima smisla da ga dodamo, to ova metoda radi
+                if (subtask.getId() == null || em.find(Task.class, subtask.getId()) == null) {
                         //metoda persist dodaje novi objekat u bazu, da li ce se i ostali objekti koji su povezani za njega dodati u bazu zavisi
-                        //od CascadeType podesavanja, 
-                        //ali o tome ne trebate sad razmisljati. Vi ih uvijek dodavajte posebno.
-                        em.persist(subtask);
-                        //Necemo cekati da zatvorimo transakciju da bismo dobili autogenerisane kljuceve, jer nam trebaju
-                        em.flush(); //u ovom trenutku subtask je dobio kljuc, rollback moze ovo ponisiti
-                    }
+                    //od CascadeType podesavanja, 
+                    //ali o tome ne trebate sad razmisljati. Vi ih uvijek dodavajte posebno.
+                    em.persist(subtask);
+                    //Necemo cekati da zatvorimo transakciju da bismo dobili autogenerisane kljuceve, jer nam trebaju
+                    em.flush(); //u ovom trenutku subtask je dobio kljuc, rollback moze ovo ponisiti
+                }
 
                     //svakom nadzadatku trebamo dodati ovaj podzadatak sa razlicitim dubinama, tako funkcionise closure tabela
-                    //ja sam dao ovo ime Parents, jer je originalno generisani naziv bio task1 ili tako nesto, ali mozda je bolji naziv Ancestors
-                    for (ClosureTasks ct : task.getClosureTasksParents()) {
+                //ja sam dao ovo ime Parents, jer je originalno generisani naziv bio task1 ili tako nesto, ali mozda je bolji naziv Ancestors
+                for (ClosureTasks ct : task.getClosureTasksParents()) {
 
-                        int depth = ct.getDepth();
-                        Task pt = ct.getParent();
-                        ClosureTasks nct = new ClosureTasks(pt.getId(), subtask.getId());
-                        nct.setDepth(depth + 1);
-                        em.persist(nct);
-
-                    }
-
-                    //dodali smo za sve nadzadtake zadatka 'task'
-                    //i jos da dodamo za zadatak 'task' unos u closure tabelu
-                    ClosureTasks nct = new ClosureTasks(task.getId(), subtask.getId());
-                    nct.setDepth(1);
+                    int depth = ct.getDepth();
+                    Task pt = ct.getParent();
+                    ClosureTasks nct = new ClosureTasks(pt.getId(), subtask.getId());
+                    nct.setDepth(depth + 1);
                     em.persist(nct);
 
-                    //zavrsila je transakcija, komitujemo izmjene
-                    em.getTransaction().commit();
+                }
+
+                    //dodali smo za sve nadzadtake zadatka 'task'
+                //i jos da dodamo za zadatak 'task' unos u closure tabelu
+                ClosureTasks nct = new ClosureTasks(task.getId(), subtask.getId());
+                nct.setDepth(1);
+                em.persist(nct);
+
+                //zavrsila je transakcija, komitujemo izmjene
+                em.getTransaction().commit();
 
                     // e sad ovaj dio je malo triki
-                    //Posto smo unijeli izmjene u tabelu Closure_Tasks, te izmjen imaju uticaj na liste closureTasksParents i closureTasksChildren
-                    //Ali te dve liste nece biti update-ovane, dok ne uradimo ovo:
-                    //Posto se izmjene odnose na ova dva zadatka, onda njih refresh-ujemo (samo poslije commit-a )
-                    em.refresh(task);
-                    em.refresh(subtask);
-                    //To morate, uraditi svaki put kad unosite neke indirekte izmjene nad nekim entitetom
+                //Posto smo unijeli izmjene u tabelu Closure_Tasks, te izmjen imaju uticaj na liste closureTasksParents i closureTasksChildren
+                //Ali te dve liste nece biti update-ovane, dok ne uradimo ovo:
+                //Posto se izmjene odnose na ova dva zadatka, onda njih refresh-ujemo (samo poslije commit-a )
+                em.refresh(task);
+                em.refresh(subtask);
+                //To morate, uraditi svaki put kad unosite neke indirekte izmjene nad nekim entitetom
 
-                    return true;
-                } catch (Exception ex) {
-                    //Ako je doslo do greske ponistavamo izmjene
-                    if(em.getTransaction().isActive())em.getTransaction().rollback();
-                    ex.printStackTrace();
-                    // javim GUI-ju da je doslo do greske pri sacuvavanju u bazu.
-                    throw new StoringException(ex.getLocalizedMessage());
+                return true;
+            } catch (Exception ex) {
+                //Ako je doslo do greske ponistavamo izmjene
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
                 }
+                ex.printStackTrace();
+                // javim GUI-ju da je doslo do greske pri sacuvavanju u bazu.
+                throw new StoringException(ex.getLocalizedMessage());
             }
+
         } finally {
             //zatvorimo EntityManager
             em.close();
         }
-        return false;
+
     }
 
     @Override
@@ -266,7 +273,7 @@ public class JpaTaskHandler implements TaskHandler {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
         try {
-            if (task.getId() == null ||(task = em.find(Task.class, task.getId())) == null) {
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
                 throw new EntityDoesNotExistException("Task does not exists in database.");
             }
 
@@ -279,69 +286,66 @@ public class JpaTaskHandler implements TaskHandler {
             }
 
             String username = user.getUsername();
+            WorksOnTask nwot = null;
 
-            //ako je u pitanju root task
-            if (task.getProjectList().size() > 0) {
+            try {
+                em.getTransaction().begin();
+
+                //ako je u pitanju root task
+                if (task.getProjectList().size() > 0) {
                 //zbog bug-a u JPA nove metode koje su dodane u Java 8 Stream API ne rade. Mozda i nije bug ali je greska u arhitekturi.
-                //Da bi omogucio stream-ove moramo pravo konstruisati odgovarajucu ArrayListu, ili neku drugu.
-                //sad jednostavno provjerimo da li je user clan ovog projekta
-                if (new ArrayList<>(task.getProjectList().get(0).getWorksOnProjectList()).stream().anyMatch(
-                        (wop) -> wop.getWorksOnProjectPK().getUsername().equals(username)
-                )) {
-                    try {
-                        em.getTransaction().begin();
-                        WorksOnTask nwot = new WorksOnTask(
+                    //Da bi omogucio stream-ove moramo pravo konstruisati odgovarajucu ArrayListu, ili neku drugu.
+                    //sad jednostavno provjerimo da li je user clan ovog projekta
+                    if (new ArrayList<>(task.getProjectList().get(0).getWorksOnProjectList()).stream().anyMatch(
+                            (wop) -> wop.getWorksOnProjectPK().getUsername().equals(username)
+                    )) {
+                        nwot = new WorksOnTask(
                                 new WorksOnTaskPK(task.getId(), username, task.getProjectList().get(0).getId()),
                                 Privileges.MEMBER.ordinal(), false);
-                        em.persist(nwot);
-
-                        em.getTransaction().commit();
-                        em.refresh(task);
-                        em.refresh(user);
-                        return true;
-                    } catch (Exception ex) {
-                        if(em.getTransaction().isActive())em.getTransaction().rollback();
-                        throw new StoringException(ex.getLocalizedMessage());
+                    } else {
+                        throw new Exception("User is not member of project.");
                     }
                 } else {
-                    //nije clan projekta
-                    return false;
-                }
-            }
+                    //nije root task, treba naci parenta
+                    for (ClosureTasks ct : task.getClosureTasksParents()) {
+                        if (ct.getDepth() == 1) {
 
-            //nije root task, treba naci parenta
-            for (ClosureTasks ct : task.getClosureTasksParents()) {
-                if (ct.getDepth() == 1) {
-                    Task parent = ct.getParent();
-                    if (isMember(parent, user)) {
-                        try {
-                            em.getTransaction().begin();
-                            int projectId = parent.getWorksOnTaskList().get(0).getWorksOnTaskPK().getIDProject();
+                            Task parent = ct.getParent();
 
-                            WorksOnTask nwot = new WorksOnTask(
-                                    new WorksOnTaskPK(task.getId(), user.getUsername(), projectId),
-                                    Privileges.MEMBER.ordinal(), false);
+                            if (isMember(parent, user)) {
 
-                            em.persist(nwot);
-
-                            em.getTransaction().commit();
-                            em.refresh(task);
-                            em.refresh(user);
-                        } catch (Exception ex) {
-                            //ex.printStackTrace();
-                            if(em.getTransaction().isActive())em.getTransaction().rollback();
-                            throw new StoringException(ex.getLocalizedMessage());
+                                int projectId = parent.getWorksOnTaskList().get(0).getWorksOnTaskPK().getIDProject();
+                                nwot = new WorksOnTask(
+                                        new WorksOnTaskPK(task.getId(), user.getUsername(), projectId),
+                                        Privileges.MEMBER.ordinal(), false);
+                            } else {
+                                throw new Exception("User is not member of parent task.");
+                            }
                         }
-                        return true;
-                    } else {
-                        return false;
                     }
+  
                 }
+                
+                if(nwot == null){
+                    throw new Exception("Task is not root task nor it has parent!");
+                }
+
+                em.persist(nwot);
+                em.getTransaction().commit();
+                em.refresh(task);
+                em.refresh(user);
+                return true;
+            } catch (Exception ex) {
+                //ex.printStackTrace();
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                throw new StoringException(ex.getLocalizedMessage());
             }
         } finally {
             em.close();
         }
-        return false;
+
 
     }
 
@@ -495,10 +499,12 @@ public class JpaTaskHandler implements TaskHandler {
         return null;
     }
 
+    @Override
     public Task getActiveTask(User user) throws EntityDoesNotExistException {
         return getActiveTask(user.getUsername());
     }
 
+    @Override
     public Task getActiveTask(String username) throws EntityDoesNotExistException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
@@ -672,13 +678,126 @@ public class JpaTaskHandler implements TaskHandler {
         return false;
     }
 
-    public boolean endTask(Task task) {
-        
-        return false;
+    @Override
+    public boolean endTask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException{
+
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
+                throw new EntityDoesNotExistException("Task does not exists in database.");
+            }
+
+            try {
+                em.getTransaction().begin();
+                Task prnt1 = null;
+                for (ClosureTasks ct : task.getClosureTasksParents()) {
+                    if (ct.getDepth() == 1) {
+                        prnt1 = ct.getParent();
+                        break;
+                    }
+                }
+                if (prnt1 == null) {
+                    //uraditi nesto kad je root task zavrsen
+                    for (WorksOnTask wot : task.getWorksOnTaskList()) {
+                        wot.setWorking(false);
+                        em.merge(wot);
+                    }
+                } else {
+
+                    Task prnt = prnt1;
+
+                    new ArrayList<>(task.getWorksOnTaskList())
+                            .stream()
+                            .filter((wot) -> wot.getWorking())
+                            .forEach((wot) -> {
+
+                                wot.setWorking(false);
+                                WorksOnTask pwot = getWorksOnTask(prnt, wot.getUser());
+                                pwot.setWorking(true);
+                                em.merge(wot);
+                                em.merge(pwot);
+
+                            });
+
+                }
+
+                em.getTransaction().commit();
+                if (prnt1 != null) {
+                    em.refresh(prnt1);
+                }
+                em.refresh(task);
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                ex.printStackTrace();
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+
+        } finally {
+            em.close();
+        }
+        return true;
     }
     
-    public boolean updateActiveTime(){
-        
+    //pronalazi trenutni zadatak i za trenutni zadatak i korisnika dodaje novi unos satnice
+    //tj. otvara novu sesiju
+   @Override
+   public boolean createNewTimetableEntry(Date startTime, Date endTime) throws StoringException{
+       EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+            try{
+            em.getTransaction().begin();
+                Query q = em.createQuery(
+                        "SELECT wot FROM  WorksOnTask wot  WHERE wot.worksOnTaskPK.username = :username AND wot.working = true  ",
+                    WorksOnTask.class);
+                
+                q.setParameter("username", loggedUser.getUser().getUsername());
+                 WorksOnTask wot = (WorksOnTask)q.getSingleResult();
+                Timetable tt = new Timetable(
+                        startTime, 
+                        wot.getWorksOnTaskPK().getIDTask(), 
+                        loggedUser.getUser().getUsername(), 
+                        wot.getWorksOnTaskPK().getIDProject()
+                );
+                tt.setEndTime(endTime);
+                em.persist(tt);
+                em.getTransaction().commit();
+            }catch(Exception ex){
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+        } finally {
+            em.close();
+        }
+        return false;
+   }
+    
+    //Dodaje novo zavrsno vrijeme kraja u aktivnu sesiju, ako nije otvorena nova sesija, produzice staru.
+    @Override
+    public boolean updateActiveTime(Date endTime) throws StoringException{
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+            try{
+            em.getTransaction().begin();
+                Query q = em.createQuery(
+                        "SELECT t FROM  WorksOnTask wot,  IN(wot.timetableList) t WHERE wot.worksOnTaskPK.username = :username AND wot.working = true AND t.timetablePK.startTime = (  SELECT MAX(t1.timetablePK.startTime)  FROM WorksOnTask wot1,  IN(wot1.timetableList) t1 WHERE wot1.worksOnTaskPK.username = :username AND wot1.working = true ) ",
+                    Timetable.class);
+                
+                q.setParameter("username", loggedUser.getUser().getUsername());
+                Timetable tt = (Timetable)q.getSingleResult();
+                tt.setEndTime(endTime);
+                em.merge(tt);
+                em.getTransaction().commit();
+            }catch(Exception ex){
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+        } finally {
+            em.close();
+        }
         return false;
     }
     

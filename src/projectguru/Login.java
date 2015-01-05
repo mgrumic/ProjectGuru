@@ -130,7 +130,7 @@ public class Login extends Application {
 //        Activity ac =new Activity(null, "neki opis");
 //        th.addActivity(task, ac);
         
-        Timetable tt = new Timetable(null, iDTask, STYLESHEET_MODENA, iDProject);
+        //Timetable tt = new Timetable(null, iDTask, STYLESHEET_MODENA, iDProject);
         
         System.exit(0);
         
