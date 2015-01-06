@@ -9,17 +9,24 @@ import java.util.List;
 import projectguru.entities.Document;
 import projectguru.entities.DocumentRevision;
 import projectguru.entities.Project;
+import projectguru.handlers.exceptions.EntityDoesNotExistException;
+import projectguru.handlers.exceptions.InsuficientPrivilegesException;
+import projectguru.handlers.exceptions.StoringException;
 
 /**
  *
  * @author ZM
  */
 public interface DocumentHandler {
-       
-    public boolean addRevision(Document original, DocumentRevision revision);
-    public boolean editDocument(Document document);
-    public boolean editRevision(DocumentRevision revision);
-    
+
+    public boolean checkPrivileges(Document document);
+
+    public boolean addRevision(Document original, DocumentRevision revision) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
+
+    public boolean editDocument(Document document) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
+
+    public boolean editRevision(DocumentRevision revision) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
+
     public List<DocumentRevision> getRevisions(Document document);
-    
+
 }
