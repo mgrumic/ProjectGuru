@@ -17,25 +17,37 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import projectguru.handlers.LoggedUser;
 
 /**
  *
  * @author ZM
  */
-public class TeamOfficeController implements Initializable {
+
+public class TeamOfficeController {
+
+    @FXML
+    private ResourceBundle resources;
+
+    @FXML
+    private URL location;
 
     @FXML
     private Label label;
 
+    /**
+     * Moje varijable
+     */
+    private LoggedUser user;
+    
     @FXML
-    private void handleButtonAction(ActionEvent event) throws IOException {
+    void initialize() {
+        assert label != null : "fx:id=\"label\" was not injected: check your FXML file 'TeamOffice.fxml'.";
 
-      
     }
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+    
+    public void setUser(LoggedUser user)
+    {
+        this.user = user;
     }
-
 }

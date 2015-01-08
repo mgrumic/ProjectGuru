@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.net.*?>
@@ -13,7 +14,7 @@
         <URL value="@/projectguru/css/login.css" />
     </stylesheets>
    <children>
-      <Pane id="logPane" layoutX="187.0" layoutY="146.0" prefHeight="199.0" prefWidth="325.0">
+      <Pane id="logPane" layoutX="187.0" layoutY="139.0" prefHeight="199.0" prefWidth="325.0">
          <children>
             <Label layoutX="29.0" layoutY="44.0" text="Username:" textFill="WHITE">
                <font>
@@ -24,11 +25,12 @@
                <font>
                   <Font name="System Bold" size="14.0" />
                </font></Label>
-            <TextField fx:id="tfPassword" layoutX="29.0" layoutY="109.0" prefHeight="25.0" prefWidth="267.0" />
-            <Button fx:id="btnExit" layoutX="218.0" layoutY="149.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Exit" />
-            <Button fx:id="btnLogin" layoutX="130.0" layoutY="149.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Login" />
+            <PasswordField fx:id="tbPassword" layoutX="29.0" layoutY="109.0" prefHeight="25.0" prefWidth="267.0" />
+            <Button fx:id="btnLogin" layoutX="130.0" layoutY="149.0" mnemonicParsing="false" onAction="#btnLoginClicked" prefHeight="25.0" prefWidth="78.0" text="Login" />
+            <Button fx:id="btnExit" layoutX="218.0" layoutY="149.0" mnemonicParsing="false" onAction="#btnExitClicked" prefHeight="25.0" prefWidth="78.0" text="Exit" />
             <Label fx:id="lblWarning" layoutX="29.0" layoutY="14.0" prefHeight="17.0" prefWidth="267.0" text="Wrong username or password" textFill="WHITE" />
          </children>
       </Pane>
+      <ImageView fx:id="imgViewLogo" fitHeight="70.0" fitWidth="145.0" layoutX="277.0" layoutY="36.0" pickOnBounds="true" preserveRatio="true" />
    </children>
 </AnchorPane>

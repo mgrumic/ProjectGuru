@@ -31,21 +31,30 @@ public class JpaActivityHandler implements ActivityHandler {
     public JpaActivityHandler(LoggedUser user) {
         this.user = user;
     }
+
     //TODO
+
     @Override
     public boolean checkActivityChefPrivileges(Activity activity) {
 
-        if (user.getUser().equals(activity.getWorksOnTask().getUser())) {
-            return true;
+        try {
+            if (user.getUser().getUsername().equals(getUpdatedActivity(activity).getWorksOnTask().getUser().getUsername())) {
+                return true;
+            }
+        } catch (EntityDoesNotExistException ex) {
+            Logger.getLogger(JpaActivityHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return false;
     }
 
-    //@Override
+   //@Override
     //public boolean addActivity(Task task, Activity activity) {
-    //    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     //}
+    /*
+     *  Activity objekat treba da je azuriran !
+     *
+     */
     @Override
     public boolean editActivity(Activity activity) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
@@ -54,14 +63,14 @@ public class JpaActivityHandler implements ActivityHandler {
             if (activity.getId() == null || em.find(Activity.class, activity.getId()) == null) {
                 throw new EntityDoesNotExistException("Activity does not exist in database.");
             }
-            if (checkActivityChefPrivileges(activity)) {
+            if (!checkActivityChefPrivileges(activity)) {
                 throw new InsuficientPrivilegesException();
             }
             try {
                 em.getTransaction().begin();
                 em.merge(activity);
                 em.getTransaction().commit();
-                
+
             } catch (Exception ex) {
                 Logger.getLogger(JpaTaskHandler.class.getName()).log(Level.SEVERE, null, ex);
                 ex.printStackTrace();
@@ -73,10 +82,35 @@ public class JpaActivityHandler implements ActivityHandler {
         return true;
     }
 
-    //TODO
     @Override
-    public boolean deleteActivity(Activity activity) {
+    public boolean deleteActivity(Activity activity) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            if (activity.getId() == null || (activity = em.find(Activity.class, activity.getId())) == null) {
+                throw new EntityDoesNotExistException("Activity does not exist.");
+            }
+            if (checkActivityChefPrivileges(activity)) {
+                throw new InsuficientPrivilegesException();
+            }
+            try {
+
+                em.getTransaction().begin();
+                em.remove(activity);
+                em.getTransaction().commit();
+
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+        } finally {
+            em.close();
+        }
         return true;
+
     }
 
     @Override
@@ -91,18 +125,16 @@ public class JpaActivityHandler implements ActivityHandler {
                 throw new InsuficientPrivilegesException();
             }
             try {
+
                 em.getTransaction().begin();
-                if (exp.getId() == null || (exp = em.find(Expense.class, exp.getId())) == null) {
+                exp.setIDActivity(activity);
+
+                if (exp.getId() == null || (em.find(Expense.class, exp.getId())) == null) {
                     em.persist(exp);
                     em.flush();
                 }
-
-                activity.getExpenseList().add(exp);
-                exp.setIDActivity(activity);
-
                 em.getTransaction().commit();
                 em.refresh(activity);
-                em.refresh(exp);
             } catch (Exception ex) {
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
@@ -129,17 +161,15 @@ public class JpaActivityHandler implements ActivityHandler {
             }
             try {
                 em.getTransaction().begin();
-                if (inc.getId() == null || (inc = em.find(Income.class, inc.getId())) == null) {
+
+                inc.setIDActivity(activity);
+                if (inc.getId() == null || (em.find(Income.class, inc.getId())) == null) {
                     em.persist(inc);
                     em.flush();
                 }
-
-                activity.getIncomeList().add(inc);
-                inc.setIDActivity(activity);
-
                 em.getTransaction().commit();
                 em.refresh(activity);
-                em.refresh(inc);
+
             } catch (Exception ex) {
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
@@ -153,4 +183,15 @@ public class JpaActivityHandler implements ActivityHandler {
         return true;
     }
 
+    @Override
+    public Activity getUpdatedActivity(Activity activity) throws EntityDoesNotExistException {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        if (activity.getId() == null || (activity = em.find(Activity.class, activity.getId())) == null) {
+            throw new EntityDoesNotExistException("Activity doesn't exist !");
+        }
+        return activity;
+
+    }
 }

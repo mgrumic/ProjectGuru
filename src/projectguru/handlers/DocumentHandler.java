@@ -27,6 +27,6 @@ public interface DocumentHandler {
 
     public boolean editRevision(DocumentRevision revision) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
 
-    public List<DocumentRevision> getRevisions(Document document);
+    public List<DocumentRevision> getRevisions(Document document) throws EntityDoesNotExistException;
 
 }

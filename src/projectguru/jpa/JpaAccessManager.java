@@ -27,13 +27,13 @@ public class JpaAccessManager extends AccessManager{
     public EntityManagerFactory getFactory() {
         return factory;
     }
-    
-    
-
     @Override
     public LoggedUser logUserIn(String username, String password) {
-        UserJpaController userCtrl = new UserJpaController(factory);
-        User u = userCtrl.findUser(username);
+        
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+       
+        User u = em.find(User.class, username);
         if(u != null && u.getPassword().equals(password)){
             return new JpaLoggedUser(u);
         }

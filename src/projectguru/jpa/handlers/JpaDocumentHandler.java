@@ -147,7 +147,16 @@ public class JpaDocumentHandler implements DocumentHandler {
     }
 
     @Override
-    public List<DocumentRevision> getRevisions(Document document) {
+    public List<DocumentRevision> getRevisions(Document document) throws EntityDoesNotExistException {
+        
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        
+        if(document.getId() == null || (document = em.find(Document.class, document.getId())) == null)
+        {
+            throw new EntityDoesNotExistException("Document doesn't exist in database !");
+        }
+        
         return document.getDocumentRevisionList();
     }
 

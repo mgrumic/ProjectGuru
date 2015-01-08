@@ -63,7 +63,7 @@ public class JpaTaskHandler implements TaskHandler {
     public boolean checkTaskChefPrivileges(Task task) {
 
         //direktna provjera:
-        if (loggedUser.getUser().equals(getChef(task))) {
+        if (loggedUser.getUser().getUsername().equals(getChef(task).getUsername())) {
             return true;
         }
 
@@ -226,9 +226,9 @@ public class JpaTaskHandler implements TaskHandler {
     public boolean setChef(Task task, User user) throws EntityDoesNotExistException, StoringException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
 
-        if (!checkTaskChefPrivileges(task)) {
-            return false;
-        }
+      //  if (!checkTaskChefPrivileges(task)) {
+        //    return false;
+       // }
 
         EntityManager em = emf.createEntityManager();
         try {
@@ -281,9 +281,9 @@ public class JpaTaskHandler implements TaskHandler {
                 throw new EntityDoesNotExistException("User does not exists in database.");
             }
 
-            if (!checkTaskChefPrivileges(task)) {
-                return false;
-            }
+           // if (!checkTaskChefPrivileges(task)) {
+           //     return false;
+          //  }
 
             String username = user.getUsername();
             WorksOnTask nwot = null;

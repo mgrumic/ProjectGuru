@@ -30,9 +30,11 @@ public interface ActivityHandler {
 
     public boolean editActivity(Activity activity) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
 
-    public boolean deleteActivity(Activity activity);
+    public boolean deleteActivity(Activity activity) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
 
     public boolean addExpense(Activity activity, Expense exp) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
 
     public boolean addIncome(Activity activity, Income inc) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
+    
+    public Activity getUpdatedActivity(Activity activity)throws EntityDoesNotExistException; 
 }
