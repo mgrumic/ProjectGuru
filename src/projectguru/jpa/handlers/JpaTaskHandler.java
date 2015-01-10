@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import projectguru.AccessManager;
 import projectguru.entities.Activity;
@@ -33,6 +34,8 @@ import projectguru.handlers.exceptions.BusyWorkersException;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
+import projectguru.handlers.exceptions.UnfinishedSubtaskException;
+import projectguru.handlers.exceptions.UserNotTaskMemberException;
 import projectguru.jpa.JpaAccessManager;
 import projectguru.jpa.controllers.ActivityJpaController;
 import projectguru.jpa.controllers.ClosureTasksJpaController;
@@ -44,7 +47,6 @@ import projectguru.jpa.controllers.exceptions.NonexistentEntityException;
 import projectguru.jpa.controllers.exceptions.PreexistingEntityException;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
-
 
 /**
  *
@@ -63,7 +65,7 @@ public class JpaTaskHandler implements TaskHandler {
     public boolean checkTaskChefPrivileges(Task task) {
 
         //direktna provjera:
-        if (loggedUser.getUser().getUsername().equals(getChef(task).getUsername())) {
+        if (loggedUser.getUser().equals(getChef(task))) {
             return true;
         }
 
@@ -121,10 +123,10 @@ public class JpaTaskHandler implements TaskHandler {
             }
 
             //moramo provjeriti da li trenutni korisnik ima pravo da uradi ovo
-            if (checkTaskChefPrivileges(task)) {
+            if (!checkTaskChefPrivileges(task)) {
                 throw new InsuficientPrivilegesException();
             }
-            
+
             //Kad je sve spremno otvorimo try-catch blok da bi sprijecili na neodgovarajuca greska ode u GUI
             try {
                 //Unutar try-catch bloka otvorimo transakciju, a zatvaramo je kad sve uspjesno zavrsi, jer nema smisla da se zavrsi parcijalno
@@ -132,7 +134,7 @@ public class JpaTaskHandler implements TaskHandler {
 
                 //ako podzadatak ne postji u bazi (to provjeravamo ovako), onda ima smisla da ga dodamo, to ova metoda radi
                 if (subtask.getId() == null || em.find(Task.class, subtask.getId()) == null) {
-                        //metoda persist dodaje novi objekat u bazu, da li ce se i ostali objekti koji su povezani za njega dodati u bazu zavisi
+                    //metoda persist dodaje novi objekat u bazu, da li ce se i ostali objekti koji su povezani za njega dodati u bazu zavisi
                     //od CascadeType podesavanja, 
                     //ali o tome ne trebate sad razmisljati. Vi ih uvijek dodavajte posebno.
                     em.persist(subtask);
@@ -140,7 +142,7 @@ public class JpaTaskHandler implements TaskHandler {
                     em.flush(); //u ovom trenutku subtask je dobio kljuc, rollback moze ovo ponisiti
                 }
 
-                    //svakom nadzadatku trebamo dodati ovaj podzadatak sa razlicitim dubinama, tako funkcionise closure tabela
+                //svakom nadzadatku trebamo dodati ovaj podzadatak sa razlicitim dubinama, tako funkcionise closure tabela
                 //ja sam dao ovo ime Parents, jer je originalno generisani naziv bio task1 ili tako nesto, ali mozda je bolji naziv Ancestors
                 for (ClosureTasks ct : task.getClosureTasksParents()) {
 
@@ -152,7 +154,7 @@ public class JpaTaskHandler implements TaskHandler {
 
                 }
 
-                    //dodali smo za sve nadzadtake zadatka 'task'
+                //dodali smo za sve nadzadtake zadatka 'task'
                 //i jos da dodamo za zadatak 'task' unos u closure tabelu
                 ClosureTasks nct = new ClosureTasks(task.getId(), subtask.getId());
                 nct.setDepth(1);
@@ -161,7 +163,7 @@ public class JpaTaskHandler implements TaskHandler {
                 //zavrsila je transakcija, komitujemo izmjene
                 em.getTransaction().commit();
 
-                    // e sad ovaj dio je malo triki
+                // e sad ovaj dio je malo triki
                 //Posto smo unijeli izmjene u tabelu Closure_Tasks, te izmjen imaju uticaj na liste closureTasksParents i closureTasksChildren
                 //Ali te dve liste nece biti update-ovane, dok ne uradimo ovo:
                 //Posto se izmjene odnose na ova dva zadatka, onda njih refresh-ujemo (samo poslije commit-a )
@@ -226,9 +228,9 @@ public class JpaTaskHandler implements TaskHandler {
     public boolean setChef(Task task, User user) throws EntityDoesNotExistException, StoringException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
 
-      //  if (!checkTaskChefPrivileges(task)) {
-        //    return false;
-       // }
+        if (!checkTaskChefPrivileges(task)) {
+            return false;
+        }
 
         EntityManager em = emf.createEntityManager();
         try {
@@ -254,7 +256,9 @@ public class JpaTaskHandler implements TaskHandler {
                     }
                 }
             } catch (Exception ex) {
-                if(em.getTransaction().isActive())em.getTransaction().rollback();
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
                 throw new StoringException(ex.getLocalizedMessage());
             }
         } finally {
@@ -281,9 +285,9 @@ public class JpaTaskHandler implements TaskHandler {
                 throw new EntityDoesNotExistException("User does not exists in database.");
             }
 
-           // if (!checkTaskChefPrivileges(task)) {
-           //     return false;
-          //  }
+            if (!checkTaskChefPrivileges(task)) {
+                return false;
+            }
 
             String username = user.getUsername();
             WorksOnTask nwot = null;
@@ -293,7 +297,7 @@ public class JpaTaskHandler implements TaskHandler {
 
                 //ako je u pitanju root task
                 if (task.getProjectList().size() > 0) {
-                //zbog bug-a u JPA nove metode koje su dodane u Java 8 Stream API ne rade. Mozda i nije bug ali je greska u arhitekturi.
+                    //zbog bug-a u JPA nove metode koje su dodane u Java 8 Stream API ne rade. Mozda i nije bug ali je greska u arhitekturi.
                     //Da bi omogucio stream-ove moramo pravo konstruisati odgovarajucu ArrayListu, ili neku drugu.
                     //sad jednostavno provjerimo da li je user clan ovog projekta
                     if (new ArrayList<>(task.getProjectList().get(0).getWorksOnProjectList()).stream().anyMatch(
@@ -323,10 +327,10 @@ public class JpaTaskHandler implements TaskHandler {
                             }
                         }
                     }
-  
+
                 }
-                
-                if(nwot == null){
+
+                if (nwot == null) {
                     throw new Exception("Task is not root task nor it has parent!");
                 }
 
@@ -346,7 +350,6 @@ public class JpaTaskHandler implements TaskHandler {
             em.close();
         }
 
-
     }
 
     @Override
@@ -354,7 +357,7 @@ public class JpaTaskHandler implements TaskHandler {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
         try {
-            if ( task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
                 throw new EntityDoesNotExistException("Task does not exists in database.");
             }
 
@@ -376,7 +379,9 @@ public class JpaTaskHandler implements TaskHandler {
                     em.getTransaction().commit();
                     em.refresh(task);
                 } catch (Exception ex) {
-                    if(em.getTransaction().isActive())em.getTransaction().rollback();
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
                     throw new StoringException(ex.getLocalizedMessage());
                 }
             }
@@ -423,7 +428,9 @@ public class JpaTaskHandler implements TaskHandler {
                 em.refresh(task);
                 return true;
             } catch (Exception ex) {
-                if(em.getTransaction().isActive())em.getTransaction().rollback();
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
                 throw new StoringException(ex.getLocalizedMessage());
             }
         } finally {
@@ -433,27 +440,41 @@ public class JpaTaskHandler implements TaskHandler {
 
     @Override
     public Double getWorkedManHoursOfTaskSubtree(Task task) {
+        /*  
+         double base = new ArrayList<>(task.getClosureTasksChildren())
+         .stream()
+         .map(ClosureTasks::getChild)
+         .map(Task::getWorksOnTaskList)
+         .flatMap((list) -> new ArrayList<>(list).stream())
+         .map(WorksOnTask::getTimetableList)
+         .flatMap((list) -> new ArrayList<>(list).stream())
+         .mapToDouble((t) -> (t.getEndTime().getTime()
+         - t.getTimetablePK().getStartTime().getTime()) / (1000.0 * 60.0 * 60.0))
+         .sum();
+         System.err.println("base="+base);
+         //izracunati su sati za pod stablo, jos korjen da uracunamo
+         return base + new ArrayList<>(task.getWorksOnTaskList())
+         .stream()
+         .map(WorksOnTask::getTimetableList)
+         .flatMap((list) -> new ArrayList<>(list).stream())
+         .mapToDouble((t) -> (t.getEndTime().getTime()
+         - t.getTimetablePK().getStartTime().getTime()) / (1000.0 * 60.0 * 60.0))
+         .sum();
+         */
 
-        task.getClosureTasksChildren().size();
-        double base = task.getClosureTasksChildren()
-                .stream()
-                .map(ClosureTasks::getChild)
-                .map(Task::getWorksOnTaskList)
-                .flatMap((list) -> new ArrayList<>(list).stream())
-                .map(WorksOnTask::getTimetableList)
-                .flatMap((list) -> new ArrayList<>(list).stream())
-                .mapToDouble((t) -> (t.getTimetablePK().getStartTime().getTime()
-                        - t.getEndTime().getTime()) / 1000.0 * 60.0 * 60.0)
-                .sum();
+        EntityManager em = ((JpaAccessManager) JpaAccessManager.getInstance()).getFactory().createEntityManager();
+        Query q = em.createQuery("SELECT  tt FROM Timetable tt WHERE tt.timetablePK.iDTask = :taskid OR tt.timetablePK.iDTask IN (SELECT ct.closureTasksPK.iDChild FROM ClosureTasks ct WHERE  ct.closureTasksPK.iDParent = :taskid  ) ");
+        q.setParameter("taskid", task.getId());
 
-        //izracunati su sati za pod stablo, jos korjen da uracunamo
-        return base + task.getWorksOnTaskList()
-                .stream()
-                .map(WorksOnTask::getTimetableList)
-                .flatMap((list) -> new ArrayList<>(list).stream())
-                .mapToDouble((t) -> (t.getTimetablePK().getStartTime().getTime()
-                        - t.getEndTime().getTime()) / 1000.0 * 60.0 * 60.0)
-                .sum();
+        List<Timetable> ttlist = q.getResultList();
+        double result = 0.0;
+        for (Timetable tt : ttlist) {
+            result += (tt.getEndTime().getTime()
+                    - tt.getTimetablePK().getStartTime().getTime()) / (1000.0 * 60.0 * 60.0);
+        }
+
+        return result;
+
     }
 
     @Override
@@ -520,7 +541,14 @@ public class JpaTaskHandler implements TaskHandler {
                     + "AND wot.working = true", Task.class);
 
             q.setParameter("username", username);
-            return (Task) q.getSingleResult();
+            Task res = null;
+            try {
+                res = (Task) q.getSingleResult();
+            } catch (NoResultException nre) {
+
+            }
+
+            return res;
         } finally {
             em.close();
         }
@@ -570,7 +598,9 @@ public class JpaTaskHandler implements TaskHandler {
                     em.refresh(task);
                     return true;
                 } catch (Exception ex) {
-                    if(em.getTransaction().isActive())em.getTransaction().rollback();
+                    if (em.getTransaction().isActive()) {
+                        em.getTransaction().rollback();
+                    }
                     throw new StoringException(ex.getLocalizedMessage());
                 }
             } finally {
@@ -581,9 +611,9 @@ public class JpaTaskHandler implements TaskHandler {
 
         return false;
     }
-    
+
     @Override
-    public List<TaskNode> getTaskNodeChildren(Task task){
+    public List<TaskNode> getTaskNodeChildren(Task task) {
 
         List<TaskNode> children = new ArrayList<>(task.getClosureTasksChildren())
                 .stream()
@@ -596,26 +626,28 @@ public class JpaTaskHandler implements TaskHandler {
 
     }
 
-
     @Override
     public TaskTree getTaskTree(Task task) {
         TaskNode root = new TaskNode(task);
         recursiveTreeGeneration(root);
         return new TaskTree(root);
     }
-    
-        
-    private  void recursiveTreeGeneration(TaskNode root){
+
+    private void recursiveTreeGeneration(TaskNode root) {
         List<TaskNode> children = getTaskNodeChildren(root.getTask());
         root.setChildren(children);
-        for(TaskNode tn : children){
+        for (TaskNode tn : children) {
             recursiveTreeGeneration(tn);
         }
     }
-    
 
     @Override
     public boolean startTask(Task task) throws EntityDoesNotExistException, BusyWorkersException, StoringException {
+        return startTask(task, OnBusyWorkers.THROW_EXCEPTION);
+    }
+
+    @Override
+    public boolean startTask(Task task, OnBusyWorkers onBusyWorkers) throws EntityDoesNotExistException, BusyWorkersException, StoringException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
 
@@ -628,20 +660,26 @@ public class JpaTaskHandler implements TaskHandler {
                 return false;
             }
 
-             //da vidimo da li su svi radnici spremini.
+            //da vidimo da li su svi radnici spremini.
             BusyWorkersException bwe = new BusyWorkersException("Some workers are busy doing other tasks");
-            List<User> available = new ArrayList<>();
+            //List<User> available = new ArrayList<>();
+            List<WorksOnTask> available_wot = new ArrayList<>();
             try {
                 em.getTransaction().begin();
 
                 for (WorksOnTask wot : task.getWorksOnTaskList()) {
                     Task active = getActiveTask(wot.getWorksOnTaskPK().getUsername());
-                    if (new ArrayList<>(task.getClosureTasksParents())
+                    //ako je roditelj aktivni zadatak trenutnog radnika na zadataku task ili ako nema aktivnog zadtaka:
+                    if (active == null || new ArrayList<>(task.getClosureTasksParents())
                             .stream()
-                            .anyMatch((a) -> a.getParent().equals(active))) {
+                            .anyMatch((a) -> a.getParent().equals(active) && a.getDepth() == 1)) {
                         //ovaj radnik je raspoloziv
-                        available.add(wot.getUser());
+                        //available.add(wot.getUser());
+                        available_wot.add(wot);
                         //moram naci wot koji povezuje active i wot.getUser(), i postaviti da je working false
+                        if (active == null) {
+                            continue;
+                        }
                         WorksOnTask wot1 = getWorksOnTask(active, wot.getUser());
                         wot1.setWorking(false);
                         em.merge(wot1);
@@ -651,35 +689,47 @@ public class JpaTaskHandler implements TaskHandler {
                 }
 
                 if (bwe.getList().size() > 0) {
-                    throw bwe;
+                    if (onBusyWorkers == OnBusyWorkers.THROW_EXCEPTION) {
+                        throw bwe;
+                    }
                 }
 
-                //postavim svima da je aktivni ovaj task
-                for (WorksOnTask wot : task.getWorksOnTaskList()) {
+                //postavim svima raspolozivim da je aktivni ovaj task
+                for (WorksOnTask wot : available_wot) {
                     wot.setWorking(true);
                     em.merge(wot);
                 }
 
+                //Ovde koristim Java 8 time API, iz paketa java.time, on je navodno bolji i nije bagovit ko ovi do sada.
+                LocalDateTime ld = LocalDateTime.now();
+                task.setStartDate(java.util.Date.from(ld.atZone(ZoneId.systemDefault()).toInstant()));
+                em.merge(task);
+
                 em.getTransaction().commit();
                 em.refresh(task);
+            } catch (BusyWorkersException bew) {
+                throw bwe;
             } catch (Exception ex) {
-                if(em.getTransaction().isActive())em.getTransaction().rollback();
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
                 ex.printStackTrace();
                 throw new StoringException(ex.getLocalizedMessage());
             }
 
-            //Ovde koristim Java 8 time API, iz paketa java.time, on je navodno bolji i nije bagovit ko ovi do sada.
-            LocalDateTime ld = LocalDateTime.now();
-            task.setStartDate(java.util.Date.from(ld.atZone(ZoneId.systemDefault()).toInstant()));
-
         } finally {
             em.close();
         }
-        return false;
+        return true;
     }
 
+        @Override
+    public boolean endTask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException, UnfinishedSubtaskException {
+        return endTask(task, false);
+    }
+    
     @Override
-    public boolean endTask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException{
+    public boolean endTask(Task task, boolean endSubtasks) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException,UnfinishedSubtaskException {
 
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
@@ -688,9 +738,29 @@ public class JpaTaskHandler implements TaskHandler {
             if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
                 throw new EntityDoesNotExistException("Task does not exists in database.");
             }
-
+            
             try {
                 em.getTransaction().begin();
+                ArrayList<Task> unfinished = new ArrayList<>();
+                //ako ima nezavrsenih podzadataka
+                if(new ArrayList<>(task.getClosureTasksChildren()).stream().anyMatch(
+                        (ct) ->  ct.getChild().getEndDate() == null
+                )){
+                    if(endSubtasks){
+                        new ArrayList<>(task.getClosureTasksChildren()).stream().forEach((ct) -> {
+                            if(ct.getChild().getEndDate() == null){
+                                try{
+                                    endTask(ct.getChild(), true);
+                                }catch(Exception ex){
+                                    
+                                }
+                            }
+                        });
+                    } else {
+                        throw new UnfinishedSubtaskException("There are unfinished subtasks");
+                    }
+                }
+                
                 Task prnt1 = null;
                 for (ClosureTasks ct : task.getClosureTasksParents()) {
                     if (ct.getDepth() == 1) {
@@ -741,58 +811,32 @@ public class JpaTaskHandler implements TaskHandler {
         }
         return true;
     }
-    
+
     //pronalazi trenutni zadatak i za trenutni zadatak i korisnika dodaje novi unos satnice
     //tj. otvara novu sesiju
-   @Override
-   public boolean createNewTimetableEntry(Date startTime, Date endTime) throws StoringException{
-       EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+    @Override
+    public boolean createNewTimetableEntry(Date startTime, Date endTime) throws StoringException {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
         try {
-            try{
-            em.getTransaction().begin();
+            try {
+                em.getTransaction().begin();
                 Query q = em.createQuery(
                         "SELECT wot FROM  WorksOnTask wot  WHERE wot.worksOnTaskPK.username = :username AND wot.working = true  ",
-                    WorksOnTask.class);
-                
+                        WorksOnTask.class);
+
                 q.setParameter("username", loggedUser.getUser().getUsername());
-                 WorksOnTask wot = (WorksOnTask)q.getSingleResult();
+                WorksOnTask wot = (WorksOnTask) q.getSingleResult();
                 Timetable tt = new Timetable(
-                        startTime, 
-                        wot.getWorksOnTaskPK().getIDTask(), 
-                        loggedUser.getUser().getUsername(), 
+                        startTime,
+                        wot.getWorksOnTaskPK().getIDTask(),
+                        loggedUser.getUser().getUsername(),
                         wot.getWorksOnTaskPK().getIDProject()
                 );
                 tt.setEndTime(endTime);
                 em.persist(tt);
                 em.getTransaction().commit();
-            }catch(Exception ex){
-                throw new StoringException(ex.getLocalizedMessage());
-            }
-        } finally {
-            em.close();
-        }
-        return false;
-   }
-    
-    //Dodaje novo zavrsno vrijeme kraja u aktivnu sesiju, ako nije otvorena nova sesija, produzice staru.
-    @Override
-    public boolean updateActiveTime(Date endTime) throws StoringException{
-        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
-        EntityManager em = emf.createEntityManager();
-        try {
-            try{
-            em.getTransaction().begin();
-                Query q = em.createQuery(
-                        "SELECT t FROM  WorksOnTask wot,  IN(wot.timetableList) t WHERE wot.worksOnTaskPK.username = :username AND wot.working = true AND t.timetablePK.startTime = (  SELECT MAX(t1.timetablePK.startTime)  FROM WorksOnTask wot1,  IN(wot1.timetableList) t1 WHERE wot1.worksOnTaskPK.username = :username AND wot1.working = true ) ",
-                    Timetable.class);
-                
-                q.setParameter("username", loggedUser.getUser().getUsername());
-                Timetable tt = (Timetable)q.getSingleResult();
-                tt.setEndTime(endTime);
-                em.merge(tt);
-                em.getTransaction().commit();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 throw new StoringException(ex.getLocalizedMessage());
             }
         } finally {
@@ -800,20 +844,115 @@ public class JpaTaskHandler implements TaskHandler {
         }
         return false;
     }
-    
+
+    //Dodaje novo zavrsno vrijeme kraja u aktivnu sesiju, ako nije otvorena nova sesija, produzice staru.
+    @Override
+    public boolean updateActiveTime(Date endTime) throws StoringException {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+            try {
+                em.getTransaction().begin();
+                Query q = em.createQuery(
+                        "SELECT t FROM  WorksOnTask wot,  IN(wot.timetableList) t WHERE wot.worksOnTaskPK.username = :username AND wot.working = true AND t.timetablePK.startTime = (  SELECT MAX(t1.timetablePK.startTime)  FROM WorksOnTask wot1,  IN(wot1.timetableList) t1 WHERE wot1.worksOnTaskPK.username = :username AND wot1.working = true ) ",
+                        Timetable.class);
+
+                q.setParameter("username", loggedUser.getUser().getUsername());
+                Timetable tt = (Timetable) q.getSingleResult();
+                tt.setEndTime(endTime);
+                em.merge(tt);
+                em.getTransaction().commit();
+            } catch (Exception ex) {
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+        } finally {
+            em.close();
+        }
+        return false;
+    }
+
+    public boolean setActiveTask(Task task) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException, UserNotTaskMemberException {
+        return setActiveTask(task, loggedUser.getUser());
+    }
+
+    public boolean setActiveTask(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException, UserNotTaskMemberException {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
+                throw new EntityDoesNotExistException("Parent task does not exist.");
+            }
+
+            if (user.getUsername() == null || (user = em.find(User.class, user.getUsername())) == null) {
+                throw new EntityDoesNotExistException("User does not exists in database.");
+            }
+
+            if (task.getStartDate() == null || task.getEndDate() != null) {
+                return false;
+            }
+
+            try {
+                em.getTransaction().begin();
+
+                if (!checkTaskChefPrivileges(task)) {
+                    throw new InsuficientPrivilegesException("User does not have sufficient privileges over task " + task.getName() + ".");
+                }
+
+                Task active = getActiveTask(user.getUsername());
+                if (active != null && !checkTaskChefPrivileges(active)) {
+                    throw new InsuficientPrivilegesException("User does not have sufficient privileges over task " + active.getName() + ".");
+                }
+                if (active != null) {
+                    WorksOnTask wota = getWorksOnTask(active, user);
+                    wota.setWorking(false);
+                    em.merge(wota);
+                }
+                WorksOnTask wot = getWorksOnTask(task, user);
+                if(wot == null){
+                    throw new UserNotTaskMemberException();
+                }
+                wot.setWorking(true);
+
+                em.merge(wot);
+
+                em.getTransaction().commit();
+                em.refresh(task);
+                em.refresh(user);
+                if (active != null) {
+                    active = em.getReference(Task.class, active.getId());
+                    em.refresh(active);
+                }
+            } catch (InsuficientPrivilegesException ipe) {
+                throw   ipe;
+            }catch(UserNotTaskMemberException uex){
+                throw uex;
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                ex.printStackTrace();
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+
+        } finally {
+            em.close();
+        }
+        return true;
+    }
+
     //Ova metoda sluzi da se dobije zadtak iz baze, koji je azuriran novim podacima, na osnovu vec postojeceg objekta.
     //Kontao sam da bi tako nesto bilo korisno.
     @Override
     public Task getUpdatedTask(Task task) {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
-        try{
+        try {
             return em.find(Task.class, task.getId());
-        }finally{
-            em.close();            
+        } finally {
+            em.close();
         }
+
     }
+
     
 }
-
-//TODO: dodati metode, endTask, updateActiveTime
