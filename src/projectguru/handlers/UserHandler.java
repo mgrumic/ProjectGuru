@@ -6,6 +6,8 @@
 package projectguru.handlers;
 
 import projectguru.entities.User;
+import projectguru.handlers.exceptions.EntityDoesNotExistException;
+import projectguru.handlers.exceptions.StoringException;
 
 /**
  *
@@ -16,7 +18,7 @@ public interface UserHandler {
      public boolean hasAdminPrivileges();
      
      public boolean addUser(User user);
-     public boolean editUser(User user);
+     public boolean editUser(User user) throws EntityDoesNotExistException, StoringException ;
      public void setActivated(User user, boolean flag);
      
 }
