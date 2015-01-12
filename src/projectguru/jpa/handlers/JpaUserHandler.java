@@ -6,6 +6,7 @@
 package projectguru.jpa.handlers;
 
 
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -52,6 +53,9 @@ public class JpaUserHandler implements UserHandler {
                 em.getTransaction().begin();
                 em.persist(user);
                 em.getTransaction().commit();
+                em.refresh(user);
+                return true;
+
             }
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
@@ -64,6 +68,7 @@ public class JpaUserHandler implements UserHandler {
         }
         return true;
     }
+
 
 
     public boolean editUser(User user) throws EntityDoesNotExistException, StoringException{
@@ -90,6 +95,7 @@ public class JpaUserHandler implements UserHandler {
             em.close();
         }
         return true;}
+
 
 
     @Override

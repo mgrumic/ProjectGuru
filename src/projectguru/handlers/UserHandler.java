@@ -18,8 +18,10 @@ public interface UserHandler {
      public boolean hasAdminPrivileges();
      
 
+
      public boolean addUser(User user) throws StoringException;
      public boolean editUser(User user) throws EntityDoesNotExistException,StoringException;
+
      public void setActivated(User user, boolean flag);
      
 }

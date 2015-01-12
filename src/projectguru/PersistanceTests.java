@@ -160,6 +160,7 @@ class PersistanceTests {
             Logger.getLogger(PersistanceTests.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        
 //
 //        pl(novi);
 //        pl("Chef privileges: " + Privileges.CHEF.ordinal());
@@ -231,4 +232,5 @@ class PersistanceTests {
         System.exit(0);  
         
     }
+    
 }
