@@ -6,7 +6,6 @@
 package projectguru.jpa.handlers;
 
 
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
@@ -18,7 +17,8 @@ import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.UserHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
-import projectguru.handlers.exceptions.InsuficientPrivilegesException;
+
+
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.jpa.JpaAccessManager;
 
@@ -68,6 +68,7 @@ public class JpaUserHandler implements UserHandler {
         }
         return true;
     }
+
 
 
 
