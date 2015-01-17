@@ -120,7 +120,7 @@ class PersistanceTests {
         JpaAccessManager jam = new JpaAccessManager("ProjectGuruPU");
         AccessManager.setInstance(jam);
         
-        LoggedUser loggedUser = AccessManager.getInstance().logUserIn("djudja", "etf");
+        LoggedUser loggedUser = AccessManager.getInstance().logUserIn("boca", "etf");
         Project project = new ProjectJpaController(jam.getFactory()).findProject(1);
         ProjectHandler jpa = loggedUser.getProjectHandler();
         
@@ -187,7 +187,7 @@ class PersistanceTests {
             TaskHandler th = loggedUser.getTaskHandler();
             Activity ac = new Activity(null, "Kreirana aktivnost !");
             
-            th.addMember(root, loggedUser.getUser());
+       //     th.addMember(root, loggedUser.getUser());
             th.setChef(root, loggedUser.getUser());
             th.addActivity(root, ac);
             
