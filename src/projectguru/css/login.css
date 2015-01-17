@@ -6,8 +6,11 @@
 
 }
 #mainPane {
-    -fx-background-color: #353377;
+        -fx-background-color: radial-gradient(radius 100%, derive(-fx-base,30%), derive(-fx-base,-30%));
 }
 #logPane {
-    -fx-background-color: #565595;
+   
+    -fx-background-color: radial-gradient(radius 100%, derive(-fx-base, 0%), derive(-fx-base, 0%));
+    -fx-background-insets: 0,1,4,5,6;
+    -fx-background-radius: 9,8,5,4,3;
 }

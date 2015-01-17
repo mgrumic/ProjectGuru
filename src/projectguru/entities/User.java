@@ -29,7 +29,8 @@ import javax.persistence.Table;
     @NamedQuery(name = "User.findByUsername", query = "SELECT u FROM User u WHERE u.username = :username"),
     @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password"),
     @NamedQuery(name = "User.findByFirstName", query = "SELECT u FROM User u WHERE u.firstName = :firstName"),
-    @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName")})
+    @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName"),
+    @NamedQuery(name = "User.findByAppPrivileges", query = "SELECT u FROM User u WHERE u.appPrivileges = :appPrivileges")})
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -45,6 +46,9 @@ public class User implements Serializable {
     @Basic(optional = false)
     @Column(name = "LastName")
     private String lastName;
+    @Basic(optional = false)
+    @Column(name = "AppPrivileges")
+    private int appPrivileges;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     private List<WorksOnProject> worksOnProjectList;
 
@@ -55,11 +59,12 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public User(String username, String password, String firstName, String lastName) {
+    public User(String username, String password, String firstName, String lastName, int appPrivileges) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.appPrivileges = appPrivileges;
     }
 
     public String getUsername() {
@@ -92,6 +97,14 @@ public class User implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public int getAppPrivileges() {
+        return appPrivileges;
+    }
+
+    public void setAppPrivileges(int appPrivileges) {
+        this.appPrivileges = appPrivileges;
     }
 
     public List<WorksOnProject> getWorksOnProjectList() {

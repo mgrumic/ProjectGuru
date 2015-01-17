@@ -187,6 +187,7 @@ public class JpaTaskHandler implements TaskHandler {
 
     }
 
+    
     @Override
     public boolean editSubtask(Task task) throws EntityDoesNotExistException, StoringException {
         if (checkTaskChefPrivileges(task)) {
