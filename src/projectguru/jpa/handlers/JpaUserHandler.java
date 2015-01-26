@@ -5,17 +5,23 @@
  */
 package projectguru.jpa.handlers;
 
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import projectguru.AccessManager;
+import projectguru.entities.Privileges;
+import projectguru.entities.Project;
 import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.UserHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
+import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.jpa.JpaAccessManager;
+
+
 
 /**
  *
@@ -31,38 +37,60 @@ public class JpaUserHandler implements UserHandler {
     
     @Override
     public boolean hasAdminPrivileges() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(user.getUser().getAppPrivileges() == Privileges.ADMIN.ordinal())
+            return true;
+        else return false;
     }
 
     @Override
-    public boolean addUser(User user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-   public boolean editUser(User user) throws EntityDoesNotExistException, StoringException {
+    public boolean addUser(User user) throws StoringException{
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
-        try {
-            if (user.getUsername() == null || em.find(User.class, user.getUsername()) == null) {
-                throw new EntityDoesNotExistException("User does not exist in database.");
-            }
-            try {
-                em.getTransaction().begin();
-                em.merge(user); //merge kreira novi entitet a sacuva u isti red u bazu,
-                em.getTransaction().commit();
 
-                return true;
-            } catch (Exception ex) {
-                Logger.getLogger(JpaUserHandler.class.getName()).log(Level.SEVERE, null, ex);
-                ex.printStackTrace();
-                throw new StoringException(ex.getLocalizedMessage());
+        try {
+            if (user.getUsername() == null || (user = em.find(User.class, user.getUsername())) == null) {
+                em.getTransaction().begin();
+                em.persist(user);
+                em.getTransaction().commit();
             }
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+            throw new StoringException(ex.getLocalizedMessage());
         } finally {
             em.close();
-            return false;
         }
+        return true;
     }
+
+
+    public boolean editUser(User user) throws EntityDoesNotExistException, StoringException{
+        //ko moze editovati Usera?
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        if (user.getUsername()== null || (em.find(User.class, user.getUsername())) == null) {
+            throw new EntityDoesNotExistException("User does not exist.");
+        }
+        try {
+
+            em.getTransaction().begin();
+            em.merge(user);
+            em.getTransaction().commit();
+
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+            throw new StoringException(ex.getLocalizedMessage());
+        } finally {
+            em.close();
+        }
+        return true;}
+
 
     @Override
     public void setActivated(User user, boolean flag) {
