@@ -17,6 +17,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -24,13 +26,15 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "user")
+@XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u"),
     @NamedQuery(name = "User.findByUsername", query = "SELECT u FROM User u WHERE u.username = :username"),
     @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password"),
     @NamedQuery(name = "User.findByFirstName", query = "SELECT u FROM User u WHERE u.firstName = :firstName"),
     @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName"),
-    @NamedQuery(name = "User.findByAppPrivileges", query = "SELECT u FROM User u WHERE u.appPrivileges = :appPrivileges")})
+    @NamedQuery(name = "User.findByAppPrivileges", query = "SELECT u FROM User u WHERE u.appPrivileges = :appPrivileges"),
+    @NamedQuery(name = "User.findByActivated", query = "SELECT u FROM User u WHERE u.activated = :activated")})
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -49,6 +53,9 @@ public class User implements Serializable {
     @Basic(optional = false)
     @Column(name = "AppPrivileges")
     private int appPrivileges;
+    @Basic(optional = false)
+    @Column(name = "Activated")
+    private boolean activated;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     private List<WorksOnProject> worksOnProjectList;
 
@@ -59,12 +66,13 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public User(String username, String password, String firstName, String lastName, int appPrivileges) {
+    public User(String username, String password, String firstName, String lastName, int appPrivileges, boolean activated) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.appPrivileges = appPrivileges;
+        this.activated = activated;
     }
 
     public String getUsername() {
@@ -107,6 +115,15 @@ public class User implements Serializable {
         this.appPrivileges = appPrivileges;
     }
 
+    public boolean getActivated() {
+        return activated;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
+
+    @XmlTransient
     public List<WorksOnProject> getWorksOnProjectList() {
         return worksOnProjectList;
     }

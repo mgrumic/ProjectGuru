@@ -36,7 +36,9 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Document.findById", query = "SELECT d FROM Document d WHERE d.id = :id"),
     @NamedQuery(name = "Document.findByName", query = "SELECT d FROM Document d WHERE d.name = :name"),
     @NamedQuery(name = "Document.findByDescription", query = "SELECT d FROM Document d WHERE d.description = :description"),
-    @NamedQuery(name = "Document.findByPostedDate", query = "SELECT d FROM Document d WHERE d.postedDate = :postedDate")})
+    @NamedQuery(name = "Document.findByPostedDate", query = "SELECT d FROM Document d WHERE d.postedDate = :postedDate"),
+    @NamedQuery(name = "Document.findByProjectID", query = "SELECT d FROM Document d WHERE d.iDProject = :iDProject")})
+
 public class Document implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
