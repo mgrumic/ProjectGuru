@@ -20,3 +20,4 @@ nbproject/*.bash
 nbproject/private/
 nbproject/private/*
 *.log
+src/projectguru/jpa/handlers/JpaUserHandler.java

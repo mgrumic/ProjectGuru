@@ -54,63 +54,13 @@ class PersistanceTests {
         Task task = new TaskJpaController(jam.getFactory()).findTask(1);
 
         TaskHandler th = luser.getTaskHandler();
-
-        pl(th.checkTaskChefPrivileges(task));
-        pl(th.checkMemberPrivileges(task));
-        pl(th.checkInsightPrivileges(task));
-
-        pl(Privileges.NO_PRIVILEGES.ordinal());
-        pl(Privileges.INSIGHT.ordinal());
-        pl(Privileges.MEMBER.ordinal());
-        pl(Privileges.CHEF.ordinal());
-
-        Task nt1 = new Task();
-        nt1.setAssumedManHours(15);
-        nt1.setDeadline(java.sql.Date.valueOf("2015-1-5"));
-        nt1.setStartDate(java.sql.Date.valueOf("2015-1-2"));
-        nt1.setEndDate(java.sql.Date.valueOf("2015-1-2"));
-        nt1.setDescription("JpaTaskHandler");
-        nt1.setName("JpaTaskHandler");
-
-        Task nt2 = new Task();
-        nt2.setAssumedManHours(15);
-        nt2.setDeadline(java.sql.Date.valueOf("2015-1-5"));
-        nt2.setStartDate(java.sql.Date.valueOf("2015-1-2"));
-        nt2.setEndDate(java.sql.Date.valueOf("2015-1-2"));
-        nt2.setDescription("JpaTaskHandler");
-        nt2.setName("JpaTaskHandler");
+//        task.setDescription(task.getDescription() + ".");
+//        th.editSubtask(task);
+//        task = th.getUpdatedTask(task);
+//        task.setDescription(task.getDescription() + ".");
+//        th.editSubtask(task);
+        pl(th.getWorkedManHoursOfTaskSubtree(task));
         
-        pl(nt1);
-        pl(nt2);
-        pl(th.addSubtask(task, nt1));
-        pl(th.addSubtask(nt1, nt2));
-
-        pl(th.addMember(nt1, luser.getUser()));
-
-       // UserJpaController userCtrl = new UserJpaController(jam.getFactory());
-        //  EntityManager em = jam.getFactory().createEntityManager();
-      //  User u1 = userCtrl.findUser("nedjo");
-       // User gruma = userCtrl.findUser("raja");
-        //System.err.println(th.setChef(task, u1));
-//        System.err.println(th.getChef(task));
-//        try{
-//            System.err.println(th.addMember(task, gruma));
-//        }catch(StoringException se){
-//           System.err.println("Ne moze se dodati.");
-//        }
-        ///task.setDescription(task.getDescription()+" Ово ће ми живце моје појести.");
-        //System.err.println(th.editSubtask(task));
-         //Task taske = new TaskJpaController(jam.getFactory()).findTask(72);
-        //System.err.println(taske.getDescription());
-        //System.err.println(task.getDescription());
-//        pl(th.addMember(task, u1));
-//        pl(th.addMember(nt1, u1));
-        //       Activity pac = em.find(Activity.class, 2);
-//        pac.setWorksOnTask(em.find(WorksOnTask.class, new WorksOnTaskPK(72,"nedjo",1)));
-//        th.addActivity(task, pac);
-        Activity ac = new Activity(null, "neki opis");
-        th.addActivity(task, ac);
-        //Timetable tt = new Timetable(null, iDTask, STYLESHEET_MODENA, iDProject);
         System.exit(0);
 
     }
