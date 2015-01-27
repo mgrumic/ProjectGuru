@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="526.0" prefWidth="707.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="projectguru.controllers.FormActivitiesController">
+    <stylesheets>
+        <URL value="@/projectguru/css/formactivities.css" />
+    </stylesheets>
+   <children>
+      <BorderPane layoutX="196.0" layoutY="155.0" prefHeight="526.0" prefWidth="707.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <items>
+                <Button fx:id="btnAddActivity" mnemonicParsing="false" onAction="#btnAddActivity_OnAction" text="Додај активност" />
+                  <Button fx:id="btnEditActivity" mnemonicParsing="false" onAction="#btnEditActivity_OnAction" text="Измјени активност" />
+                  <Button fx:id="btnDeleteActivity" mnemonicParsing="false" onAction="#btnDeleteActivity_OnAction" text="Обриши активност" />
+              </items>
+            </ToolBar>
+         </top>
+         <center>
+            <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <top>
+                  <AnchorPane prefHeight="78.0" prefWidth="707.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <CheckBox fx:id="chbOnlyMine" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Само моје активности" />
+                        <CheckBox fx:id="chbOnlyThisTask" layoutX="14.0" layoutY="46.0" mnemonicParsing="false" text="Само од овог задатка (без подзадатака)" />
+                     </children>
+                  </AnchorPane>
+               </top>
+               <left>
+                  <ListView prefHeight="408.0" prefWidth="250.0" BorderPane.alignment="CENTER" />
+               </left>
+               <right>
+                  <AnchorPane prefHeight="408.0" prefWidth="443.0" BorderPane.alignment="CENTER" />
+               </right>
+            </BorderPane>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>
