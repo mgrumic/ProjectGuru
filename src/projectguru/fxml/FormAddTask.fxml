@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="478.0" prefWidth="460.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormAddTaskController">
+   <children>
+      <AnchorPane fx:id="page1" layoutY="1.0" prefHeight="474.0" prefWidth="460.0" visible="false">
+         <children>
+            <TextArea fx:id="description" layoutX="161.0" layoutY="258.0" prefHeight="99.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
+            <TextField fx:id="mensHours" layoutX="161.0" layoutY="207.0" prefHeight="25.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
+            <Label layoutX="63.0" layoutY="260.0" text="Description:" />
+            <Label layoutX="63.0" layoutY="93.0" text="Name:" />
+            <Label layoutX="63.0" layoutY="211.0" text="Men/Hours:" />
+            <DatePicker fx:id="end" layoutX="161.0" layoutY="168.0" prefHeight="25.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
+            <Label layoutX="65.0" layoutY="170.0" text="Ends:" />
+            <DatePicker fx:id="start" layoutX="161.0" layoutY="130.0" prefHeight="25.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
+            <Label layoutX="63.0" layoutY="134.0" text="Starts at:" />
+            <TextField fx:id="name" layoutX="161.0" layoutY="89.0" prefHeight="25.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
+            <Label layoutX="63.0" layoutY="40.0" text="New task:">
+               <font>
+                  <Font name="System Bold" size="15.0" />
+               </font>
+            </Label>
+            <Button fx:id="buttonNext" layoutX="255.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="76.0" text="Next" AnchorPane.leftAnchor="255.0" />
+            <Button fx:id="buttonOK" layoutX="354.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="76.0" text="Finish" AnchorPane.leftAnchor="352.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="page2" prefHeight="478.0" prefWidth="460.0" visible="false">
+         <children>
+            <ListView fx:id="listViewSelectedMembers" layoutX="29.0" layoutY="51.0" prefHeight="294.0" prefWidth="167.0" AnchorPane.leftAnchor="263.0" />
+            <ListView fx:id="listViewAllMembers" layoutX="29.0" layoutY="51.0" prefHeight="294.0" prefWidth="167.0" AnchorPane.leftAnchor="29.0" />
+            <Label layoutX="29.0" layoutY="23.0" text="Members:" />
+            <Button fx:id="buttonAllToSel" layoutX="214.0" layoutY="85.0" mnemonicParsing="false" text="&lt;&lt;" AnchorPane.leftAnchor="214.0" />
+            <Button fx:id="buttonOneToSel" layoutX="214.0" layoutY="120.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="&lt;" AnchorPane.leftAnchor="214.0" />
+            <Button fx:id="buttonAllFromSel" layoutX="214.0" layoutY="155.0" mnemonicParsing="false" text="&gt;&gt;" AnchorPane.leftAnchor="214.0" />
+            <Button fx:id="buttonOneFromSel" layoutX="214.0" layoutY="190.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="&gt;" AnchorPane.leftAnchor="214.0" />
+            <Button fx:id="buttonPrevious" layoutX="255.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="76.0" text="Previous" AnchorPane.leftAnchor="256.0" />
+            <Button fx:id="buttonOk" layoutX="354.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="76.0" text="Finish" AnchorPane.leftAnchor="354.0" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
