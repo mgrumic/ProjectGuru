@@ -27,19 +27,15 @@ public class ProjectGuru {
         
         Parent root = loader.load();
         
-        //ako mi
         TeamOfficeController controller = (TeamOfficeController)loader.getController();
         controller.setUser(user);
         
         Scene scene = new Scene(root);
-        //scene.getStylesheets().add(this.getClass().getResource("/projectguru/css/office.css").toExternalForm());
+        scene.getStylesheets().add(this.getClass().getResource("/projectguru/css/projectguru.css").toExternalForm());
         
         primaryStage.setTitle("Project Guru");
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.DECORATED);
-        
-        //primaryStage.setResizable(true);
-      //  primaryStage.setMaximized(true);
         
         primaryStage.show();
         

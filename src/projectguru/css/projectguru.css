@@ -1,0 +1,19 @@
+#treeTask .tree-cell {
+    -fx-shape: null;
+    -fx-background-color: blue;
+    -fx-background-image: url("/projectguru/images/root.png");
+}
+#treeTask .tree-cell:expanded .tree-disclosure-node .arrow {
+    -fx-shape: null;
+    -fx-background-color: red;
+    -fx-background-image: url("/projectguru/images/root.png");
+}
+
+#treeTask {
+    -fx-background-color: red;
+    -fx-border-color: red;
+}
+
+.titled-pane {
+    -fx-font-size: 13px;
+}

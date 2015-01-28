@@ -40,6 +40,11 @@ public class TaskNode {
     public void addChild(TaskNode node){
         children.add(node);
     }
+
+    @Override
+    public String toString() {
+        return task.getName();
+    }
     
     
 }

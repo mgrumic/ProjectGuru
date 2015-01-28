@@ -35,13 +35,14 @@ import projectguru.jpa.JpaAccessManager;
  *
  * @author ZM
  */
-public class JpaProjectHandler implements ProjectHandler{
+public class JpaProjectHandler implements ProjectHandler {
 
     private LoggedUser loggedUser;
-    
+
     public JpaProjectHandler(LoggedUser user) {
         this.loggedUser = user;
     }
+
     @Override
     public boolean checkProjectChefPrivileges(Project project) {
         return isChef(project, loggedUser.getUser());
@@ -55,6 +56,50 @@ public class JpaProjectHandler implements ProjectHandler{
     @Override
     public boolean checkInsightPrivileges(Project project) {
         return isInsight(project, loggedUser.getUser());
+    }
+
+    @Override
+    public List<Project> getAllProjects() {
+
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        try {
+
+            TypedQuery<Project> query = em.createQuery("SELECT wop.project FROM User u, "
+                    + "IN(u.worksOnProjectList) wop WHERE u.username = :username", Project.class);
+
+            query.setParameter("username", loggedUser.getUser().getUsername());
+
+            return query.getResultList();
+
+        } catch (Exception ex) {
+
+        } finally {
+            em.close();
+        }
+        return new ArrayList<Project>();
+    }
+
+    @Override
+    public List<User> getAllMembers(Project project) {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        try {
+
+            TypedQuery<User> query = em.createQuery("SELECT wop.user FROM Project p, IN(p.worksOnProjectList) wop WHERE p.id = :id", User.class);
+            
+            query.setParameter("id", project.getId());
+
+            return query.getResultList();
+
+        } catch (Exception ex) {
+
+        } finally {
+            em.close();
+        }
+        return new ArrayList<User>();
     }
 
     @Override
@@ -92,7 +137,7 @@ public class JpaProjectHandler implements ProjectHandler{
      *   pomocu funkcije getUpdatedProject(Project project) i da se on izmjeni pa 
      *   da se onda edituje !
      */
-     @Override
+    @Override
     public boolean editProject(Project project) throws InsuficientPrivilegesException, EntityDoesNotExistException, StoringException {
 
         if (!checkProjectChefPrivileges(project)) {
@@ -515,5 +560,5 @@ public class JpaProjectHandler implements ProjectHandler{
         em.close();
         return user;
     }
-    
+
 }

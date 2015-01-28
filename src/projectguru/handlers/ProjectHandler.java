@@ -29,6 +29,10 @@ public interface ProjectHandler {
 
     public boolean checkInsightPrivileges(Project project);
 
+    public List<Project> getAllProjects();
+    
+    public List<User> getAllMembers(Project project);
+    
     public boolean createProject(Project project) throws  InsuficientPrivilegesException, StoringException;
     public boolean editProject(Project project) throws InsuficientPrivilegesException, EntityDoesNotExistException, StoringException;
     public boolean deleteProject(Project project) throws InsuficientPrivilegesException, EntityDoesNotExistException, StoringException;
