@@ -12,8 +12,8 @@
    <top>
       <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
-          <Button mnemonicParsing="false" text="Нова активност" />
-            <Button mnemonicParsing="false" text="Обриши активност" />
+          <Button fx:id="btnNewActivity" mnemonicParsing="false" onAction="#btnNewActivity_OnAction" text="Нова активност" />
+            <Button fx:id="btnDeleteActivity" mnemonicParsing="false" onAction="#btnDeleteActivity_OnAction" text="Обриши активност" />
         </items>
       </ToolBar>
    </top>
@@ -22,8 +22,8 @@
          <top>
             <AnchorPane prefHeight="72.0" prefWidth="749.0" BorderPane.alignment="CENTER">
                <children>
-                  <CheckBox layoutX="26.0" layoutY="14.0" mnemonicParsing="false" text="Само моје активности" />
-                  <CheckBox layoutX="26.0" layoutY="47.0" mnemonicParsing="false" text="Само за овај задатак (без подзадатака)" />
+                  <CheckBox fx:id="chbOnlyMyActivity" layoutX="26.0" layoutY="14.0" mnemonicParsing="false" text="Само моје активности" />
+                  <CheckBox fx:id="chbOnlyThisTask" layoutX="26.0" layoutY="47.0" mnemonicParsing="false" text="Само за овај задатак (без подзадатака)" />
                </children>
             </AnchorPane>
          </top>
@@ -47,17 +47,17 @@
                   <Label text="Назив:" />
                   <Label text="Задатак:" GridPane.rowIndex="1" />
                   <Label text="Креатор:" GridPane.rowIndex="2" />
-                  <TextField GridPane.columnIndex="1" />
-                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <DatePicker prefHeight="25.0" prefWidth="265.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <TextField fx:id="txtName" GridPane.columnIndex="1" />
+                  <TextField fx:id="txtTaskName" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="txtCreator" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <DatePicker fx:id="dpDate" prefHeight="25.0" prefWidth="265.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <Label text="Датум:" GridPane.rowIndex="3" />
                   <Label text="Опис:" GridPane.rowIndex="4" GridPane.valignment="TOP" />
-                  <TextArea prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <TextArea fx:id="txtDescription" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <Label text="Напомена:" GridPane.rowIndex="5" />
-                  <TextField GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <Button mnemonicParsing="false" text="Сачувај измјене" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
-                  <Button mnemonicParsing="false" text="Поништи" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
+                  <TextField fx:id="txtRemark" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <Button fx:id="btnSaveChanges" mnemonicParsing="false" onAction="#btnSaveChanges_OnAction" text="Сачувај измјене" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+                  <Button fx:id="btnReject" mnemonicParsing="false" onAction="#btnReject_OnAction" text="Поништи" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
                </children>
                <padding>
                   <Insets left="5.0" right="5.0" />
@@ -65,7 +65,7 @@
             </GridPane>
          </right>
          <center>
-            <TableView prefHeight="393.0" prefWidth="481.0" BorderPane.alignment="CENTER">
+            <TableView fx:id="tblActivities" prefHeight="393.0" prefWidth="481.0" BorderPane.alignment="CENTER">
               <columns>
                 <TableColumn prefWidth="75.0" text="Назив" />
                 <TableColumn prefWidth="75.0" text="Задатак" />

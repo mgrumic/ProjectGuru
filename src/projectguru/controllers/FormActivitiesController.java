@@ -11,6 +11,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 
 /**
  * FXML Controller class
@@ -24,22 +29,58 @@ public class FormActivitiesController implements Initializable {
     @FXML
     private URL location;
 
+
     @FXML
-    private Button btnAddActivity;
+    private TextField txtRemark;
+
+    @FXML
+    private TableView<?> tblActivities;
+
+    @FXML
+    private TextField txtName;
+
+    @FXML
+    private TextArea txtDescription;
+
+    @FXML
+    private Button btnNewActivity;
+
+    @FXML
+    private CheckBox chbOnlyMyActivity;
+
+    @FXML
+    private Button btnReject;
 
     @FXML
     private Button btnDeleteActivity;
 
     @FXML
-    private Button btnEditActivity;
+    private Button btnSaveChanges;
 
     @FXML
-    void btnAddActivity_OnAction(ActionEvent event) {
+    private TextField txtTaskName;
+
+    @FXML
+    private DatePicker dpDate;
+
+    @FXML
+    private TextField txtCreator;
+
+    @FXML
+    private CheckBox chbOnlyThisTask;
+
+    @FXML
+    void btnSaveChanges_OnAction(ActionEvent event) {
 
     }
 
     @FXML
-    void btnEditActivity_OnAction(ActionEvent event) {
+    void btnReject_OnAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void btnNewActivity_OnAction(ActionEvent event) {
 
     }
 
@@ -47,8 +88,7 @@ public class FormActivitiesController implements Initializable {
     void btnDeleteActivity_OnAction(ActionEvent event) {
 
     }
-    
-    
+
     
     /**
      * Initializes the controller class.
@@ -56,9 +96,6 @@ public class FormActivitiesController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        assert btnAddActivity != null : "fx:id=\"btnAddActivity\" was not injected: check your FXML file 'FormActivities.fxml'.";
-        assert btnDeleteActivity != null : "fx:id=\"btnDeleteActivity\" was not injected: check your FXML file 'FormActivities.fxml'.";
-        assert btnEditActivity != null : "fx:id=\"btnEditActivity\" was not injected: check your FXML file 'FormActivities.fxml'.";
 
 
     }    
