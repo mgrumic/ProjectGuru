@@ -27,13 +27,15 @@ import javax.persistence.TemporalType;
 
 /**
  *
- * @author ZM
+ * @author marko
  */
 @Entity
 @Table(name = "activity")
 @NamedQueries({
     @NamedQuery(name = "Activity.findAll", query = "SELECT a FROM Activity a"),
     @NamedQuery(name = "Activity.findById", query = "SELECT a FROM Activity a WHERE a.id = :id"),
+    @NamedQuery(name = "Activity.findByName", query = "SELECT a FROM Activity a WHERE a.name = :name"),
+    @NamedQuery(name = "Activity.findByCreationDate", query = "SELECT a FROM Activity a WHERE a.creationDate = :creationDate"),
     @NamedQuery(name = "Activity.findByDescription", query = "SELECT a FROM Activity a WHERE a.description = :description"),
     @NamedQuery(name = "Activity.findByRemark", query = "SELECT a FROM Activity a WHERE a.remark = :remark")})
 public class Activity implements Serializable {
@@ -46,22 +48,6 @@ public class Activity implements Serializable {
     @Basic(optional = false)
     @Column(name = "Name")
     private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
     @Basic(optional = false)
     @Column(name = "CreationDate")
     @Temporal(TemporalType.DATE)
@@ -89,8 +75,10 @@ public class Activity implements Serializable {
         this.id = id;
     }
 
-    public Activity(Integer id, String description) {
+    public Activity(Integer id, String name, Date creationDate, String description) {
         this.id = id;
+        this.name = name;
+        this.creationDate = creationDate;
         this.description = description;
     }
 
@@ -100,6 +88,22 @@ public class Activity implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     public String getDescription() {
@@ -141,7 +145,7 @@ public class Activity implements Serializable {
     public void setExpenseList(List<Expense> expenseList) {
         this.expenseList = expenseList;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;

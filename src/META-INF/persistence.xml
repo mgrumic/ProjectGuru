@@ -14,6 +14,7 @@
     <class>projectguru.entities.DocumentRevision</class>
     <class>projectguru.entities.Income</class>
     <class>projectguru.entities.Document</class>
+    <class>projectguru.entities.Activity_1</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/baza?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="student"/>

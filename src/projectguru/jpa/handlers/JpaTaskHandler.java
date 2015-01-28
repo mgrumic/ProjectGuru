@@ -245,6 +245,7 @@ public class JpaTaskHandler implements TaskHandler {
             try {
                 for (WorksOnTask wot : task.getWorksOnTaskList()) {
                     if (wot.getWorksOnTaskPK().getUsername().equals(user.getUsername())) {
+                        
                         wot.setPrivileges(Privileges.CHEF.ordinal());
 
                         em.getTransaction().begin();
@@ -274,7 +275,7 @@ public class JpaTaskHandler implements TaskHandler {
     //TODO: razmisliti da u ovakvim situacijama bacimo izuzetak
     //npr: InsuficientPrivilegesException, UserNotMemberOfProjectException
     @Override
-    public boolean addMember(Task task, User user) throws EntityDoesNotExistException, StoringException {
+    public boolean addMember(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
         try {
@@ -287,7 +288,7 @@ public class JpaTaskHandler implements TaskHandler {
             }
 
             if (!checkTaskChefPrivileges(task)) {
-                return false;
+                throw new InsuficientPrivilegesException();
             }
 
             String username = user.getUsername();
@@ -440,7 +441,7 @@ public class JpaTaskHandler implements TaskHandler {
     }
 
     @Override
-    public Double getWorkedManHoursOfTaskSubtree(Task task) {
+    public Double getWorkedManHoursOfTaskSubtree(Task task) throws EntityDoesNotExistException {
         /*  
          double base = new ArrayList<>(task.getClosureTasksChildren())
          .stream()
@@ -464,6 +465,11 @@ public class JpaTaskHandler implements TaskHandler {
          */
 
         EntityManager em = ((JpaAccessManager) JpaAccessManager.getInstance()).getFactory().createEntityManager();
+        
+        if(task.getId() == null || (task = em.find(Task.class, task.getId())) == null){
+            throw new EntityDoesNotExistException("Task does not exist.");
+        }
+        
         Query q = em.createQuery("SELECT  tt FROM Timetable tt WHERE tt.timetablePK.iDTask = :taskid OR tt.timetablePK.iDTask IN (SELECT ct.closureTasksPK.iDChild FROM ClosureTasks ct WHERE  ct.closureTasksPK.iDParent = :taskid  ) ");
         q.setParameter("taskid", task.getId());
 

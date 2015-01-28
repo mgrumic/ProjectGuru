@@ -78,8 +78,9 @@ public class Login extends Application {
 
         launch(args);
         PersistanceTests test = new PersistanceTests();
+        test.projectHandlerTests();
         test.taskHandlerTests();
-      //  test.projectHandlerTests();
+        System.exit(0);
         
     }
     

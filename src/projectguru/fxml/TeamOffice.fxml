@@ -67,10 +67,7 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="361.0" prefWidth="404.0">
                                        <children>
-                                          <BorderPane layoutX="265.0" layoutY="128.0" prefHeight="510.0" prefWidth="797.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <top>
-                                                <Button mnemonicParsing="false" onAction="#showActivities" text="Button" BorderPane.alignment="CENTER" />
-                                             </top></BorderPane>
+                                          <BorderPane layoutX="265.0" layoutY="128.0" prefHeight="510.0" prefWidth="797.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children></AnchorPane>
                               </content>
                             </Tab>

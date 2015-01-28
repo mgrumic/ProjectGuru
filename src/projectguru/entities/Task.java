@@ -55,11 +55,11 @@ public class Task implements Serializable {
     @Basic(optional = false)
     @Column(name = "AssumedManHours")
     private int assumedManHours;
-    @Basic(optional = false)
+    @Basic(optional = true)
     @Column(name = "StartDate")
     @Temporal(TemporalType.DATE)
     private Date startDate;
-    @Basic(optional = false)
+    @Basic(optional = true)
     @Column(name = "EndDate")
     @Temporal(TemporalType.DATE)
     private Date endDate;

@@ -36,13 +36,13 @@ public interface TaskHandler {
     
     public boolean setChef(Task task, User user) throws EntityDoesNotExistException, StoringException;
     public User getChef(Task task);
-    public boolean addMember(Task task, User user) throws EntityDoesNotExistException, StoringException;
+    public boolean addMember(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException;
     
     public boolean addActivity(Task task, Activity activity) throws EntityDoesNotExistException, StoringException;
     
     public boolean addTimetable(Timetable timetable) throws StoringException;
-    public boolean editTimetable(Timetable timetable) throws StoringException, EntityDoesNotExistException;;
-    public Double getWorkedManHoursOfTaskSubtree(Task task);
+    public boolean editTimetable(Timetable timetable) throws StoringException, EntityDoesNotExistException;
+    public Double getWorkedManHoursOfTaskSubtree(Task task) throws EntityDoesNotExistException;
     
     public boolean isMember(Task task, User user);
     public Task getActiveTask();

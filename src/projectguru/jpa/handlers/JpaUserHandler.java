@@ -49,7 +49,7 @@ public class JpaUserHandler implements UserHandler {
         EntityManager em = emf.createEntityManager();
 
         try {
-            if (user.getUsername() == null || (user = em.find(User.class, user.getUsername())) == null) {
+            if (em.find(User.class, user.getUsername()) == null) {
                 em.getTransaction().begin();
                 em.persist(user);
                 em.getTransaction().commit();
