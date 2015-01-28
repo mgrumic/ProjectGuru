@@ -80,6 +80,7 @@ public class Login extends Application {
       //  PersistanceTests test = new PersistanceTests();
     //    test.taskHandlerTests();
      //   test.projectHandlerTests();
+
         
     }
     

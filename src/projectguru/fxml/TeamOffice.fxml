@@ -29,7 +29,7 @@
                            <children>
                               <Accordion fx:id="accMembers" GridPane.rowIndex="1">
                                 <panes>
-                                  <TitledPane animated="false" text="Članovi">
+                                  <TitledPane animated="false" text="Чланови">
                                     <content>
                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
@@ -42,7 +42,7 @@
                               </Accordion>
                               <Accordion fx:id="accProjects">
                                 <panes>
-                                  <TitledPane animated="false" text="Projekti">
+                                  <TitledPane animated="false" text="Пројекти">
                                     <content>
                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
