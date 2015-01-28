@@ -50,4 +50,25 @@ public class TeamOfficeController {
     {
         this.user = user;
     }
+    
+    @FXML
+    void showActivities(ActionEvent event) {
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/projectguru/fxml/FormActivities.fxml"));
+            
+            Parent root = loader.load();
+            
+            Stage stage = new Stage();
+            
+            stage.setScene(new Scene(root));
+            
+            stage.setTitle("Активности за задатака: ");
+            
+            stage.show();
+            
+        }catch(Exception ex){
+            
+        }
+            
+    }
 }

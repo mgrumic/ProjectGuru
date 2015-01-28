@@ -3,5 +3,7 @@
  */
 
 .mainFxmlClass {
-
+    #gridForm {
+        border: activeborder solid 2px;
+    }
 }
