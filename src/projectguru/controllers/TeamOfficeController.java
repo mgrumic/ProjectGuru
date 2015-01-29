@@ -7,15 +7,14 @@ package projectguru.controllers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -24,34 +23,31 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.ContextMenuBuilder;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.MenuItemBuilder;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialogs;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
 import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
+import projectguru.utils.FormLoader;
 
 /**
  *
@@ -101,6 +97,38 @@ public class TeamOfficeController {
     @FXML
     private AnchorPane anchorHeader;
 
+    @FXML
+    private Button btnAddSubtask;
+
+    @FXML
+    private Button btnAddActivity;
+    
+    @FXML
+    void btnAddSubtaskPressed(ActionEvent event) {
+        
+    }
+
+    @FXML
+    void btnAddActivityPressed(ActionEvent event) {
+        if(treeTasks.getSelectionModel().getSelectedItem() != null)
+        {
+            TaskNode taskNode = treeTasks.getSelectionModel().getSelectedItem().getValue();
+            try {
+                FormLoader.loadFormActivities(taskNode.getTask());
+            } catch (IOException ex) {
+                Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else {
+            
+            Dialogs.create()
+            .owner(new Stage())
+            .title("Напомена")
+            .masthead(null)
+            .message("Изаберите задатак за који желите додати активност !")
+            .showInformation();
+        }
+
+    }
     /**
      * Moje varijable
      */
@@ -119,6 +147,11 @@ public class TeamOfficeController {
 
         assert label != null : "fx:id=\"label\" was not injected: check your FXML file 'TeamOffice.fxml'.";
 
+        btnAddActivity.setGraphic(new ImageView(new Image(TeamOfficeController.class
+            .getResourceAsStream("/projectguru/images/add_activity.png"))));
+        btnAddSubtask.setGraphic(new ImageView(new Image(TeamOfficeController.class
+            .getResourceAsStream("/projectguru/images/add_task.png"))));
+        
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
@@ -130,21 +163,45 @@ public class TeamOfficeController {
         });
 
         rootContextMenu = new ContextMenu();
-        final MenuItem addSubtask = new MenuItem("Add subtask");
-        final MenuItem addActivity = new MenuItem("Add activity");
+        final MenuItem addSubtask = new MenuItem("Додај подзадатак");
+        final MenuItem addActivity = new MenuItem("Додај активност");
         addSubtask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+               
             }
         });
         addActivity.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
+                btnAddActivityPressed(event);
             }
         });
-        
-        
+        rootContextMenu.getItems().addAll(addSubtask, addActivity);
+
+        treeColumnTasks.setCellFactory(new Callback<TreeTableColumn<TaskNode, String>, TreeTableCell<TaskNode, String>>() {
+            @Override
+            public TreeTableCell<TaskNode, String> call(TreeTableColumn<TaskNode, String> param) {
+                TreeTableCell<TaskNode, String> cell = new TreeTableCell<TaskNode, String>() {
+                    @Override
+                    protected void updateItem(String t, boolean bln) {
+                        super.updateItem(t, bln);
+                        if(bln)
+                        {
+                            setText(null);
+                            setContextMenu(null);
+                        }else if (t != null) {
+                            setText(t);
+                            setContextMenu(rootContextMenu);
+                        }
+
+                    }
+
+                };
+                return cell;
+            }
+
+        });
         treeColumnTasks.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<TaskNode, String> param)
                 -> new ReadOnlyStringWrapper(param.getValue().getValue().getTask().getName())
@@ -298,5 +355,5 @@ public class TeamOfficeController {
         }
 
     }
-    
+
 }

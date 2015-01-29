@@ -63,7 +63,7 @@
                      <children>
                         <TabPane blendMode="COLOR_BURN" layoutX="54.0" layoutY="27.0" prefHeight="399.0" prefWidth="485.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <tabs>
-                            <Tab text="Overview">
+                            <Tab text="Преглед стања">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="361.0" prefWidth="404.0">
                                        <children>
@@ -71,25 +71,39 @@
                                        </children></AnchorPane>
                               </content>
                             </Tab>
-                            <Tab text="Tasks     ">
+                            <Tab text="Задаци">
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
                                           <BorderPane layoutX="106.0" layoutY="112.0" prefHeight="510.0" prefWidth="539.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                             <top>
-                                                <Pane prefHeight="44.0" prefWidth="539.0" BorderPane.alignment="CENTER" />
-                                             </top>
                                              <center>
                                                 <TreeTableView fx:id="treeTasks" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                                   <columns>
-                                                    <TreeTableColumn fx:id="treeColumnTasks" prefWidth="343.0" text="Zadaci" />
-                                                    <TreeTableColumn fx:id="treeColumnDescription" prefWidth="181.0" text="Opis" />
+                                                    <TreeTableColumn fx:id="treeColumnTasks" prefWidth="343.0" />
+                                                    <TreeTableColumn fx:id="treeColumnDescription" prefWidth="181.0" text="Опис" />
                                                   </columns>
                                                    <columnResizePolicy>
                                                       <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                    </columnResizePolicy>
                                                 </TreeTableView>
                                              </center>
+                                             <top>
+                                                <FlowPane alignment="CENTER_LEFT" columnHalignment="CENTER" hgap="20.0" prefHeight="47.0" prefWidth="539.0" vgap="20.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Button fx:id="btnAddSubtask" mnemonicParsing="false" onAction="#btnAddSubtaskPressed" text="Додај задатак" />
+                                                      <Button fx:id="btnAddActivity" mnemonicParsing="false" onAction="#btnAddActivityPressed" text="Додај активност" />
+                                                   </children>
+                                                   <opaqueInsets>
+                                                      <Insets />
+                                                   </opaqueInsets>
+                                                   <BorderPane.margin>
+                                                      <Insets />
+                                                   </BorderPane.margin>
+                                                   <padding>
+                                                      <Insets left="20.0" right="20.0" />
+                                                   </padding>
+                                                </FlowPane>
+                                             </top>
                                           </BorderPane>
                                        </children></AnchorPane>
                               </content>
