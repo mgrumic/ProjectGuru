@@ -29,6 +29,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
@@ -102,30 +103,71 @@ public class TeamOfficeController {
 
     @FXML
     private Button btnAddActivity;
-    
+
+    @FXML
+    private Button btnNewProject;
+
+    @FXML
+    private Button btnAddMember;
+
+    @FXML
+    private TextField tfSearchProjects;
+
+    @FXML
+    private TextField tfSearchMembers;
+
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
-        
+
+        ProjectWrapper projectItem = listProjects.getSelectionModel().getSelectedItem();
+        if (projectItem != null) {
+            TreeItem<TaskNode> taskNode = null;
+            if (treeTasks.getRoot() == null) {
+                try {
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null);
+                } catch (IOException ex) {
+                    Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
+                try {
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null);
+                } catch (IOException ex) {
+                    Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                FormLoader.showInformationDialog("Напомена", "Изаберите задатак за који желите додати подзадатак !");
+            }
+        } else {
+            FormLoader.showInformationDialog("Напомена", "Изаберите пројекат за који желите додати подзадатак !");
+        }
+
+    }
+
+    @FXML
+    void btnAddMemberPressed(ActionEvent event) {
+
+    }
+
+    @FXML
+    void btnNewProjectPressed(ActionEvent event) {
+        try {
+            FormLoader.loadFormAddProject();
+        } catch (IOException ex) {
+            Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
     void btnAddActivityPressed(ActionEvent event) {
-        if(treeTasks.getSelectionModel().getSelectedItem() != null)
-        {
+        if (treeTasks.getSelectionModel().getSelectedItem() != null) {
             TaskNode taskNode = treeTasks.getSelectionModel().getSelectedItem().getValue();
             try {
                 FormLoader.loadFormActivities(taskNode.getTask());
             } catch (IOException ex) {
                 Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }else {
-            
-            Dialogs.create()
-            .owner(new Stage())
-            .title("Напомена")
-            .masthead(null)
-            .message("Изаберите задатак за који желите додати активност !")
-            .showInformation();
+        } else {
+            FormLoader.showInformationDialog("Напомена", "Изаберите задатак не који желите додати активност !");
         }
 
     }
@@ -148,10 +190,14 @@ public class TeamOfficeController {
         assert label != null : "fx:id=\"label\" was not injected: check your FXML file 'TeamOffice.fxml'.";
 
         btnAddActivity.setGraphic(new ImageView(new Image(TeamOfficeController.class
-            .getResourceAsStream("/projectguru/images/add_activity.png"))));
+                .getResourceAsStream("/projectguru/images/add_activity.png"))));
         btnAddSubtask.setGraphic(new ImageView(new Image(TeamOfficeController.class
-            .getResourceAsStream("/projectguru/images/add_task.png"))));
-        
+                .getResourceAsStream("/projectguru/images/add_task.png"))));
+        btnAddMember.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/add_member.png"))));
+        btnNewProject.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/add_project.png"))));
+
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
@@ -168,7 +214,7 @@ public class TeamOfficeController {
         addSubtask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-               
+                btnAddSubtaskPressed(event);
             }
         });
         addActivity.setOnAction(new EventHandler<ActionEvent>() {
@@ -186,11 +232,10 @@ public class TeamOfficeController {
                     @Override
                     protected void updateItem(String t, boolean bln) {
                         super.updateItem(t, bln);
-                        if(bln)
-                        {
+                        if (bln) {
                             setText(null);
                             setContextMenu(null);
-                        }else if (t != null) {
+                        } else if (t != null) {
                             setText(t);
                             setContextMenu(rootContextMenu);
                         }
@@ -225,6 +270,20 @@ public class TeamOfficeController {
                         }));
         timeline.playFromStart();
 
+        tfSearchProjects.textProperty().addListener(new ChangeListener() {
+            public void changed(ObservableValue observable, Object oldVal,
+                    Object newVal) {
+                searchProjects((String) oldVal, (String) newVal);
+            }
+        });
+        tfSearchMembers.textProperty().addListener(new ChangeListener() {
+            public void changed(ObservableValue observable, Object oldVal,
+                    Object newVal) {
+                if(listProjects.getSelectionModel().getSelectedItem() != null) {
+                    searchMembers((String) oldVal, (String) newVal);
+                }
+            }
+        });
     }
 
     public void setUser(LoggedUser user) {
@@ -283,6 +342,48 @@ public class TeamOfficeController {
         long m = (ellapsed / 60) % 60;
         long h = (ellapsed / (60 * 60)) % 24;
         lblTime.setText(String.format("%02d:%02d:%02d", h, m, s));
+    }
+
+    private void searchProjects(String oldValue, String newValue) {
+        if (oldValue != null && (newValue.length() < oldValue.length())) {
+            listProjects.setItems(projects);
+        }
+        if(newValue.length() == 0)
+        {
+            loadProjects();
+            return;
+        }
+        String value = newValue.toUpperCase();
+        ObservableList<ProjectWrapper> subentries = FXCollections.observableArrayList();
+        for (Object entry : listProjects.getItems()) {
+            boolean match = true;
+            ProjectWrapper entryProject = (ProjectWrapper) entry;
+            if (entryProject.getProject().getName().toUpperCase().startsWith(value)) {
+                subentries.add(entryProject);
+            }
+        }
+        listProjects.setItems(subentries);
+    }
+
+    private void searchMembers(String oldValue, String newValue) {
+        if (oldValue != null && (newValue.length() < oldValue.length())) {
+            listMembers.setItems(members);
+        }
+        if(newValue.length() == 0 && listProjects.getSelectionModel().getSelectedItem() != null)
+        {
+            loadMembers(listProjects.getSelectionModel().getSelectedItem().getProject());
+            return;
+        }
+        String value = newValue.toUpperCase();
+        ObservableList<UserWrapper> subentries = FXCollections.observableArrayList();
+        for (Object entry : listMembers.getItems()) {
+            boolean match = true;
+            UserWrapper entryUser = (UserWrapper) entry;
+            if (entryUser.getUser().getUsername().toUpperCase().startsWith(value)) {
+                subentries.add(entryUser);
+            }
+        }
+        listMembers.setItems(subentries);
     }
 
     /**

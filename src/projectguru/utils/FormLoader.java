@@ -13,6 +13,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.controlsfx.dialog.Dialogs;
+import projectguru.entities.Project;
 import projectguru.entities.Task;
 
 /**
@@ -21,6 +23,22 @@ import projectguru.entities.Task;
  */
 public class FormLoader {
     
+    public static void loadFormAddProject() throws IOException
+    {
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddProject.fxml"));
+            
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddproject.css").toExternalForm());
+
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Нови пројекат");
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.show();
+    }
     public static void loadFormActivities(Task task) throws IOException
     {   
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormActivities.fxml"));
@@ -36,6 +54,37 @@ public class FormLoader {
         stage.initModality(Modality.APPLICATION_MODAL);
 
         stage.show();
+    }
+    /**
+     * Poziva se kada se dodaje podzadatak za neki zadatak
+     * @param task
+     * @throws IOException 
+     */
+    public static void loadFormAddTask(Project project, Task task) throws IOException
+    {
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddTask.fxml"));
+            
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddtask.css").toExternalForm());
+
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Задаци");
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.show();
+    }
+
+    public static void showInformationDialog(String title, String message)
+    {
+        Dialogs.create()
+            .owner(new Stage())
+            .title(title)
+            .masthead(null)
+            .message(message)
+            .showInformation();
     }
    
 }

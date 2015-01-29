@@ -14,7 +14,7 @@
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
       <BorderPane prefHeight="461.0" prefWidth="675.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <center>
-            <SplitPane dividerPositions="0.32503113325031135" prefHeight="568.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+            <SplitPane dividerPositions="0.3300124533001245" prefHeight="568.0" prefWidth="900.0" BorderPane.alignment="CENTER">
               <items>
                 <AnchorPane fx:id="leftPane" minHeight="0.0" minWidth="200.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                      <children>
@@ -28,17 +28,29 @@
                           </rowConstraints>
                            <children>
                               <Accordion fx:id="accMembers" GridPane.rowIndex="1">
-                                <panes>
+                                 <panes>
                                   <TitledPane animated="false" text="Чланови">
                                     <content>
                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
-                                                <ListView fx:id="listMembers" layoutX="14.0" layoutY="22.0" prefHeight="243.0" prefWidth="244.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <BorderPane layoutX="23.0" layoutY="14.0" prefHeight="244.0" prefWidth="246.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <center>
+                                                      <ListView fx:id="listMembers" prefHeight="198.0" prefWidth="227.0" BorderPane.alignment="CENTER" />
+                                                   </center>
+                                                   <top>
+                                                      <HBox alignment="CENTER" prefHeight="35.0" prefWidth="227.0" spacing="5.0" BorderPane.alignment="CENTER">
+                                                         <children>
+                                                            <TextField fx:id="tfSearchMembers" promptText="Претрага" HBox.hgrow="ALWAYS" />
+                                                            <Button fx:id="btnAddMember" mnemonicParsing="false" onAction="#btnAddMemberPressed" prefHeight="25.0" prefWidth="74.0" text="Додај" HBox.hgrow="ALWAYS" />
+                                                         </children>
+                                                      </HBox>
+                                                   </top>
+                                                </BorderPane>
                                              </children>
                                           </AnchorPane>
                                     </content>
                                   </TitledPane>
-                                </panes>
+                                 </panes>
                               </Accordion>
                               <Accordion fx:id="accProjects">
                                 <panes>
@@ -46,7 +58,19 @@
                                     <content>
                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                              <children>
-                                                <ListView fx:id="listProjects" layoutX="44.0" layoutY="22.0" prefHeight="244.0" prefWidth="244.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                <BorderPane layoutX="28.0" layoutY="-12.0" prefHeight="244.0" prefWidth="256.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <center>
+                                                      <ListView fx:id="listProjects" prefHeight="244.0" prefWidth="244.0" BorderPane.alignment="CENTER" />
+                                                   </center>
+                                                   <top>
+                                                      <HBox alignment="CENTER" prefHeight="34.0" prefWidth="227.0" spacing="5.0" BorderPane.alignment="CENTER">
+                                                         <children>
+                                                            <TextField fx:id="tfSearchProjects" promptText="Претрага" HBox.hgrow="ALWAYS" />
+                                                            <Button fx:id="btnNewProject" mnemonicParsing="false" onAction="#btnNewProjectPressed" prefHeight="25.0" prefWidth="78.0" text="Нови " HBox.hgrow="ALWAYS" />
+                                                         </children>
+                                                      </HBox>
+                                                   </top>
+                                                </BorderPane>
                                              </children>
                                           </AnchorPane>
                                     </content>
