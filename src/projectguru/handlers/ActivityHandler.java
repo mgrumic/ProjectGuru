@@ -5,9 +5,11 @@
  */
 package projectguru.handlers;
 
+import java.util.List;
 import projectguru.entities.Activity;
 import projectguru.entities.Expense;
 import projectguru.entities.Income;
+import projectguru.entities.Task;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
@@ -35,6 +37,8 @@ public interface ActivityHandler {
     public boolean addExpense(Activity activity, Expense exp) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
 
     public boolean addIncome(Activity activity, Income inc) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
+    
+    public List<Activity> findActivitiesForTask(Task task, boolean includeSubtasks, boolean onlyForCurrentUser) throws InsuficientPrivilegesException, StoringException;
     
     public Activity getUpdatedActivity(Activity activity)throws EntityDoesNotExistException; 
 }

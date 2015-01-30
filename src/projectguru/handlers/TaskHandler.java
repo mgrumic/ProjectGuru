@@ -91,7 +91,7 @@ public interface TaskHandler {
     
     /**
      * 
-     * Same as startTask(task, OnBusyWorkers.THROW_EXCEPTION)
+     * Same as startTask(task, OnBusyWorkers.SIMPLE)
      * 
      * @param task task to be started
      * @return true if successful, false otherwise.
@@ -99,15 +99,17 @@ public interface TaskHandler {
      * @throws BusyWorkersException
      * @throws StoringException 
      */
-    public boolean startTask(Task task) throws EntityDoesNotExistException, BusyWorkersException, StoringException;
+    public boolean startTask(Task task) throws EntityDoesNotExistException, StoringException;
     /**
      *  Sets task's start date to current date.
      *  Sets this task as active task to all available members.
-     *  Member is available if it's active task is direct parent of this task or if it does not have active task.
+     *  Member is available if it does not have active task.
+     *  If onBusyWorkers is set to TRANSFER_FROM_PARENT_TASK it will set this task as active task to all members
+     *  who's active task is direct parent of this task.
      *  If there are unavailable members and onBusyWorkers is THROW_EXCEPTION it will throw BusyWorkersException.
      * 
      * @param task
-     * @param onBusyWorkers
+     * @param onBusyWorkers defines behavior if there are workers active on other tasks, excluding direct parent of this task.
      * @return true if successful.
      * @throws EntityDoesNotExistException
      * @throws BusyWorkersException
@@ -149,7 +151,7 @@ public interface TaskHandler {
     
     
     public enum OnBusyWorkers {
-        THROW_EXCEPTION, TRANSFER_FROM_PARENT_TASK
+        THROW_EXCEPTION, TRANSFER_FROM_PARENT_TASK, SIMPLE
     }
     
 }

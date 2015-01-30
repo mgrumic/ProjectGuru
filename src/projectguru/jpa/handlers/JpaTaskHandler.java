@@ -649,8 +649,13 @@ public class JpaTaskHandler implements TaskHandler {
     }
 
     @Override
-    public boolean startTask(Task task) throws EntityDoesNotExistException, BusyWorkersException, StoringException {
-        return startTask(task, OnBusyWorkers.THROW_EXCEPTION);
+    public boolean startTask(Task task) throws EntityDoesNotExistException, StoringException {
+        try{
+            return startTask(task, OnBusyWorkers.SIMPLE);
+        }catch(BusyWorkersException bwe){
+            
+        }
+        return false;
     }
 
     @Override
@@ -669,30 +674,41 @@ public class JpaTaskHandler implements TaskHandler {
 
             //da vidimo da li su svi radnici spremini.
             BusyWorkersException bwe = new BusyWorkersException("Some workers are busy doing other tasks");
-            //List<User> available = new ArrayList<>();
-            List<WorksOnTask> available_wot = new ArrayList<>();
+
+            List<WorksOnTask> availableFromParentWots = new ArrayList<>();
+            List<WorksOnTask> availableNoActiveWots = new ArrayList<>();
             try {
                 em.getTransaction().begin();
 
                 for (WorksOnTask wot : task.getWorksOnTaskList()) {
                     Task active = getActiveTask(wot.getWorksOnTaskPK().getUsername());
-                    //ako je roditelj aktivni zadatak trenutnog radnika na zadataku task ili ako nema aktivnog zadtaka:
-                    if (active == null || new ArrayList<>(task.getClosureTasksParents())
+                    
+                    //ako nema aktivnog
+                    if (active == null) {
+                            availableNoActiveWots.add(wot);
+                            continue;
+                    }
+                    
+                    //ako je otac aktivni
+                    if (new ArrayList<>(task.getClosureTasksParents())
                             .stream()
                             .anyMatch((a) -> a.getParent().equals(active) && a.getDepth() == 1)) {
                         //ovaj radnik je raspoloziv
-                        //available.add(wot.getUser());
-                        available_wot.add(wot);
-                        //moram naci wot koji povezuje active i wot.getUser(), i postaviti da je working false
-                        if (active == null) {
-                            continue;
+   
+                        if(onBusyWorkers == OnBusyWorkers.TRANSFER_FROM_PARENT_TASK){
+                            availableFromParentWots.add(wot);
+                            //moram naci wot koji povezuje active i wot.getUser(), i postaviti da je working false
+                            WorksOnTask wot1 = getWorksOnTask(active, wot.getUser());
+                            wot1.setWorking(false);
+                            em.merge(wot1);
                         }
-                        WorksOnTask wot1 = getWorksOnTask(active, wot.getUser());
-                        wot1.setWorking(false);
-                        em.merge(wot1);
-                    } else {
-                        bwe.add(wot.getUser());
-                    }
+                        
+                        continue;
+                    } 
+                    
+                    
+                    bwe.add(wot.getUser());
+                    
                 }
 
                 if (bwe.getList().size() > 0) {
@@ -701,12 +717,24 @@ public class JpaTaskHandler implements TaskHandler {
                     }
                 }
 
+                if(onBusyWorkers == OnBusyWorkers.TRANSFER_FROM_PARENT_TASK){
+                    //postavim svima raspolozivim da je aktivni ovaj task
+                    //a vec je postavljeno da dosadasnji vise nije aktivan
+                    for (WorksOnTask wot : availableFromParentWots) {
+                        wot.setWorking(true);
+                        em.merge(wot);
+
+                    }
+                }
+                
                 //postavim svima raspolozivim da je aktivni ovaj task
-                for (WorksOnTask wot : available_wot) {
+                //a vec je postavljeno da dosadasnji vise nije aktivan
+                for (WorksOnTask wot : availableNoActiveWots) {
                     wot.setWorking(true);
                     em.merge(wot);
-                }
 
+                }
+                
                 //Ovde koristim Java 8 time API, iz paketa java.time, on je navodno bolji i nije bagovit ko ovi do sada.
                 LocalDateTime ld = LocalDateTime.now();
                 task.setStartDate(java.util.Date.from(ld.atZone(ZoneId.systemDefault()).toInstant()));
