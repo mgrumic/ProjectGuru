@@ -338,11 +338,11 @@ public class JpaTaskHandler implements TaskHandler {
 
                 em.persist(nwot);
                 em.getTransaction().commit();
-                em.refresh(task);
+//                em.refresh(task);
                 em.refresh(user);
                 return true;
             } catch (Exception ex) {
-                //ex.printStackTrace();
+                ex.printStackTrace();
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
                 }

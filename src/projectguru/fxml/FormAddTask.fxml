@@ -7,41 +7,65 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="478.0" prefWidth="460.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormAddTaskController">
+<AnchorPane id="AnchorPane" prefHeight="425.0" prefWidth="412.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormAddTaskController">
    <children>
-      <AnchorPane fx:id="page1" layoutY="1.0" prefHeight="474.0" prefWidth="460.0" visible="false">
-         <children>
-            <TextArea fx:id="description" layoutX="161.0" layoutY="258.0" prefHeight="99.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
-            <TextField fx:id="mensHours" layoutX="161.0" layoutY="207.0" prefHeight="25.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
-            <Label layoutX="63.0" layoutY="260.0" text="Description:" />
-            <Label layoutX="63.0" layoutY="93.0" text="Name:" />
-            <Label layoutX="63.0" layoutY="211.0" text="Men/Hours:" />
-            <DatePicker fx:id="end" layoutX="161.0" layoutY="168.0" prefHeight="25.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
-            <Label layoutX="65.0" layoutY="170.0" text="Ends:" />
-            <DatePicker fx:id="start" layoutX="161.0" layoutY="130.0" prefHeight="25.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
-            <Label layoutX="63.0" layoutY="134.0" text="Starts at:" />
-            <TextField fx:id="name" layoutX="161.0" layoutY="89.0" prefHeight="25.0" prefWidth="267.0" AnchorPane.leftAnchor="161.0" />
-            <Label layoutX="63.0" layoutY="40.0" text="New task:">
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font>
-            </Label>
-            <Button fx:id="buttonNext" layoutX="255.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="76.0" text="Next" AnchorPane.leftAnchor="255.0" />
-            <Button fx:id="buttonOK" layoutX="354.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="76.0" text="Finish" AnchorPane.leftAnchor="352.0" />
-         </children>
-      </AnchorPane>
-      <AnchorPane fx:id="page2" prefHeight="478.0" prefWidth="460.0" visible="false">
-         <children>
-            <ListView fx:id="listViewSelectedMembers" layoutX="29.0" layoutY="51.0" prefHeight="294.0" prefWidth="167.0" AnchorPane.leftAnchor="263.0" />
-            <ListView fx:id="listViewAllMembers" layoutX="29.0" layoutY="51.0" prefHeight="294.0" prefWidth="167.0" AnchorPane.leftAnchor="29.0" />
-            <Label layoutX="29.0" layoutY="23.0" text="Members:" />
-            <Button fx:id="buttonAllToSel" layoutX="214.0" layoutY="85.0" mnemonicParsing="false" text="&lt;&lt;" AnchorPane.leftAnchor="214.0" />
-            <Button fx:id="buttonOneToSel" layoutX="214.0" layoutY="120.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="&lt;" AnchorPane.leftAnchor="214.0" />
-            <Button fx:id="buttonAllFromSel" layoutX="214.0" layoutY="155.0" mnemonicParsing="false" text="&gt;&gt;" AnchorPane.leftAnchor="214.0" />
-            <Button fx:id="buttonOneFromSel" layoutX="214.0" layoutY="190.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="&gt;" AnchorPane.leftAnchor="214.0" />
-            <Button fx:id="buttonPrevious" layoutX="255.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="76.0" text="Previous" AnchorPane.leftAnchor="256.0" />
-            <Button fx:id="buttonOk" layoutX="354.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="76.0" text="Finish" AnchorPane.leftAnchor="354.0" />
-         </children>
-      </AnchorPane>
+      <BorderPane fx:id="borderPane" layoutX="62.0" layoutY="141.0" prefHeight="536.0" prefWidth="413.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <Pane prefHeight="41.0" prefWidth="433.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label layoutX="38.0" layoutY="10.0" text="Нови задатак:">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+         </top>
+         <center>
+            <AnchorPane BorderPane.alignment="CENTER">
+               <children>
+                  <GridPane prefHeight="269.0" prefWidth="412.0" AnchorPane.bottomAnchor="61.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="269.0" minWidth="10.0" prefWidth="29.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="269.0" minWidth="10.0" prefWidth="174.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="403.0" minWidth="10.0" prefWidth="169.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="403.0" minWidth="10.0" prefWidth="42.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Назив:" GridPane.columnIndex="1" />
+                        <TextField fx:id="name" prefHeight="25.0" prefWidth="201.0" GridPane.columnIndex="2" />
+                        <Label prefHeight="29.0" prefWidth="153.0" text="Предвиђено човјек/часова:" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label text="Опис:" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <TextField fx:id="menHours" prefHeight="25.0" prefWidth="201.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                        <TextField fx:id="description" prefHeight="77.0" prefWidth="229.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                        <Label text="Датум почетка:" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label text="Датум краја:" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <DatePicker fx:id="start" prefHeight="25.0" prefWidth="267.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                        <DatePicker fx:id="ends" prefHeight="25.0" prefWidth="267.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <Label text="Крајњи рок:" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <DatePicker fx:id="dedline" prefHeight="25.0" prefWidth="267.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                     </children>
+                  </GridPane>
+                  <Label fx:id="label" layoutX="28.0" layoutY="292.0" prefHeight="17.0" prefWidth="342.0" text="Попуните сва поља" />
+               </children>
+            </AnchorPane>
+         </center>
+         <bottom>
+            <AnchorPane prefHeight="54.0" prefWidth="380.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="btnFinish" layoutX="217.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="109.0" text="Креирај задатак" AnchorPane.rightAnchor="131.0" />
+                  <Button fx:id="btnNext" layoutX="320.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" text="Даље" AnchorPane.rightAnchor="28.0" />
+               </children>
+            </AnchorPane>
+         </bottom>
+      </BorderPane>
    </children>
 </AnchorPane>

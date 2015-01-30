@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="page2" prefHeight="330.0" prefWidth="412.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ListView fx:id="listViewSelectedMembers" layoutX="277.0" layoutY="51.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="50.0" />
+      <ListView fx:id="listViewAllMembers" layoutX="29.0" layoutY="51.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="250.0" AnchorPane.topAnchor="50.0" />
+      <Label layoutX="29.0" layoutY="23.0" text="Чланови:" />
+      <Button fx:id="buttonUnselectAll" layoutX="190.0" layoutY="205.0" mnemonicParsing="false" text="&lt;&lt;" AnchorPane.leftAnchor="190.0" />
+      <Button fx:id="buttonUnselectOne" layoutX="190.0" layoutY="172.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="&lt;" AnchorPane.leftAnchor="190.0" />
+      <Button fx:id="buttonSelectAll" layoutX="190.0" layoutY="100.0" mnemonicParsing="false" text="&gt;&gt;" AnchorPane.leftAnchor="190.0" />
+      <Button fx:id="buttonSelectOne" layoutX="190.0" layoutY="135.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="&gt;" AnchorPane.leftAnchor="190.0" />
+   </children>
+</AnchorPane>

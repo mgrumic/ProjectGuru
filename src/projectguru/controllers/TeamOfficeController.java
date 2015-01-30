@@ -124,17 +124,18 @@ public class TeamOfficeController {
             TreeItem<TaskNode> taskNode = null;
             if (treeTasks.getRoot() == null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
+
                 FormLoader.showInformationDialog("Напомена", "Изаберите задатак за који желите додати подзадатак !");
             }
         } else {
@@ -151,7 +152,7 @@ public class TeamOfficeController {
     @FXML
     void btnNewProjectPressed(ActionEvent event) {
         try {
-            FormLoader.loadFormAddProject();
+            FormLoader.loadFormAddProject(user);
         } catch (IOException ex) {
             Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -279,7 +280,7 @@ public class TeamOfficeController {
         tfSearchMembers.textProperty().addListener(new ChangeListener() {
             public void changed(ObservableValue observable, Object oldVal,
                     Object newVal) {
-                if(listProjects.getSelectionModel().getSelectedItem() != null) {
+                if (listProjects.getSelectionModel().getSelectedItem() != null) {
                     searchMembers((String) oldVal, (String) newVal);
                 }
             }
@@ -348,8 +349,7 @@ public class TeamOfficeController {
         if (oldValue != null && (newValue.length() < oldValue.length())) {
             listProjects.setItems(projects);
         }
-        if(newValue.length() == 0)
-        {
+        if (newValue.length() == 0) {
             loadProjects();
             return;
         }
@@ -369,8 +369,7 @@ public class TeamOfficeController {
         if (oldValue != null && (newValue.length() < oldValue.length())) {
             listMembers.setItems(members);
         }
-        if(newValue.length() == 0 && listProjects.getSelectionModel().getSelectedItem() != null)
-        {
+        if (newValue.length() == 0 && listProjects.getSelectionModel().getSelectedItem() != null) {
             loadMembers(listProjects.getSelectionModel().getSelectedItem().getProject());
             return;
         }
@@ -411,7 +410,7 @@ public class TeamOfficeController {
         }
     }
 
-    private static class UserWrapper {
+    public static class UserWrapper {
 
         private User user;
 

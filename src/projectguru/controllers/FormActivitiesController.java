@@ -23,11 +23,6 @@ import javafx.scene.control.TextField;
  * @author marko
  */
 public class FormActivitiesController implements Initializable {
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
 
 
     @FXML
