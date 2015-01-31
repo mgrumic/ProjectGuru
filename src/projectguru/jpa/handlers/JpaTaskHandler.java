@@ -646,6 +646,20 @@ public class JpaTaskHandler implements TaskHandler {
         for (TaskNode tn : children) {
             recursiveTreeGeneration(tn);
         }
+        double part = 1.0 / (children.size() + 1);
+        double partDone = 0.0;
+        
+        for(TaskNode ch : children){
+            partDone += part*ch.getPartDone();
+        }
+        
+        //ako je ovaj zadatak uradjen, treba i njega dodati u racun
+        if(root.getTask().getEndDate() != null){
+            partDone += part;
+        }
+        
+        root.setPartDone(partDone);
+
     }
 
     @Override

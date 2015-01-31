@@ -15,6 +15,15 @@ import projectguru.entities.Task;
  */
 public class TaskNode {
     protected Task task;
+    protected double partDone;
+
+    public double getPartDone() {
+        return partDone;
+    }
+
+    public void setPartDone(double partDone) {
+        this.partDone = partDone;
+    }
 
     public TaskNode(Task task) {
         this.task = task;

@@ -32,6 +32,7 @@ public interface ProjectHandler {
     public List<Project> getAllProjects();
     
     public List<User> getAllMembers(Project project);
+    public List<User> getAllChefs(Project project);
     
     public boolean createProject(Project project) throws  InsuficientPrivilegesException, StoringException;
     public boolean editProject(Project project) throws InsuficientPrivilegesException, EntityDoesNotExistException, StoringException;

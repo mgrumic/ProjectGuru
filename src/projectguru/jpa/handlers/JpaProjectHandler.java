@@ -103,6 +103,32 @@ public class JpaProjectHandler implements ProjectHandler {
         }
         return new ArrayList<User>();
     }
+    
+    @Override
+    public List<User> getAllChefs(Project project) {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        try {
+
+            TypedQuery<User> query = em.createQuery("SELECT wop.user FROM Project p, IN(p.worksOnProjectList) wop WHERE p.id = :id "
+                    + "and wop.privileges = :privileges", User.class);
+            
+            query.setParameter("id", project.getId());
+            query.setParameter("privileges", Privileges.CHEF.ordinal());
+            
+           // System.out.println(Privileges.CHEF.ordinal());
+            
+            return query.getResultList();
+
+        } catch (Exception ex) {
+            System.out.println("Exception !");
+        } finally {
+            em.close();
+        }
+        return new ArrayList<User>();
+    }
+    
 
     @Override
     public boolean createProject(Project project) throws InsuficientPrivilegesException, StoringException {

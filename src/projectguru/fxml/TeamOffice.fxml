@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
@@ -9,12 +10,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="640.0" prefWidth="805.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.TeamOfficeController">
+<AnchorPane id="AnchorPane" prefHeight="664.0" prefWidth="1237.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.TeamOfficeController">
     <children>
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
       <BorderPane prefHeight="461.0" prefWidth="675.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <center>
-            <SplitPane dividerPositions="0.3300124533001245" prefHeight="568.0" prefWidth="900.0" BorderPane.alignment="CENTER">
+            <SplitPane dividerPositions="0.24615384615384617" prefHeight="568.0" prefWidth="900.0" BorderPane.alignment="CENTER">
               <items>
                 <AnchorPane fx:id="leftPane" minHeight="0.0" minWidth="200.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                      <children>
@@ -91,7 +92,63 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="361.0" prefWidth="404.0">
                                        <children>
-                                          <BorderPane layoutX="265.0" layoutY="128.0" prefHeight="510.0" prefWidth="797.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <BorderPane layoutX="265.0" layoutY="128.0" prefHeight="510.0" prefWidth="797.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <center>
+                                                <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Label layoutX="43.0" layoutY="61.0" text="Oпис:" AnchorPane.leftAnchor="43.0" AnchorPane.topAnchor="61.0" />
+                                                      <TextArea fx:id="tAreaDescription" editable="false" focusTraversable="false" layoutX="43.0" layoutY="78.0" prefHeight="102.0" prefWidth="501.0" text="Има несто текста." wrapText="true" AnchorPane.leftAnchor="43.0" AnchorPane.rightAnchor="32.0" AnchorPane.topAnchor="78.0">
+                                                         <cursor>
+                                                            <Cursor fx:constant="DEFAULT" />
+                                                         </cursor>
+                                                      </TextArea>
+                                                      <Label fx:id="lblProjectName" layoutX="43.0" layoutY="14.0" prefHeight="27.0" prefWidth="196.0" text="Project Guru" AnchorPane.leftAnchor="43.0" AnchorPane.topAnchor="14.0">
+                                                         <font>
+                                                            <Font name="System Bold" size="18.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Label layoutX="322.0" layoutY="19.0" text="Укупно одрађено:" AnchorPane.rightAnchor="113.0" />
+                                                      <Label fx:id="lblProjectCompleted" layoutX="441.0" layoutY="15.0" prefHeight="25.0" prefWidth="57.0" text="34 %" AnchorPane.rightAnchor="44.0">
+                                                         <font>
+                                                            <Font name="System Bold" size="16.0" />
+                                                         </font>
+                                                      </Label>
+                                                      <Label layoutX="43.0" layoutY="185.0" text="Шефови пројекта:" />
+                                                      <ListView fx:id="listChefs" layoutX="44.0" layoutY="205.0" prefHeight="264.0" prefWidth="189.0" />
+                                                      <GridPane alignment="CENTER" layoutX="273.0" layoutY="206.0" prefHeight="208.0" prefWidth="271.0" AnchorPane.leftAnchor="273.0">
+                                                        <columnConstraints>
+                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="170.0" minWidth="10.0" prefWidth="156.0" />
+                                                          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="130.0" minWidth="10.0" prefWidth="115.0" />
+                                                        </columnConstraints>
+                                                        <rowConstraints>
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                        </rowConstraints>
+                                                         <children>
+                                                            <Label text="Датум почетка:" />
+                                                            <Label fx:id="lblStartDate" prefHeight="17.0" prefWidth="112.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                                                            <Label text="Датум краја:" GridPane.rowIndex="1" />
+                                                            <Label fx:id="lblEndDate" prefHeight="17.0" prefWidth="113.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                                                            <Label text="Планирани буџет:" GridPane.rowIndex="3" />
+                                                            <Label fx:id="lblBudget" prefHeight="17.0" prefWidth="115.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+                                                            <Label text="Укупан број учесника:" GridPane.rowIndex="5" />
+                                                            <Label fx:id="lblNumMembers" prefHeight="17.0" prefWidth="114.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
+                                                            <Label prefHeight="17.0" prefWidth="122.0" text="Укупан број задатака:" GridPane.rowIndex="6" />
+                                                            <Label fx:id="lblNumTasks" prefHeight="17.0" prefWidth="114.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
+                                                            <Label text="Укупан број активности:" GridPane.rowIndex="7" />
+                                                            <Label fx:id="lblNumActivities" prefHeight="17.0" prefWidth="113.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
+                                                         </children>
+                                                      </GridPane>
+                                                      <PieChart fx:id="chartPie" layoutX="621.0" layoutY="201.0" prefHeight="210.0" prefWidth="350.0" title="Укупно одрађено: 34 %" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="201.0" />
+                                                   </children>
+                                                </AnchorPane>
+                                             </center></BorderPane>
                                        </children></AnchorPane>
                               </content>
                             </Tab>
@@ -103,8 +160,9 @@
                                              <center>
                                                 <TreeTableView fx:id="treeTasks" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                                   <columns>
-                                                    <TreeTableColumn fx:id="treeColumnTasks" prefWidth="343.0" />
-                                                    <TreeTableColumn fx:id="treeColumnDescription" prefWidth="181.0" text="Опис" />
+                                                    <TreeTableColumn fx:id="treeColumnTasks" prefWidth="358.0" />
+                                                      <TreeTableColumn fx:id="treeColumnCompleted" maxWidth="2200.0" prefWidth="260.0" text="Завршено" />
+                                                    <TreeTableColumn fx:id="treeColumnDescription" prefWidth="408.0" text="Опис" />
                                                   </columns>
                                                    <columnResizePolicy>
                                                       <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -144,17 +202,18 @@
                <top>
                   <MenuBar BorderPane.alignment="CENTER">
                     <menus>
-                      <Menu mnemonicParsing="false" text="File">
+                      <Menu mnemonicParsing="false" text="Апликација">
                         <items>
+                              <MenuItem fx:id="mItemKorisnickiNalozi" mnemonicParsing="false" onAction="#mItemKorisnickNaloziPressed" text="Кориснички налози" />
                           <MenuItem mnemonicParsing="false" text="Close" />
                         </items>
                       </Menu>
-                      <Menu mnemonicParsing="false" text="Edit">
+                      <Menu mnemonicParsing="false" text="Опције">
                         <items>
                           <MenuItem mnemonicParsing="false" text="Delete" />
                         </items>
                       </Menu>
-                      <Menu mnemonicParsing="false" text="Help">
+                      <Menu mnemonicParsing="false" text="Помоћ">
                         <items>
                           <MenuItem mnemonicParsing="false" text="About" />
                         </items>
@@ -170,7 +229,7 @@
                               <Font name="System Bold" size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="14.0" layoutY="10.0" text="ProjectGuru" AnchorPane.leftAnchor="14.0">
+                        <Label layoutX="14.0" layoutY="10.0" text="Пројекат Гуру" AnchorPane.leftAnchor="14.0">
                            <font>
                               <Font name="System Bold" size="18.0" />
                            </font>

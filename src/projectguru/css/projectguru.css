@@ -17,3 +17,11 @@
 .titled-pane {
     -fx-font-size: 13px;
 }
+
+.progress-bar { -fx-box-border: goldenrod; }
+
+.green-bar  { -fx-accent: green;  }
+.yellow-bar { -fx-accent: yellow; }
+.orange-bar { -fx-accent: orange; }
+.red-bar    { -fx-accent: red;    }
+.blue-bar   { -fx-accent: blue;   }

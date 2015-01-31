@@ -59,7 +59,7 @@ public class Login extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add(this.getClass().getResource("/projectguru/css/login.css").toExternalForm());
         
-        primaryStage.setTitle("Login");
+        primaryStage.setTitle("Пријава на систем");
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.UTILITY);
         primaryStage.setResizable(false);

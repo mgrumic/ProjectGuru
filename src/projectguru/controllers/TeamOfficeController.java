@@ -7,6 +7,7 @@ package projectguru.controllers;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -14,8 +15,13 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
+
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,20 +29,26 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -85,36 +97,54 @@ public class TeamOfficeController {
 
     @FXML
     private TreeTableView<TaskNode> treeTasks;
-
     @FXML
     private TreeTableColumn<TaskNode, String> treeColumnTasks;
-
     @FXML
     private TreeTableColumn<TaskNode, String> treeColumnDescription;
+    @FXML
+    private TreeTableColumn<TaskNode, Double> treeColumnCompleted;
 
     @FXML
     private Label lblTime;
-
     @FXML
     private AnchorPane anchorHeader;
-
     @FXML
     private Button btnAddSubtask;
-
     @FXML
     private Button btnAddActivity;
-
     @FXML
     private Button btnNewProject;
-
     @FXML
     private Button btnAddMember;
-
     @FXML
     private TextField tfSearchProjects;
-
     @FXML
     private TextField tfSearchMembers;
+
+    @FXML
+    private Label lblProjectName;
+    @FXML
+    private Label lblProjectCompleted;
+    @FXML
+    private Label lblStartDate;
+    @FXML
+    private TextArea tAreaDescription;
+    @FXML
+    private Label lblNumMembers;
+    @FXML
+    private Label lblEndDate;
+    @FXML
+    private Label lblBudget;
+    @FXML
+    private Label lblNumActivities;
+    @FXML
+    private Label lblNumTasks;
+    @FXML
+    private PieChart chartPie;
+    @FXML
+    private ListView<UserWrapper> listChefs;
+    @FXML
+    private MenuItem mItemKorisnickiNalozi;
 
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
@@ -171,6 +201,12 @@ public class TeamOfficeController {
         }
 
     }
+
+    @FXML
+    void mItemKorisnickNaloziPressed(ActionEvent event) {
+
+    }
+
     /**
      * Moje varijable
      */
@@ -202,8 +238,14 @@ public class TeamOfficeController {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
                 if (newValue != null) {
-                    loadMembers(newValue.getProject());
-                    loadTaskTree(newValue.getProject());
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            loadMembers(newValue.getProject());
+                            loadTaskTree(newValue.getProject());
+                            setOverviewTab();
+                        }
+                    });
                 }
             }
         });
@@ -247,6 +289,28 @@ public class TeamOfficeController {
             }
 
         });
+        treeColumnCompleted.setCellFactory(new Callback<TreeTableColumn<TaskNode, Double>, TreeTableCell<TaskNode, Double>>() {
+            @Override
+            public TreeTableCell<TaskNode, Double> call(TreeTableColumn<TaskNode, Double> param) {
+                TreeTableCell<TaskNode, Double> cell = new TreeTableCell<TaskNode, Double>() {
+                    @Override
+                    protected void updateItem(Double t, boolean bln) {
+                        super.updateItem(t, bln);
+                        if (bln) {
+                            setText(null);
+                            setGraphic(null);
+                        } else if (t != null) {
+                            setAlignment(Pos.CENTER);
+                            setText(t * 100 + "%");
+                            setGraphic(new ColoredProgressBar(t));
+                        }
+
+                    }
+
+                };
+                return cell;
+            }
+        });
         treeColumnTasks.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<TaskNode, String> param)
                 -> new ReadOnlyStringWrapper(param.getValue().getValue().getTask().getName())
@@ -255,6 +319,10 @@ public class TeamOfficeController {
                 (TreeTableColumn.CellDataFeatures<TaskNode, String> param)
                 -> new ReadOnlyStringWrapper(param.getValue().getValue().getTask().getDescription())
         );
+        treeColumnCompleted.setCellValueFactory(
+                (TreeTableColumn.CellDataFeatures<TaskNode, Double> param)
+                -> new ReadOnlyObjectWrapper<Double>(param.getValue().getValue().getPartDone()));
+
         accProjects.setExpandedPane(accProjects.getPanes().get(0));
         accMembers.setExpandedPane(accMembers.getPanes().get(0));
 
@@ -279,7 +347,7 @@ public class TeamOfficeController {
         tfSearchMembers.textProperty().addListener(new ChangeListener() {
             public void changed(ObservableValue observable, Object oldVal,
                     Object newVal) {
-                if(listProjects.getSelectionModel().getSelectedItem() != null) {
+                if (listProjects.getSelectionModel().getSelectedItem() != null) {
                     searchMembers((String) oldVal, (String) newVal);
                 }
             }
@@ -290,6 +358,7 @@ public class TeamOfficeController {
 
         this.user = user;
         loadProjects();
+        listProjects.getSelectionModel().select(0);
 
     }
 
@@ -317,11 +386,12 @@ public class TeamOfficeController {
         treeTasks.setRoot(null);
         Task rootTask = project.getIDRootTask();
         if (rootTask != null) {
-            TreeItem<TaskNode> root = new TreeItem<>(new TaskNode(rootTask));
-            root.setExpanded(true);
             TaskTree tree = user.getTaskHandler().getTaskTree(rootTask);
+            TreeItem<TaskNode> root = new TreeItem<>(tree.getRoot());
+            root.setExpanded(true);
             recursiveTaskTreeLoad(root, tree.getRoot());
             treeTasks.setRoot(root);
+
         }
     }
 
@@ -344,12 +414,48 @@ public class TeamOfficeController {
         lblTime.setText(String.format("%02d:%02d:%02d", h, m, s));
     }
 
+    private void setOverviewTab() {
+        ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
+        TreeItem<TaskNode> root = treeTasks.getRoot();
+        if (projectWrapper != null) {
+            ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+            if (root != null) {
+                lblProjectCompleted.setText(root.getValue().getPartDone() * 100 + "%");
+                chartPie.setTitle("Укупно одрађено: " + root.getValue().getPartDone() * 100 + "%");
+                pieChartData.add(new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100));
+                pieChartData.add(new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100)));
+            } else {
+                lblProjectCompleted.setText("0.0 %");
+                chartPie.setTitle("Укупно одрађено: 0.0 %");
+                pieChartData.add(new PieChart.Data("Одрађено", 0));
+                pieChartData.add(new PieChart.Data("Преостало", 100));
+            }
+            chartPie.setData(pieChartData);
+
+            SimpleDateFormat formater = new SimpleDateFormat("YYYY-MM-DD");
+            Project project = projectWrapper.getProject();
+            lblProjectName.setText(project.getName());
+            tAreaDescription.setText(project.getDescription());
+            lblStartDate.setText(formater.format(project.getStartDate()));
+            lblEndDate.setText(formater.format(project.getEndDate()));
+            lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
+            lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
+            lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
+            lblNumActivities.setText("");
+            ObservableList<UserWrapper> userList = FXCollections.observableArrayList(
+                    user.getProjectHandler().getAllChefs(project)
+                    .stream()
+                    .map((member) -> new UserWrapper(member))
+                    .collect(Collectors.toList()));
+            listChefs.setItems(userList);
+        }
+    }
+
     private void searchProjects(String oldValue, String newValue) {
         if (oldValue != null && (newValue.length() < oldValue.length())) {
             listProjects.setItems(projects);
         }
-        if(newValue.length() == 0)
-        {
+        if (newValue.length() == 0) {
             loadProjects();
             return;
         }
@@ -369,8 +475,7 @@ public class TeamOfficeController {
         if (oldValue != null && (newValue.length() < oldValue.length())) {
             listMembers.setItems(members);
         }
-        if(newValue.length() == 0 && listProjects.getSelectionModel().getSelectedItem() != null)
-        {
+        if (newValue.length() == 0 && listProjects.getSelectionModel().getSelectedItem() != null) {
             loadMembers(listProjects.getSelectionModel().getSelectedItem().getProject());
             return;
         }
@@ -434,27 +539,19 @@ public class TeamOfficeController {
 
     }
 
-    private static class TaskWrapper {
+    private static class ColoredProgressBar extends ProgressBar {
 
-        private Task task;
-
-        public TaskWrapper(Task task) {
-            this.task = task;
+        public ColoredProgressBar(double initValue) {
+            super(initValue);
+            String cssClass = "green-bar";
+            if (initValue < 0.33) {
+                cssClass = "red-bar";
+            } else if (initValue >= 0.33 && initValue < 0.66) {
+                cssClass = "blue-bar";
+            } else if (initValue >= 0.66 && initValue < 1) {
+                cssClass = "green-bar";
+            }
+            getStyleClass().add(cssClass);
         }
-
-        public Task getTask() {
-            return task;
-        }
-
-        public void setTask(Task task) {
-            this.task = task;
-        }
-
-        @Override
-        public String toString() {
-            return task.getName();
-        }
-
     }
-
 }
