@@ -115,6 +115,8 @@ public class TeamOfficeController {
     @FXML
     private Button btnAddMember;
     @FXML
+    private Button btnEditProject;
+    @FXML
     private TextField tfSearchProjects;
     @FXML
     private TextField tfSearchMembers;
@@ -180,12 +182,19 @@ public class TeamOfficeController {
     @FXML
     void btnNewProjectPressed(ActionEvent event) {
         try {
-            FormLoader.loadFormAddProject(user);
+            FormLoader.loadFormAddProject(user, this);
         } catch (IOException ex) {
-            Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+            
         }
     }
-
+    @FXML
+    void btnEditProjectPressed(ActionEvent event) {
+        ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
+        if(projectWrapper != null) {
+            Project project = projectWrapper.getProject();
+            
+        }
+    }
     @FXML
     void btnAddActivityPressed(ActionEvent event) {
         if (treeTasks.getSelectionModel().getSelectedItem() != null) {
@@ -232,7 +241,9 @@ public class TeamOfficeController {
                 .getResourceAsStream("/projectguru/images/add_member.png"))));
         btnNewProject.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/add_project.png"))));
-
+        btnEditProject.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/edit.png"))));
+        
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
@@ -361,7 +372,7 @@ public class TeamOfficeController {
 
     }
 
-    private void loadProjects() {
+    public void loadProjects() {
         projects = FXCollections.observableArrayList(
                 user.getProjectHandler().getAllProjects()
                 .stream()
@@ -371,7 +382,7 @@ public class TeamOfficeController {
         listProjects.setItems(projects);
     }
 
-    private void loadMembers(Project project) {
+    public void loadMembers(Project project) {
         members = FXCollections.observableArrayList(
                 user.getProjectHandler().getAllMembers(project)
                 .stream()
@@ -380,7 +391,7 @@ public class TeamOfficeController {
         listMembers.setItems(members);
     }
 
-    private void loadTaskTree(Project project) {
+    public void loadTaskTree(Project project) {
 
         treeTasks.setRoot(null);
         Task rootTask = project.getIDRootTask();

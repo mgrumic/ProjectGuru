@@ -38,6 +38,7 @@ import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.jpa.handlers.JpaProjectHandler;
+import projectguru.utils.FormLoader;
 
 /**
  * FXML Controller class
@@ -69,7 +70,8 @@ public class FormAddProjectController implements Initializable {
 
     private ObservableList<UserWrapper> allMembers;
     private ObservableList<UserWrapper> selectedMembers;
-
+    private TeamOfficeController controller;
+    
     private final EventHandler<MouseEvent> eventOnClickNext = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent t) {
@@ -147,11 +149,12 @@ public class FormAddProjectController implements Initializable {
                     }
                 }
                 Stage stage = (Stage) btnFinish.getScene().getWindow();
+                controller.loadProjects();
                 stage.close();
             } catch (InsuficientPrivilegesException ex) {
-                Logger.getLogger(FormAddProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                FormLoader.showInformationDialog("Напомена", "Немате довољно привилегија !");
             } catch (StoringException ex) {
-                Logger.getLogger(FormAddProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                FormLoader.showInformationDialog("Напомена", "Грешка са базом !");
             }
         }
 
@@ -174,5 +177,7 @@ public class FormAddProjectController implements Initializable {
     public void setUser(LoggedUser user) {
         this.user = user;
     }
-
+    public void setController(TeamOfficeController controller) {
+        this.controller = controller;
+    }
 }

@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import org.controlsfx.dialog.Dialogs;
 import projectguru.controllers.FormAddProjectController;
 import projectguru.controllers.FormAddTaskController;
+import projectguru.controllers.TeamOfficeController;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
 import projectguru.handlers.LoggedUser;
@@ -26,14 +27,14 @@ import projectguru.handlers.LoggedUser;
  */
 public class FormLoader {
 
-    public static void loadFormAddProject(LoggedUser user) throws IOException {
+    public static void loadFormAddProject(LoggedUser user, TeamOfficeController controller) throws IOException {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddProject.fxml"));
 
         Parent root = loader.load();
 
         FormAddProjectController fapc = loader.getController();
         fapc.setUser(user);
-
+        fapc.setController(controller); //treba mi za refresh projekata 
         Scene scene = new Scene(root);
         scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddproject.css").toExternalForm());
 

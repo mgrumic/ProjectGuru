@@ -13,7 +13,7 @@
          <top>
             <Pane prefHeight="41.0" prefWidth="433.0" BorderPane.alignment="CENTER">
                <children>
-                  <Label layoutX="38.0" layoutY="10.0" text="Нови задатак:">
+                  <Label layoutX="28.0" layoutY="10.0" text="Нови задатак:">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>
@@ -54,7 +54,7 @@
                         <DatePicker fx:id="dedline" prefHeight="25.0" prefWidth="267.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                      </children>
                   </GridPane>
-                  <Label fx:id="label" layoutX="28.0" layoutY="292.0" prefHeight="17.0" prefWidth="342.0" text="Попуните сва поља" />
+                  <Label fx:id="label" layoutX="28.0" layoutY="292.0" prefHeight="17.0" prefWidth="342.0" text="Попуните сва поља" visible="false" />
                </children>
             </AnchorPane>
          </center>
