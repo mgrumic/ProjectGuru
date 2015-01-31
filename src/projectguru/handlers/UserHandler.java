@@ -5,6 +5,7 @@
  */
 package projectguru.handlers;
 
+import java.util.List;
 import projectguru.entities.User;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.StoringException;
@@ -14,16 +15,14 @@ import projectguru.handlers.exceptions.StoringException;
  * @author ZM
  */
 public interface UserHandler {
-    
-     public boolean hasAdminPrivileges();
-     
 
+    public boolean hasAdminPrivileges();
 
+    public List<User> getAllUser();
 
-     public boolean addUser(User user) throws StoringException;
-     public boolean editUser(User user) throws EntityDoesNotExistException,StoringException;
+    public boolean addUser(User user) throws StoringException;
 
+    public boolean editUser(User user) throws EntityDoesNotExistException, StoringException;
 
-     public void setActivated(User user, boolean flag);
-     
+    public void setActivated(User user, boolean flag);
 }

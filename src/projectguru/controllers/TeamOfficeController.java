@@ -52,8 +52,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
 import projectguru.entities.User;
@@ -154,17 +152,18 @@ public class TeamOfficeController {
             TreeItem<TaskNode> taskNode = null;
             if (treeTasks.getRoot() == null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
+
                 FormLoader.showInformationDialog("Напомена", "Изаберите задатак за који желите додати подзадатак !");
             }
         } else {
@@ -181,7 +180,7 @@ public class TeamOfficeController {
     @FXML
     void btnNewProjectPressed(ActionEvent event) {
         try {
-            FormLoader.loadFormAddProject();
+            FormLoader.loadFormAddProject(user);
         } catch (IOException ex) {
             Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -516,7 +515,7 @@ public class TeamOfficeController {
         }
     }
 
-    private static class UserWrapper {
+    public static class UserWrapper {
 
         private User user;
 

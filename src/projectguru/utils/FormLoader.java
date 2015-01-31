@@ -14,20 +14,26 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.dialog.Dialogs;
+import projectguru.controllers.FormAddProjectController;
+import projectguru.controllers.FormAddTaskController;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
+import projectguru.handlers.LoggedUser;
 
 /**
  *
  * @author ZM
  */
 public class FormLoader {
-    
-    public static void loadFormAddProject() throws IOException
-    {
+
+    public static void loadFormAddProject(LoggedUser user) throws IOException {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddProject.fxml"));
-            
+
         Parent root = loader.load();
+
+        FormAddProjectController fapc = loader.getController();
+        fapc.setUser(user);
+
         Scene scene = new Scene(root);
         scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddproject.css").toExternalForm());
 
@@ -39,10 +45,10 @@ public class FormLoader {
 
         stage.show();
     }
-    public static void loadFormActivities(Task task) throws IOException
-    {   
+
+    public static void loadFormActivities(Task task) throws IOException {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormActivities.fxml"));
-            
+
         Parent root = loader.load();
         Scene scene = new Scene(root);
         scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formactivities.css").toExternalForm());
@@ -55,18 +61,28 @@ public class FormLoader {
 
         stage.show();
     }
+
     /**
      * Poziva se kada se dodaje podzadatak za neki zadatak
+     *
      * @param task
-     * @throws IOException 
+     * @throws IOException
      */
-    public static void loadFormAddTask(Project project, Task task) throws IOException
-    {
+    public static void loadFormAddTask(Project project, Task task, LoggedUser user) throws IOException {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddTask.fxml"));
-            
+
         Parent root = loader.load();
+
+        FormAddTaskController fatc = loader.getController();
+        fatc.setUser(user);
+        fatc.setProject(project);
+        if (task == null) {
+            task = project.getIDRootTask();
+        }
+        fatc.setTask(task);
+
         Scene scene = new Scene(root);
-        scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddtask.css").toExternalForm());
+        //scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddtask.css").toExternalForm());
 
         Stage stage = new Stage();
         stage.setScene(scene);
@@ -77,14 +93,13 @@ public class FormLoader {
         stage.show();
     }
 
-    public static void showInformationDialog(String title, String message)
-    {
+    public static void showInformationDialog(String title, String message) {
         Dialogs.create()
-            .owner(new Stage())
-            .title(title)
-            .masthead(null)
-            .message(message)
-            .showInformation();
+                .owner(new Stage())
+                .title(title)
+                .masthead(null)
+                .message(message)
+                .showInformation();
     }
-   
+
 }
