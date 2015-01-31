@@ -14,11 +14,9 @@ hs_err_pid*
 dist/
 build/
 test/
-lib/
 .dep.inc
 nbproject/*.mk
 nbproject/*.bash
 nbproject/private/
 nbproject/private/*
 *.log
-src/projectguru/jpa/handlers/JpaUserHandler.java
