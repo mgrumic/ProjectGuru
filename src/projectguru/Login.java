@@ -65,6 +65,7 @@ public class Login extends Application {
         primaryStage.setResizable(false);
         
         primaryStage.show();
+        
     }
 
     private static void pl(Object o){
@@ -80,6 +81,7 @@ public class Login extends Application {
       //  PersistanceTests test = new PersistanceTests();
     //    test.taskHandlerTests();
      //   test.projectHandlerTests();
+       
 
         
     }

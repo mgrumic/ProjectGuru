@@ -98,8 +98,9 @@ public class JpaUserHandler implements UserHandler {
     }
 
     @Override
-    public void setActivated(User user, boolean flag) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setActivated(User user, boolean flag) throws EntityDoesNotExistException, StoringException{
+        user.setActivated(flag);
+        editUser(user);
     }
 
     @Override

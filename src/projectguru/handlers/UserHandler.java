@@ -24,5 +24,5 @@ public interface UserHandler {
 
     public boolean editUser(User user) throws EntityDoesNotExistException, StoringException;
 
-    public void setActivated(User user, boolean flag);
+    public void setActivated(User user, boolean flag) throws EntityDoesNotExistException, StoringException;
 }

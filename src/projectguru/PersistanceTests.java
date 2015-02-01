@@ -67,12 +67,13 @@ class PersistanceTests {
 
     }
 
+    
     public void projectHandlerTests() throws InsuficientPrivilegesException, StoringException, EntityDoesNotExistException {
         
         JpaAccessManager jam = new JpaAccessManager("ProjectGuruPU");
         AccessManager.setInstance(jam);
         
-        LoggedUser loggedUser = AccessManager.getInstance().logUserIn("bruksa", "nenadjebivi");
+        LoggedUser loggedUser = AccessManager.getInstance().logUserIn("admin", "admin");
         
         User kors[] = new User[7];
         kors[0] = new User("boca", "etf", "Александар", "Вукотић", 4, true);
@@ -268,5 +269,6 @@ class PersistanceTests {
         System.exit(0);  
         
     }
+    
     
 }
