@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" fx:id="anchor" prefHeight="425.0" prefWidth="526.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormAddDocumentationController">
+    <stylesheets>
+        <URL value="@/projectguru/css/formadddocumentation.css" />
+    </stylesheets>
+   <children>
+      <Label fx:id="label" layoutX="35.0" layoutY="38.0" text="Нови документ">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label layoutX="35.0" layoutY="83.0" text="Ревизија на:" />
+      <ChoiceBox fx:id="chooseBoxRevisionOn" layoutX="141.0" layoutY="79.0" prefHeight="25.0" prefWidth="337.0" />
+      <Label layoutX="35.0" layoutY="127.0" text="Назив:" />
+      <TextField fx:id="textBoxName" layoutX="141.0" layoutY="123.0" prefHeight="25.0" prefWidth="337.0" />
+      <Label layoutX="35.0" layoutY="175.0" text="Документ:" />
+      <TextField fx:id="textBoxDocPath" layoutX="141.0" layoutY="171.0" prefHeight="25.0" prefWidth="266.0" />
+      <Button fx:id="btnChooseDoc" layoutX="414.0" layoutY="171.0" mnemonicParsing="false" onAction="#btnChooseDocPressed" text="Изабери" />
+      <Label layoutX="35.0" layoutY="217.0" text="Опис:" />
+      <TextArea fx:id="textBoxDesc" layoutX="141.0" layoutY="217.0" prefHeight="117.0" prefWidth="337.0" />
+      <Button fx:id="btnSave" layoutX="355.0" layoutY="376.0" mnemonicParsing="false" text="Сачувај" />
+      <Button fx:id="btnCancel" layoutX="426.0" layoutY="376.0" mnemonicParsing="false" text="Изађи" />
+   </children>
+</AnchorPane>

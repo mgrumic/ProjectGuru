@@ -211,6 +211,16 @@ public class TeamOfficeController {
     }
 
     @FXML
+    void btnDokumPressed(ActionEvent event){
+        ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
+        try{
+            FormLoader.loadFormDocumentation(projectWrapper.getProject(), user);
+        }catch(IOException ex){
+            Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE,null, ex);
+        }
+        catch(Exception e){}
+    }
+    @FXML
     void mItemKorisnickNaloziPressed(ActionEvent event) {
 
     }

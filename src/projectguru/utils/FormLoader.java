@@ -9,13 +9,20 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.dialog.Dialogs;
+import projectguru.controllers.FormAddDocumentationController;
 import projectguru.controllers.FormAddProjectController;
 import projectguru.controllers.FormAddTaskController;
+import projectguru.controllers.FormDocumentationController;
 import projectguru.controllers.TeamOfficeController;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
@@ -92,6 +99,48 @@ public class FormLoader {
         stage.initModality(Modality.APPLICATION_MODAL);
 
         stage.show();
+    }
+
+    public static void loadFormDocumentation(Project project, LoggedUser user) throws Exception {
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormDocumentation.fxml"));
+        Parent root = loader.load();
+
+        FormDocumentationController fdc = loader.getController();
+        fdc.setProject(project);
+        fdc.setUser(user);
+
+        Scene scene = new Scene(root);
+
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Документација");
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.show();
+
+    }
+
+    public static void loadFormAddDocumentation(Project project, LoggedUser user) throws Exception {
+        
+            FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddDocumentation.fxml"));
+            Parent root = loader.load();
+
+            FormAddDocumentationController fdc = loader.getController();
+            fdc.setProject(project);
+            fdc.setUser(user);
+
+            Scene scene = new Scene(root);
+
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Нови документ");
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.show();
+        
+
     }
 
     public static void showInformationDialog(String title, String message) {
