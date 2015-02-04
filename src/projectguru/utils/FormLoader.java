@@ -159,7 +159,6 @@ public class FormLoader {
 
             stage.show();
         
-
     }
     
     public static void loadFormUserAccounts(LoggedUser user) throws IOException {

@@ -142,9 +142,9 @@
                                                             <Label fx:id="lblBudget" prefHeight="17.0" prefWidth="115.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
                                                             <Label text="Укупан број учесника:" GridPane.rowIndex="5" />
                                                             <Label fx:id="lblNumMembers" prefHeight="17.0" prefWidth="114.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
-                                                            <Label prefHeight="17.0" prefWidth="122.0" text="Укупан број задатака:" GridPane.rowIndex="7" />
+                                                            <Label prefHeight="17.0" prefWidth="161.0" text="Укупан број задатака:" GridPane.rowIndex="6" />
                                                             <Label fx:id="lblNumTasks" prefHeight="17.0" prefWidth="114.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
-                                                            <Label text="Укупан број активности:" GridPane.rowIndex="7" />
+                                                            <Label prefHeight="17.0" prefWidth="168.0" text="Укупан број активности:" GridPane.rowIndex="7" />
                                                             <Label fx:id="lblNumActivities" prefHeight="17.0" prefWidth="113.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
                                                             <Button fx:id="btnEditProject" mnemonicParsing="false" onAction="#btnEditProjectPressed" prefHeight="25.0" prefWidth="155.0" text="Измјени ставке" GridPane.rowIndex="9">
                                                                <GridPane.margin>
@@ -256,7 +256,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </Label>
-                  <Button fx:id="reportTestButton" mnemonicParsing="false" onMouseClicked="#onReportTestButtonClick" text="Button" />
+                  <Button fx:id="getReportTest" mnemonicParsing="false" onAction="#btnGetReportPressed" text="Button" />
                </children>
             </FlowPane>
          </bottom>

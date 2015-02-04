@@ -148,7 +148,7 @@ public class TeamOfficeController {
     @FXML
     private MenuItem mItemKorisnickiNalozi;
     @FXML
-    private Button generateReportButton;
+    private Button getReportTest;
 
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
@@ -218,9 +218,12 @@ public class TeamOfficeController {
 
     @FXML
     void btnDokumPressed(ActionEvent event){
+        
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
         try{
-            FormLoader.loadFormDocumentation(projectWrapper.getProject(), user);
+            if(projectWrapper != null){
+                FormLoader.loadFormDocumentation(projectWrapper.getProject(), user);
+            }
         }catch(IOException ex){
             Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE,null, ex);
         }
@@ -237,7 +240,7 @@ public class TeamOfficeController {
     }
     
     @FXML
-    void onReportTestButtonClick(ActionEvent event){
+    void btnGetReportPressed(ActionEvent event){
         try {
             FormLoader.loadFormReport();
         } catch (Exception ex) {
