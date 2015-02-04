@@ -145,6 +145,8 @@ public class TeamOfficeController {
     private ListView<UserWrapper> listChefs;
     @FXML
     private MenuItem mItemKorisnickiNalozi;
+    @FXML
+    private Button generateReportButton;
 
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
@@ -224,7 +226,15 @@ public class TeamOfficeController {
     void mItemKorisnickNaloziPressed(ActionEvent event) {
 
     }
-
+    
+    @FXML
+    void onReportTestButtonClick(ActionEvent event){
+        try {
+            FormLoader.loadFormReport();
+        } catch (Exception ex) {
+            
+        }
+    }
     /**
      * Moje varijable
      */

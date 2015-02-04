@@ -142,6 +142,23 @@ public class FormLoader {
         
 
     }
+    public static void loadFormReport() throws Exception {
+        
+            FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormReport.fxml"));
+            Parent root = loader.load();
+            
+            Scene scene = new Scene(root);
+
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Нови документ");
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.show();
+        
+
+    }
 
     public static void showInformationDialog(String title, String message) {
         Dialogs.create()

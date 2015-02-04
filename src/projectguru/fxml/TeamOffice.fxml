@@ -256,6 +256,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>
                   </Label>
+                  <Button fx:id="reportTestButton" mnemonicParsing="false" onMouseClicked="#onReportTestButtonClick" text="Button" />
                </children>
             </FlowPane>
          </bottom>
