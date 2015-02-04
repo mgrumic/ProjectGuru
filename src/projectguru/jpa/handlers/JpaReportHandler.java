@@ -25,6 +25,9 @@ import net.sf.dynamicreports.report.constant.VerticalAlignment;
 import net.sf.dynamicreports.report.exception.DRException;
 import net.sf.dynamicreports.report.builder.chart.Bar3DChartBuilder;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilders;
+import org.eclipse.persistence.sessions.Session;
+import projectguru.AccessManager;
+import projectguru.jpa.JpaAccessManager;
 /**
  *
  * @author medlan
@@ -36,13 +39,9 @@ public class JpaReportHandler implements ReportHandler{
         Connection connection = null;
         try{
             Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dynamicreports_test","root", "");
-        }catch(SQLException ex){
-            ex.printStackTrace();
-            return;
-        }catch(ClassNotFoundException ex){
-            ex.printStackTrace();
-            return;
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/baza","student", "student");
+        }catch(Exception ex){
+           System.out.println(ex.getMessage());
         }
        
         JasperReportBuilder report = DynamicReports.report();
@@ -55,34 +54,32 @@ public class JpaReportHandler implements ReportHandler{
         StyleBuilder columnTitleStyle  = DynamicReports.stl.style(boldCenteredStyle)
                                     .setBorder(DynamicReports.stl.pen1Point())
                                     .setBackgroundColor(Color.LIGHT_GRAY);
-        TextColumnBuilder<java.math.BigDecimal> unitPriceColumn = 
-                Columns.column("Unit price", "price", DataTypes.bigDecimalType());
+        TextColumnBuilder<String> usernameColumn = 
+                Columns.column("Username", "username", DataTypes.stringType());
         
-        TextColumnBuilder<java.lang.Integer> quantityColumn = 
-                Columns.column("Quantity", "quantity", DataTypes.integerType());
+        TextColumnBuilder<String> passColumn = 
+                Columns.column("Password", "password", DataTypes.stringType());
         
-        TextColumnBuilder<java.math.BigDecimal> priceColumn = 
-                unitPriceColumn.multiply(quantityColumn).setTitle("Price");
         
-        TextColumnBuilder<String> itemColumn = 
-                Columns.column("Item", "item", DataTypes.stringType());
+        TextColumnBuilder<String> nameColumn = 
+                Columns.column("Name", "firstname", DataTypes.stringType());
+                
+        TextColumnBuilder<String> surnameColumn = 
+                Columns.column("Surname", "lastname", DataTypes.stringType());
                 
         TextColumnBuilder<Integer> rowNumberColumn = 
                 DynamicReports.col.reportRowNumberColumn("No.")
                 .setFixedColumns(3)
                 .setHorizontalAlignment(HorizontalAlignment.RIGHT);
         
-        PercentageColumnBuilder pricePercColumn = Columns.percentageColumn("Price %", priceColumn)
-                .setHorizontalAlignment(HorizontalAlignment.LEFT);
-        
-        Bar3DChartBuilder itemChart = DynamicReports.cht.bar3DChart()
+        /*Bar3DChartBuilder itemChart = DynamicReports.cht.bar3DChart()
                 .setTitle("Sales by item")
                 .setCategory(itemColumn)
                 .addSerie(DynamicReports.cht.serie(unitPriceColumn), DynamicReports.cht.serie(priceColumn));
-        
-        ColumnGroupBuilder itemGroup = DynamicReports.grp.group(itemColumn);
-        itemGroup.setPrintSubtotalsWhenExpression(
-                DynamicReports.exp.printWhenGroupHasMoreThanOneRow(itemGroup)
+        */        
+        ColumnGroupBuilder passGroup = DynamicReports.grp.group(passColumn);
+        passGroup.setPrintSubtotalsWhenExpression(
+                DynamicReports.exp.printWhenGroupHasMoreThanOneRow(passGroup)
         );
         StyleBuilder titleStyle =  DynamicReports.stl.style(boldCenteredStyle)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
@@ -92,36 +89,32 @@ public class JpaReportHandler implements ReportHandler{
         
         report.columns(
                 rowNumberColumn,
-                itemColumn,
+                usernameColumn,
                 //        .setHorizontalAlignment(HorizontalAlignment.LEFT),
-                quantityColumn
+                passColumn
                         .setHorizontalAlignment(HorizontalAlignment.RIGHT),
-                unitPriceColumn
+                nameColumn
                         .setHorizontalAlignment(HorizontalAlignment.RIGHT),
-                priceColumn
-                        .setHorizontalAlignment(HorizontalAlignment.RIGHT),
-                pricePercColumn
+                surnameColumn
                         .setHorizontalAlignment(HorizontalAlignment.RIGHT)
                 )
                 .title(
                         cmp.horizontalList()
-                        .add(cmp.image(new Object().getClass().getResourceAsStream("../../guru-logo.png"))
-                            .setFixedDimension(64, 64), 
+                        .add(cmp.image(getClass().getResourceAsStream("/projectguru/images/pg.png"))
+                            .setFixedDimension(148, 82),
                             cmp.text("ProjectGURU").setStyle(titleStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
                             cmp.text("Report").setStyle(titleStyle).setHorizontalAlignment(HorizontalAlignment.RIGHT))
                         .newRow()
                         .add(cmp.filler().setStyle(DynamicReports.stl.style().setTopBorder(DynamicReports.stl.pen2Point())).setFixedHeight(10)))
                 .pageFooter(Components.pageXofY().setStyle(boldCenteredStyle))
-                .subtotalsAtSummary(DynamicReports.sbt.sum(unitPriceColumn).setStyle(boldStyle), DynamicReports.sbt.sum(priceColumn).setStyle(boldStyle))
-                .subtotalsAtFirstGroupFooter(DynamicReports.sbt.sum(unitPriceColumn).setStyle(boldStyle), DynamicReports.sbt.sum(priceColumn).setStyle(boldStyle))
                 .setColumnTitleStyle(columnTitleStyle)
-                .groupBy(itemGroup)
+                .groupBy(passGroup)
                 .setHighlightDetailEvenRows(Boolean.TRUE)
-                .summary(itemChart)
-                .setDataSource("select item, quantity, price from test_table", connection);
+                .setDataSource(query, connection);
         try{
             report.show();
         }catch(DRException ex){
+            System.out.println("Message: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
