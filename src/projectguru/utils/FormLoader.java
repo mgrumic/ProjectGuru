@@ -23,6 +23,7 @@ import projectguru.controllers.FormAddDocumentationController;
 import projectguru.controllers.FormAddProjectController;
 import projectguru.controllers.FormAddTaskController;
 import projectguru.controllers.FormDocumentationController;
+import projectguru.controllers.FormUserAccountsController;
 import projectguru.controllers.TeamOfficeController;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
@@ -50,7 +51,8 @@ public class FormLoader {
         stage.setTitle("Нови пројекат");
 
         stage.initModality(Modality.APPLICATION_MODAL);
-
+        stage.setResizable(false);
+        
         stage.show();
     }
 
@@ -66,7 +68,7 @@ public class FormLoader {
         stage.setTitle("Активност");
 
         stage.initModality(Modality.APPLICATION_MODAL);
-
+        stage.setResizable(false);
         stage.show();
     }
 
@@ -159,7 +161,23 @@ public class FormLoader {
         
 
     }
-
+    
+    public static void loadFormUserAccounts(LoggedUser user) throws IOException {
+        
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormUserAccounts.fxml"));
+        Parent root = loader.load();
+        FormUserAccountsController controller = loader.getController();
+        controller.setUser(user);
+        
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Кориснички налози");
+        stage.setResizable(false);
+        
+        stage.show();
+    }
+    
     public static void showInformationDialog(String title, String message) {
         Dialogs.create()
                 .owner(new Stage())

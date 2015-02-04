@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="517.0" prefWidth="632.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormUserAccountsController">
+    <stylesheets>
+        <URL value="@/projectguru/css/formuseraccounts.css" />
+    </stylesheets>
+   <children>
+      <ListView fx:id="listViewUsers" layoutX="50.0" layoutY="113.0" prefHeight="302.0" prefWidth="235.0" />
+      <TextField fx:id="tfSearch" layoutX="50.0" layoutY="80.0" prefHeight="25.0" prefWidth="235.0" promptText="Претрага" />
+      <Label layoutX="335.0" layoutY="55.0" prefHeight="25.0" prefWidth="95.0" text="Корисничко име:" />
+      <TextField fx:id="tfUsername" layoutX="335.0" layoutY="80.0" prefHeight="25.0" prefWidth="247.0" />
+      <Label layoutX="335.0" layoutY="105.0" prefHeight="25.0" prefWidth="95.0" text="Шифра:" />
+      <Label layoutX="335.0" layoutY="154.0" prefHeight="25.0" prefWidth="95.0" text="Потврди шифру:" />
+      <Label layoutX="335.0" layoutY="204.0" prefHeight="25.0" prefWidth="95.0" text="Привилегије:" />
+      <ComboBox fx:id="cbPrivileges" layoutX="335.0" layoutY="229.0" prefHeight="25.0" prefWidth="218.0" />
+      <CheckBox fx:id="checkAccountActive" layoutX="335.0" layoutY="270.0" mnemonicParsing="false" text="Налог активан" />
+      <Label layoutX="335.0" layoutY="315.0" prefHeight="25.0" prefWidth="95.0" text="Име:" />
+      <TextField fx:id="tfFirstName" layoutX="335.0" layoutY="340.0" prefHeight="25.0" prefWidth="247.0" />
+      <Label layoutX="335.0" layoutY="365.0" prefHeight="25.0" prefWidth="95.0" text="Презиме:" />
+      <TextField fx:id="tfLastName" layoutX="335.0" layoutY="390.0" prefHeight="25.0" prefWidth="247.0" />
+      <Button fx:id="btnAddUser" layoutX="335.0" layoutY="451.0" mnemonicParsing="false" onAction="#btnAddUserPressed" prefHeight="25.0" prefWidth="68.0" text="Додај" />
+      <Button fx:id="btnEdit" layoutX="422.0" layoutY="451.0" mnemonicParsing="false" onAction="#btnEditUserPressed" prefHeight="25.0" prefWidth="68.0" text="Измјени" />
+      <Button fx:id="btnExit" layoutX="508.0" layoutY="451.0" mnemonicParsing="false" onAction="#btnExitPressed" prefHeight="25.0" prefWidth="68.0" text="Излаз" />
+      <PasswordField fx:id="pfPassword" layoutX="335.0" layoutY="130.0" prefHeight="25.0" prefWidth="247.0" />
+      <PasswordField fx:id="pfConfirmPassword" layoutX="335.0" layoutY="179.0" prefHeight="25.0" prefWidth="247.0" />
+      <Label layoutX="50.0" layoutY="55.0" prefHeight="25.0" prefWidth="95.0" text="Корисници:" />
+   </children>
+</AnchorPane>

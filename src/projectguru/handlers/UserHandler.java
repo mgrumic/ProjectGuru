@@ -18,7 +18,7 @@ public interface UserHandler {
 
     public boolean hasAdminPrivileges();
 
-    public List<User> getAllUser();
+    public List<User> getAllUsers();
 
     public boolean addUser(User user) throws StoringException;
 

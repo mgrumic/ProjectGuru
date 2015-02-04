@@ -79,7 +79,7 @@ public class FormAddProjectController implements Initializable {
             try {
 
                 allMembers = FXCollections.observableArrayList(
-                        user.getUserHandler().getAllUser()
+                        user.getUserHandler().getAllUsers()
                         .stream()
                         .map((member) -> new UserWrapper(member))
                         .collect(Collectors.toList())

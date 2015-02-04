@@ -104,7 +104,7 @@ public class JpaUserHandler implements UserHandler {
     }
 
     @Override
-    public List<User> getAllUser() {
+    public List<User> getAllUsers() {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
         try {

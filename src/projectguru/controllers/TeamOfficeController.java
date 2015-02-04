@@ -52,10 +52,12 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import projectguru.entities.Privileges;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
 import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
+import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
 import projectguru.utils.FormLoader;
@@ -186,17 +188,19 @@ public class TeamOfficeController {
         try {
             FormLoader.loadFormAddProject(user, this);
         } catch (IOException ex) {
-            
+
         }
     }
+
     @FXML
     void btnEditProjectPressed(ActionEvent event) {
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
-        if(projectWrapper != null) {
+        if (projectWrapper != null) {
             Project project = projectWrapper.getProject();
-            
+
         }
     }
+
     @FXML
     void btnAddActivityPressed(ActionEvent event) {
         if (treeTasks.getSelectionModel().getSelectedItem() != null) {
@@ -224,6 +228,11 @@ public class TeamOfficeController {
     }
     @FXML
     void mItemKorisnickNaloziPressed(ActionEvent event) {
+        try {
+            FormLoader.loadFormUserAccounts(user);
+        } catch (IOException ex) {
+            Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
     
@@ -238,7 +247,7 @@ public class TeamOfficeController {
     /**
      * Moje varijable
      */
-    private LoggedUser user;
+    private static LoggedUser user;
     private ObservableList<ProjectWrapper> projects;
     private ObservableList<UserWrapper> members;
     private long time = System.currentTimeMillis();
@@ -247,6 +256,10 @@ public class TeamOfficeController {
 
     private static final ImageView rootImage = new ImageView(new Image(TeamOfficeController.class
             .getResourceAsStream("/projectguru/images/root.png")));
+
+    public static void updateLoggedUser() throws EntityDoesNotExistException {
+        user.setUser(user.getProjectHandler().getUpdatedUser(user.getUser()));
+    }
 
     @FXML
     void initialize() {
@@ -263,7 +276,6 @@ public class TeamOfficeController {
                 .getResourceAsStream("/projectguru/images/add_project.png"))));
         btnEditProject.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/edit.png"))));
-        
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
@@ -371,14 +383,24 @@ public class TeamOfficeController {
         tfSearchProjects.textProperty().addListener(new ChangeListener() {
             public void changed(ObservableValue observable, Object oldVal,
                     Object newVal) {
-                searchProjects((String) oldVal, (String) newVal);
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchProjects((String) oldVal, (String) newVal);
+                    }
+                });
             }
         });
         tfSearchMembers.textProperty().addListener(new ChangeListener() {
             public void changed(ObservableValue observable, Object oldVal,
                     Object newVal) {
                 if (listProjects.getSelectionModel().getSelectedItem() != null) {
-                    searchMembers((String) oldVal, (String) newVal);
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            searchMembers((String) oldVal, (String) newVal);
+                        }
+                    });
                 }
             }
         });
@@ -387,6 +409,10 @@ public class TeamOfficeController {
     public void setUser(LoggedUser user) {
 
         this.user = user;
+
+        if (user.getUser().getAppPrivileges() != Privileges.ADMIN.ordinal()) {
+            mItemKorisnickiNalozi.setVisible(false);
+        }
         loadProjects();
         listProjects.getSelectionModel().select(0);
 
@@ -412,17 +438,21 @@ public class TeamOfficeController {
     }
 
     public void loadTaskTree(Project project) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                treeTasks.setRoot(null);
+                Task rootTask = project.getIDRootTask();
+                if (rootTask != null) {
+                    TaskTree tree = user.getTaskHandler().getTaskTree(rootTask);
+                    TreeItem<TaskNode> root = new TreeItem<>(tree.getRoot());
+                    root.setExpanded(true);
+                    recursiveTaskTreeLoad(root, tree.getRoot());
+                    treeTasks.setRoot(root);
 
-        treeTasks.setRoot(null);
-        Task rootTask = project.getIDRootTask();
-        if (rootTask != null) {
-            TaskTree tree = user.getTaskHandler().getTaskTree(rootTask);
-            TreeItem<TaskNode> root = new TreeItem<>(tree.getRoot());
-            root.setExpanded(true);
-            recursiveTaskTreeLoad(root, tree.getRoot());
-            treeTasks.setRoot(root);
-
-        }
+                }
+            }
+        });
     }
 
     private void recursiveTaskTreeLoad(TreeItem<TaskNode> root, TaskNode task) {
@@ -445,40 +475,46 @@ public class TeamOfficeController {
     }
 
     private void setOverviewTab() {
-        ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
-        TreeItem<TaskNode> root = treeTasks.getRoot();
-        if (projectWrapper != null) {
-            ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-            if (root != null) {
-                lblProjectCompleted.setText(root.getValue().getPartDone() * 100 + "%");
-                chartPie.setTitle("Укупно одрађено: " + root.getValue().getPartDone() * 100 + "%");
-                pieChartData.add(new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100));
-                pieChartData.add(new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100)));
-            } else {
-                lblProjectCompleted.setText("0.0 %");
-                chartPie.setTitle("Укупно одрађено: 0.0 %");
-                pieChartData.add(new PieChart.Data("Одрађено", 0));
-                pieChartData.add(new PieChart.Data("Преостало", 100));
-            }
-            chartPie.setData(pieChartData);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
 
-            SimpleDateFormat formater = new SimpleDateFormat("YYYY-MM-DD");
-            Project project = projectWrapper.getProject();
-            lblProjectName.setText(project.getName());
-            tAreaDescription.setText(project.getDescription());
-            lblStartDate.setText(formater.format(project.getStartDate()));
-            lblEndDate.setText(formater.format(project.getEndDate()));
-            lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
-            lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
-            lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
-            lblNumActivities.setText("");
-            ObservableList<UserWrapper> userList = FXCollections.observableArrayList(
-                    user.getProjectHandler().getAllChefs(project)
-                    .stream()
-                    .map((member) -> new UserWrapper(member))
-                    .collect(Collectors.toList()));
-            listChefs.setItems(userList);
-        }
+                ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
+                TreeItem<TaskNode> root = treeTasks.getRoot();
+                if (projectWrapper != null) {
+                    ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+                    if (root != null) {
+                        lblProjectCompleted.setText(root.getValue().getPartDone() * 100 + "%");
+                        chartPie.setTitle("Укупно одрађено: " + root.getValue().getPartDone() * 100 + "%");
+                        pieChartData.add(new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100));
+                        pieChartData.add(new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100)));
+                    } else {
+                        lblProjectCompleted.setText("0.0 %");
+                        chartPie.setTitle("Укупно одрађено: 0.0 %");
+                        pieChartData.add(new PieChart.Data("Одрађено", 0));
+                        pieChartData.add(new PieChart.Data("Преостало", 100));
+                    }
+                    chartPie.setData(pieChartData);
+
+                    SimpleDateFormat formater = new SimpleDateFormat("YYYY-MM-DD");
+                    Project project = projectWrapper.getProject();
+                    lblProjectName.setText(project.getName());
+                    tAreaDescription.setText(project.getDescription());
+                    lblStartDate.setText(formater.format(project.getStartDate()));
+                    lblEndDate.setText(formater.format(project.getEndDate()));
+                    lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
+                    lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
+                    lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
+                    lblNumActivities.setText("");
+                    ObservableList<UserWrapper> userList = FXCollections.observableArrayList(
+                            user.getProjectHandler().getAllChefs(project)
+                            .stream()
+                            .map((member) -> new UserWrapper(member))
+                            .collect(Collectors.toList()));
+                    listChefs.setItems(userList);
+                }
+            }
+        });
     }
 
     private void searchProjects(String oldValue, String newValue) {
@@ -492,7 +528,6 @@ public class TeamOfficeController {
         String value = newValue.toUpperCase();
         ObservableList<ProjectWrapper> subentries = FXCollections.observableArrayList();
         for (Object entry : listProjects.getItems()) {
-            boolean match = true;
             ProjectWrapper entryProject = (ProjectWrapper) entry;
             if (entryProject.getProject().getName().toUpperCase().startsWith(value)) {
                 subentries.add(entryProject);
@@ -512,7 +547,6 @@ public class TeamOfficeController {
         String value = newValue.toUpperCase();
         ObservableList<UserWrapper> subentries = FXCollections.observableArrayList();
         for (Object entry : listMembers.getItems()) {
-            boolean match = true;
             UserWrapper entryUser = (UserWrapper) entry;
             if (entryUser.getUser().getUsername().toUpperCase().startsWith(value)) {
                 subentries.add(entryUser);

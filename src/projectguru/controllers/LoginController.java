@@ -54,7 +54,7 @@ public class LoginController implements Initializable {
 
     @FXML
     private ImageView imgViewLogo;
-    
+
     /**
      * Moje varijable
      */
@@ -80,6 +80,7 @@ public class LoginController implements Initializable {
     void btnLoginClicked(ActionEvent event) {
         login();
     }
+
     /**
      * Initializes the controller class.
      */
@@ -100,10 +101,12 @@ public class LoginController implements Initializable {
         });
 
     }
+
     public void setStage(Stage stage) {
         this.stage = stage;
 
     }
+
     private void login() {
         Platform.runLater(new Runnable() {
             @Override
@@ -117,18 +120,26 @@ public class LoginController implements Initializable {
                 LoggedUser user = access.logUserIn(username, password);
 
                 if (user != null) {
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            stage.hide();
-                            try {
-                                new ProjectGuru().start(new Stage(), user);
-                            } catch (IOException ex) {
-                                Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+                    if (user.getUser().getActivated() == false) {
+                        lblWarning.setText("Ваш налог је деактивиран.\nКонтактирајте администратора !");
+                        lblWarning.setVisible(true);
+                        tbPassword.setText("");
+                        
+                    } else {
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                stage.hide();
+                                try {
+                                    new ProjectGuru().start(new Stage(), user);
+                                } catch (IOException ex) {
+                                    Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 } else {
+                    lblWarning.setText("Погрешно корисничко име или шифра");
                     lblWarning.setVisible(true);
                     tfUsername.setText("");
                     tbPassword.setText("");
