@@ -201,7 +201,7 @@ public class TeamOfficeController {
         }
     }
 
-    @FXML
+    @FXML  
     void btnAddActivityPressed(ActionEvent event) {
         if (treeTasks.getSelectionModel().getSelectedItem() != null) {
             TaskNode taskNode = treeTasks.getSelectionModel().getSelectedItem().getValue();
@@ -486,17 +486,21 @@ public class TeamOfficeController {
                 TreeItem<TaskNode> root = treeTasks.getRoot();
                 if (projectWrapper != null) {
                     ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+                    PieChart.Data worked;
+                    PieChart.Data left;
                     if (root != null) {
                         lblProjectCompleted.setText(root.getValue().getPartDone() * 100 + "%");
                         chartPie.setTitle("Укупно одрађено: " + root.getValue().getPartDone() * 100 + "%");
-                        pieChartData.add(new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100));
-                        pieChartData.add(new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100)));
+                        worked = new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100);
+                        left = new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100));
                     } else {
                         lblProjectCompleted.setText("0.0 %");
                         chartPie.setTitle("Укупно одрађено: 0.0 %");
-                        pieChartData.add(new PieChart.Data("Одрађено", 0));
-                        pieChartData.add(new PieChart.Data("Преостало", 100));
+                        worked = new PieChart.Data("Одрађено", 0);
+                        left = new PieChart.Data("Преостало", 100);
                     }
+                    pieChartData.add(worked);
+                    pieChartData.add(left);
                     chartPie.setData(pieChartData);
 
                     SimpleDateFormat formater = new SimpleDateFormat("YYYY-MM-DD");

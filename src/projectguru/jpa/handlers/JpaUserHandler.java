@@ -48,16 +48,15 @@ public class JpaUserHandler implements UserHandler {
     public boolean addUser(User user) throws StoringException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
-
+        boolean result = false;
         try {
             if (em.find(User.class, user.getUsername()) == null) {
                 em.getTransaction().begin();
                 em.persist(user);
                 em.getTransaction().commit();
-                em.refresh(user);
-                return true;
-
+                result = true;
             }
+            return result;
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -67,7 +66,6 @@ public class JpaUserHandler implements UserHandler {
         } finally {
             em.close();
         }
-        return true;
     }
 
     @Override

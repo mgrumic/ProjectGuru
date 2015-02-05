@@ -25,3 +25,10 @@
 .orange-bar { -fx-accent: orange; }
 .red-bar    { -fx-accent: red;    }
 .blue-bar   { -fx-accent: blue;   }
+
+.pie-chart-worked { -fx-pie-color: green }
+.pie-chart-left   { -fx-pie-color: red }
+
+.default-color0.chart-pie { -fx-pie-color: green }
+.default-color1.chart-pie { -fx-pie-color: red }
+.default-color2.chart-pie { -fx-pie-color: yellow }

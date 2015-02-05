@@ -7,6 +7,8 @@ package projectguru.controllers;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -23,12 +25,17 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import projectguru.entities.Privileges;
 
 import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
+import projectguru.handlers.exceptions.EntityDoesNotExistException;
+import projectguru.handlers.exceptions.StoringException;
+import projectguru.utils.FormLoader;
 
 /**
  * FXML Controller class
@@ -76,21 +83,29 @@ public class FormUserAccountsController implements Initializable {
     @FXML
     private Button btnExit;
 
+    @FXML
+    private Button btnCleanFields;
+
     /**
      *
      * Moje varijable
      */
-    LoggedUser user;
-    ObservableList<UserWrapper> users;
+    private LoggedUser user;
+    private ObservableList<UserWrapper> users;
+    private ObservableList<ApplicationPrivileges> privileges;
 
     @FXML
     void btnAddUserPressed(ActionEvent event) {
-
+        if (checkFields() == true) {
+            addUser();
+        }
     }
 
     @FXML
     void btnEditUserPressed(ActionEvent event) {
-
+        if (checkFields() == true) {
+            editUser();
+        }
     }
 
     @FXML
@@ -99,9 +114,32 @@ public class FormUserAccountsController implements Initializable {
         stage.close();
     }
 
+    @FXML
+    void btnCleanFieldsPressed(ActionEvent event) {
+        tfUsername.setText("");
+        pfPassword.setText("");
+        pfConfirmPassword.setText("");
+        cbPrivileges.setValue(getItemWithPrivileges(0));
+        checkAccountActive.setSelected(true);
+        tfFirstName.setText("");
+        tfLastName.setText("");
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        btnAddUser.setGraphic(new ImageView(new Image(FormUserAccountsController.class
+                .getResourceAsStream("/projectguru/images/add_user.png"))));
+
+        btnEdit.setGraphic(new ImageView(new Image(FormUserAccountsController.class
+                .getResourceAsStream("/projectguru/images/edit_user.png"))));
+
+        btnCleanFields.setGraphic(new ImageView(new Image(FormUserAccountsController.class
+                .getResourceAsStream("/projectguru/images/clean.png"))));
+
+        btnExit.setGraphic(new ImageView(new Image(FormUserAccountsController.class
+                .getResourceAsStream("/projectguru/images/close.png"))));
+        
         listViewUsers.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<UserWrapper>() {
             @Override
             public void changed(ObservableValue<? extends UserWrapper> observable, UserWrapper oldValue, UserWrapper newValue) {
@@ -143,13 +181,15 @@ public class FormUserAccountsController implements Initializable {
                 };
             }
         });
-        ApplicationPrivileges admin = new ApplicationPrivileges("Администратор", Privileges.ADMIN.ordinal());
-        ApplicationPrivileges chefProject = new ApplicationPrivileges("Шеф пројекта", Privileges.CHEF.ordinal());
-        ApplicationPrivileges member = new ApplicationPrivileges("Члан", Privileges.MEMBER.ordinal());
-        ApplicationPrivileges insight = new ApplicationPrivileges("Надзор", Privileges.INSIGHT.ordinal());
-        
-        cbPrivileges.getItems().addAll(insight, member, chefProject, admin);
-        
+
+        privileges = FXCollections.observableArrayList();
+        privileges.add(new ApplicationPrivileges("Без привилегија", Privileges.NO_PRIVILEGES.ordinal()));
+        privileges.add(new ApplicationPrivileges("Надзор", Privileges.INSIGHT.ordinal()));
+        privileges.add(new ApplicationPrivileges("Члан", Privileges.MEMBER.ordinal()));
+        privileges.add(new ApplicationPrivileges("Шеф пројекта", Privileges.CHEF.ordinal()));
+        privileges.add(new ApplicationPrivileges("Администратор", Privileges.ADMIN.ordinal()));
+
+        cbPrivileges.setItems(privileges);
     }
 
     public void setUser(LoggedUser user) {
@@ -177,6 +217,17 @@ public class FormUserAccountsController implements Initializable {
         tfFirstName.setText(user.getFirstName());
         tfLastName.setText(user.getLastName());
 
+        cbPrivileges.setValue(getItemWithPrivileges(user.getAppPrivileges()));
+
+    }
+
+    private ApplicationPrivileges getItemWithPrivileges(int privilege) {
+        for (ApplicationPrivileges pr : privileges) {
+            if (pr.getValue() == privilege) {
+                return pr;
+            }
+        }
+        return null;
     }
 
     private void searchUsers(String oldValue, String newValue) {
@@ -196,6 +247,97 @@ public class FormUserAccountsController implements Initializable {
             }
         }
         listViewUsers.setItems(subentries);
+    }
+
+    private boolean checkFields() {
+        boolean result = true;
+        if (tfUsername.getText().equals("")) {
+            FormLoader.showInformationDialog("Грешка", "Нисте унијели корисничко име !");
+            result = false;
+        } else if (pfPassword.getText().equals("")) {
+            FormLoader.showInformationDialog("Грешка", "Нисте унијели шифру !");
+            result = false;
+        } else if (pfConfirmPassword.getText().equals("")) {
+            FormLoader.showInformationDialog("Грешка", "Нисте потврдили шифру !");
+            result = false;
+        } else if (!pfPassword.getText().equals(pfConfirmPassword.getText())) {
+            FormLoader.showInformationDialog("Грешка", "Нисте потврдили шифру !");
+            result = false;
+        } else if (tfFirstName.getText().equals("")) {
+            FormLoader.showInformationDialog("Грешка", "Нисте унијели име корисника !");
+            result = false;
+        } else if (tfLastName.getText().equals("")) {
+            FormLoader.showInformationDialog("Грешка", "Нисте унијели презиме корисника !");
+            result = false;
+        }
+        return result;
+    }
+
+    private boolean addUser() {
+        String username = tfUsername.getText();
+        for (UserWrapper item : listViewUsers.getItems()) {
+            if (item.getUser().getUsername().equals(username)) {
+                FormLoader.showInformationDialog("Грешка", "Постоји корисник са корисничким именом " + username + "!");
+                return false;
+            }
+        }
+        boolean result = false;
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setPassword(pfPassword.getText());
+        newUser.setAppPrivileges(cbPrivileges.getValue().getValue());
+        newUser.setActivated(checkAccountActive.isSelected());
+        newUser.setFirstName(tfFirstName.getText());
+        newUser.setLastName(tfLastName.getText());
+
+        try {
+            result = user.getUserHandler().addUser(newUser);
+            if (result == true) {
+                FormLoader.showInformationDialog("Обавјештење", "Корисник је успјешно додан.");
+                loadUsers();
+            }
+            return result;
+        } catch (StoringException ex) {
+            FormLoader.showInformationDialog("Грешка са базом", "Није успјело додавање новог корисника !");
+        }
+        return false;
+    }
+
+    private boolean editUser() {
+        UserWrapper userItem = listViewUsers.getSelectionModel().getSelectedItem();
+        if (userItem == null) {
+            FormLoader.showInformationDialog("Грешка", "Морате изабрати корисника");
+            return false;
+        }
+        User selected = userItem.getUser();
+        String username = tfUsername.getText();
+        if (!selected.getUsername().equals(username)) {
+            FormLoader.showInformationDialog("Грешка", "Није дозвољена промјена корисничког имена");
+            tfUsername.setText(selected.getUsername());
+            return false;
+        }
+        boolean result = false;
+        selected.setPassword(pfPassword.getText());
+        selected.setAppPrivileges(cbPrivileges.getValue().getValue());
+        selected.setActivated(checkAccountActive.isSelected());
+        selected.setFirstName(tfFirstName.getText());
+        selected.setLastName(tfLastName.getText());
+
+        try {
+
+            result = user.getUserHandler().editUser(selected);
+            if (result == true) {
+                FormLoader.showInformationDialog("Обавјештење", "Корисник је успјешно измјењен.");
+                loadUsers();
+                listViewUsers.getSelectionModel().select(userItem);
+            }
+            return result;
+        } catch (EntityDoesNotExistException ex) {
+            FormLoader.showInformationDialog("Грешка", "Корисник не постоји !");
+        } catch (StoringException ex) {
+            FormLoader.showInformationDialog("Грешка са базом", "Није успјелa измјена корисника !");
+        }
+        return result;
     }
 
     private static class UserWrapper {

@@ -143,9 +143,9 @@
                                                             <Label text="Укупан број учесника:" GridPane.rowIndex="5" />
                                                             <Label fx:id="lblNumMembers" prefHeight="17.0" prefWidth="114.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
                                                             <Label prefHeight="17.0" prefWidth="161.0" text="Укупан број задатака:" GridPane.rowIndex="6" />
-                                                            <Label fx:id="lblNumTasks" prefHeight="17.0" prefWidth="114.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
+                                                            <Label fx:id="lblNumTasks" prefHeight="17.0" prefWidth="114.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
                                                             <Label prefHeight="17.0" prefWidth="168.0" text="Укупан број активности:" GridPane.rowIndex="7" />
-                                                            <Label fx:id="lblNumActivities" prefHeight="17.0" prefWidth="113.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
+                                                            <Label fx:id="lblNumActivities" prefHeight="17.0" prefWidth="99.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="7" />
                                                             <Button fx:id="btnEditProject" mnemonicParsing="false" onAction="#btnEditProjectPressed" prefHeight="25.0" prefWidth="155.0" text="Измјени ставке" GridPane.rowIndex="9">
                                                                <GridPane.margin>
                                                                   <Insets />
