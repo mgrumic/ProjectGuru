@@ -19,6 +19,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import projectguru.AccessManager;
 import projectguru.entities.Activity;
 import projectguru.entities.ClosureTasks;
@@ -1001,6 +1002,27 @@ public class JpaTaskHandler implements TaskHandler {
             em.close();
         }
 
+    }
+
+    @Override
+    public List<User> getAllMembers(Task task) {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        try {
+
+            TypedQuery<User> query = em.createQuery("SELECT wot.user FROM Task t, IN(t.worksOnTaskList) wot WHERE t.id = :id", User.class);
+            
+            query.setParameter("id", task.getId());
+
+            return query.getResultList();
+
+        } catch (Exception ex) {
+
+        } finally {
+            em.close();
+        }
+        return new ArrayList<User>();
     }
 
     

@@ -158,13 +158,13 @@ public class TeamOfficeController {
             TreeItem<TaskNode> taskNode = null;
             if (treeTasks.getRoot() == null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), taskNode.getValue().getTask(), user, this);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -180,15 +180,22 @@ public class TeamOfficeController {
 
     @FXML
     void btnAddMemberPressed(ActionEvent event) {
-
+        try {
+            FormLoader.loadFormAddMembersOnProjects(user,
+                    listProjects.getSelectionModel().getSelectedItem().getProject(),
+                    this
+            );
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @FXML
     void btnNewProjectPressed(ActionEvent event) {
         try {
-            FormLoader.loadFormAddProject(user, this);
+            FormLoader.loadFormAddProject(user, null, this);
         } catch (IOException ex) {
-
+            ex.printStackTrace();
         }
     }
 
@@ -197,7 +204,11 @@ public class TeamOfficeController {
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
         if (projectWrapper != null) {
             Project project = projectWrapper.getProject();
-
+            try {
+                FormLoader.loadFormAddProject(user, project, this);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -217,18 +228,19 @@ public class TeamOfficeController {
     }
 
     @FXML
-    void btnDokumPressed(ActionEvent event){
-        
+    void btnDokumPressed(ActionEvent event) {
+
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
-        try{
-            if(projectWrapper != null){
+        try {
+            if (projectWrapper != null) {
                 FormLoader.loadFormDocumentation(projectWrapper.getProject(), user);
             }
-        }catch(IOException ex){
-            Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE,null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
         }
-        catch(Exception e){}
     }
+
     @FXML
     void mItemKorisnickNaloziPressed(ActionEvent event) {
         try {
@@ -238,13 +250,13 @@ public class TeamOfficeController {
         }
 
     }
-    
+
     @FXML
-    void btnGetReportPressed(ActionEvent event){
+    void btnGetReportPressed(ActionEvent event) {
         try {
             FormLoader.loadFormReport();
         } catch (Exception ex) {
-            
+
         }
     }
     /**
@@ -606,6 +618,16 @@ public class TeamOfficeController {
         @Override
         public String toString() {
             return user.getUsername();
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (!(object instanceof UserWrapper)) {
+                return false;
+            }
+
+            UserWrapper other = (UserWrapper) object;
+            return user.equals(other.getUser());
         }
 
     }

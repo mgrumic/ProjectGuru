@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -39,6 +40,7 @@ import projectguru.handlers.TaskHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
+import projectguru.utils.FormLoader;
 
 /**
  * FXML Controller class
@@ -75,44 +77,41 @@ public class FormAddTaskController implements Initializable {
 
     private ObservableList<TeamOfficeController.UserWrapper> allMembers;
     private ObservableList<TeamOfficeController.UserWrapper> selectedMembers;
+    private TeamOfficeController controller;
+
+    private Node firstNode = null;
+    private Node secondNode = null;
 
     private final EventHandler<MouseEvent> eventOnClickNext = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent t) {
-            Node view;
-            try {
-
-                allMembers = FXCollections.observableArrayList(
-                        user.getProjectHandler().getAllMembers(project)
-                        .stream()
-                        .map((member) -> new UserWrapper(member))
-                        .collect(Collectors.toList()));
-
-                String strName = name.getText();
-                String strDescr = description.getText();
-                LocalDate startDate = start.getValue();
-                LocalDate endDate = ends.getValue();
-                LocalDate dedlineDate = dedline.getValue();
-                String strMenHours = menHours.getText();
-
-                if (strName == null || strDescr == null || startDate == null || endDate == null || strMenHours == null || dedlineDate == null) {
-                    label.setText("Нисте попунили сва поља");
-                    label.setTextFill(Color.web("#ff0000"));
-                    return;
-                }
-
-                selectedMembers = FXCollections.observableArrayList();
-                FXMLLoader fxmlLoader;
-                fxmlLoader = new FXMLLoader(getClass().getResource("/projectguru/fxml/FormAddMembers.fxml"));
-                fxmlLoader.setController(new FormAddMembersController(allMembers, selectedMembers));
-                view = fxmlLoader.load();
-                borderPane.setCenter(view);
-            } catch (IOException ex) {
-                Logger.getLogger(FormAddMembersController.class.getName()).log(Level.SEVERE, null, ex);
+            if (secondNode == null) {
+                secondNode = FormLoader.getAddMembersNode(allMembers, selectedMembers);
+                firstNode = borderPane.getCenter();
             }
-
+            borderPane.setCenter(secondNode);
+            btnNext.setDisable(true);
+            btnBack.setDisable(false);
         }
 
+    };
+
+    private final EventHandler<MouseEvent> eventOnClickBack = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent t) {
+            borderPane.setCenter(firstNode);
+            btnBack.setDisable(true);
+            btnNext.setDisable(false);
+        }
+
+    };
+    private final EventHandler<MouseEvent> eventOnClickHelp = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent t) {
+            FormLoader.showInformationDialog("Напомена", "Како бисе успјешно "
+                    + "креирао задатак морате унијети сва поља. "
+                    + "Додавање чланова је опционо.");
+        }
     };
 
     private final EventHandler<MouseEvent> eventOnClickFinish = new EventHandler<MouseEvent>() {
@@ -125,9 +124,12 @@ public class FormAddTaskController implements Initializable {
             LocalDate dedlineDate = dedline.getValue();
             String strMenHours = menHours.getText();
 
-            if (strName == null || strDescr == null || startDate == null || endDate == null || strMenHours == null) {
-                label.setText("Нисте попунили сва поља");
-                label.setTextFill(Color.web("#ff0000"));
+            if (strName == null
+                    || strDescr == null
+                    || startDate == null
+                    || endDate == null
+                    || strMenHours == null) {
+                FormLoader.showInformationDialog("Напомена", "Нисте попунили сва поља!");
                 return;
             }
             Integer intMenHours = (new Integer(strMenHours));
@@ -135,9 +137,9 @@ public class FormAddTaskController implements Initializable {
                     null,
                     strName,
                     intMenHours,
-                    new Date(startDate.toEpochDay()),
-                    new Date(endDate.toEpochDay()),
-                    new Date(dedlineDate.toEpochDay())
+                    Date.from(startDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                    Date.from(endDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                    Date.from(dedlineDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
             );
 
             TaskHandler taskJpa = user.getTaskHandler();
@@ -147,12 +149,13 @@ public class FormAddTaskController implements Initializable {
                     Iterator<UserWrapper> itr = selectedMembers.iterator();
                     while (itr.hasNext()) {
                         taskJpa.addMember(
-                                tmpTask, 
+                                tmpTask,
                                 itr.next().getUser()
                         );
                     }
                 }
                 Stage stage = (Stage) btnFinish.getScene().getWindow();
+                controller.loadTaskTree(project);
                 stage.close();
             } catch (EntityDoesNotExistException ex) {
                 Logger.getLogger(FormAddTaskController.class.getName()).log(Level.SEVERE, null, ex);
@@ -165,18 +168,24 @@ public class FormAddTaskController implements Initializable {
         }
 
     };
+    @FXML
+    private Button btnHelp;
+    @FXML
+    private Button btnBack;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         btnNext.setOnMouseClicked(eventOnClickNext);
+        btnBack.setOnMouseClicked(eventOnClickBack);
         btnFinish.setOnMouseClicked(eventOnClickFinish);
-        allMembers = null;
-        selectedMembers = null;
+        btnHelp.setOnMouseClicked(eventOnClickHelp);
     }
 
     public void setUser(LoggedUser user) {
         this.user = user;
+        if (task != null || user != null) {
+            defineObservableList();
+        }
     }
 
     public void setProject(Project project) {
@@ -185,6 +194,22 @@ public class FormAddTaskController implements Initializable {
 
     public void setTask(Task task) {
         this.task = task;
+        if (task != null || user != null) {
+            defineObservableList();
+        }
+    }
+
+    private void defineObservableList() {
+        allMembers = FXCollections.observableArrayList(
+                user.getTaskHandler().getAllMembers(task)
+                .stream()
+                .map((member) -> new UserWrapper(member))
+                .collect(Collectors.toList()));
+        selectedMembers = FXCollections.observableArrayList();
+    }
+
+    public void setController(TeamOfficeController controller) {
+        this.controller = controller;
     }
 
 }
