@@ -72,6 +72,7 @@ public class FormAddTaskController implements Initializable {
     private LoggedUser user;
     private Project project;
     private Task task;
+    private TeamOfficeController controller;
 
     private ObservableList<TeamOfficeController.UserWrapper> allMembers;
     private ObservableList<TeamOfficeController.UserWrapper> selectedMembers;
@@ -142,14 +143,17 @@ public class FormAddTaskController implements Initializable {
 
             TaskHandler taskJpa = user.getTaskHandler();
             try {
-                taskJpa.addSubtask(task, tmpTask);
-                if (selectedMembers != null) {
-                    Iterator<UserWrapper> itr = selectedMembers.iterator();
-                    while (itr.hasNext()) {
-                        taskJpa.addMember(
-                                tmpTask, 
-                                itr.next().getUser()
-                        );
+                boolean result = taskJpa.addSubtask(task, tmpTask);
+                if (result == true) {
+                    controller.loadTaskTree(project);
+                    if (selectedMembers != null) {
+                        Iterator<UserWrapper> itr = selectedMembers.iterator();
+                        while (itr.hasNext()) {
+                            taskJpa.addMember(
+                                    tmpTask,
+                                    itr.next().getUser()
+                            );
+                        }
                     }
                 }
                 Stage stage = (Stage) btnFinish.getScene().getWindow();
@@ -179,8 +183,9 @@ public class FormAddTaskController implements Initializable {
         this.user = user;
     }
 
-    public void setProject(Project project) {
+    public void setProjectAndController(Project project, TeamOfficeController controller) {
         this.project = project;
+        this.controller = controller;
     }
 
     public void setTask(Task task) {

@@ -400,7 +400,6 @@ public class JpaProjectHandler implements ProjectHandler {
     @Override
     public boolean addDocument(Project project, Document document) throws InsuficientPrivilegesException, StoringException {
 
-        //Ova metoda samo ubacuje dokument u bazu, moze i da ga updatuje jer radim merge
         if (!checkMemberPrivileges(project)) {
             throw new InsuficientPrivilegesException();
         }
@@ -416,7 +415,7 @@ public class JpaProjectHandler implements ProjectHandler {
        
             document.setIDProject(project);
 
-            em.merge(document);
+            em.persist(document);
             em.getTransaction().commit();
 
             return true;
@@ -663,5 +662,7 @@ public class JpaProjectHandler implements ProjectHandler {
         em.close();
         return user;
     }
+    
+    
 
 }

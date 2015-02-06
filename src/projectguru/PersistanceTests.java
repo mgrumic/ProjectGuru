@@ -74,7 +74,7 @@ class PersistanceTests {
         AccessManager.setInstance(jam);
         
         LoggedUser loggedUser = AccessManager.getInstance().logUserIn("admin", "admin");
-        
+      /*  
         User kors[] = new User[7];
         kors[0] = new User("boca", "etf", "Александар", "Вукотић", 4, true);
         kors[1] = new User("raja", "etf", "Марко", "Грумић", 2, true);
@@ -87,7 +87,7 @@ class PersistanceTests {
         for(User u : kors){
             loggedUser.getUserHandler().addUser(u);
         }
-
+*/
         
         
         loggedUser = AccessManager.getInstance().logUserIn("boca", "etf");
@@ -113,9 +113,9 @@ class PersistanceTests {
         jpa.createProject(novi);
         novi = jpa.getUpdatedProject(novi);
         
-        for(User u : kors){
-            jpa.addMember(novi, u);
-        }
+       // for(User u : kors){
+      //      jpa.addMember(novi, u);
+      //  }
         
         
         
@@ -132,6 +132,9 @@ class PersistanceTests {
         doc2.setPostedDate(java.sql.Date.valueOf("2015-1-2"));
         
         jpa.addDocument(novi, doc1);
+        
+        System.out.println("DOKUMENT ID USING MY SHIT: " + doc1.getId());
+     /*   
         jpa.addDocument(novi, doc2);
         
         
@@ -264,7 +267,7 @@ class PersistanceTests {
         } catch (Exception ex) {
             Logger.getLogger(PersistanceTests.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        */
         
         System.exit(0);  
         

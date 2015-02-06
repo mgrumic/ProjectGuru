@@ -626,7 +626,7 @@ public class JpaTaskHandler implements TaskHandler {
                 .stream()
                 .filter((e) -> e.getDepth() == 1)
                 .map(ClosureTasks::getChild)
-                .map((t) -> new TaskNode(t))
+                .map((t) -> new TaskNode(getUpdatedTask(t)))
                 .collect(Collectors.toList());
 
         return children;
@@ -635,7 +635,7 @@ public class JpaTaskHandler implements TaskHandler {
 
     @Override
     public TaskTree getTaskTree(Task task) {
-        TaskNode root = new TaskNode(task);
+        TaskNode root = new TaskNode(getUpdatedTask(task));
         recursiveTreeGeneration(root);
         return new TaskTree(root);
     }

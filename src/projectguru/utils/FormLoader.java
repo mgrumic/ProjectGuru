@@ -6,23 +6,18 @@
 package projectguru.utils;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBoxBuilder;
-import javafx.scene.text.Text;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.controlsfx.dialog.Dialogs;
 import projectguru.controllers.FormAddDocumentationController;
 import projectguru.controllers.FormAddProjectController;
 import projectguru.controllers.FormAddTaskController;
 import projectguru.controllers.FormDocumentationController;
+import projectguru.controllers.FormReportController;
 import projectguru.controllers.FormUserAccountsController;
 import projectguru.controllers.TeamOfficeController;
 import projectguru.entities.Project;
@@ -52,7 +47,7 @@ public class FormLoader {
 
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
-        
+
         stage.show();
     }
 
@@ -78,14 +73,14 @@ public class FormLoader {
      * @param task
      * @throws IOException
      */
-    public static void loadFormAddTask(Project project, Task task, LoggedUser user) throws IOException {
+    public static void loadFormAddTask(Project project, Task task, LoggedUser user, TeamOfficeController controller) throws IOException {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddTask.fxml"));
 
         Parent root = loader.load();
 
         FormAddTaskController fatc = loader.getController();
         fatc.setUser(user);
-        fatc.setProject(project);
+        fatc.setProjectAndController(project, controller);
         if (task == null) {
             task = project.getIDRootTask();
         }
@@ -124,66 +119,73 @@ public class FormLoader {
     }
 
     public static void loadFormAddDocumentation(Project project, LoggedUser user) throws Exception {
-        
-            FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddDocumentation.fxml"));
-            Parent root = loader.load();
 
-            FormAddDocumentationController fdc = loader.getController();
-            fdc.setProject(project);
-            fdc.setUser(user);
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddDocumentation.fxml"));
+        Parent root = loader.load();
 
-            Scene scene = new Scene(root);
+        FormAddDocumentationController fdc = loader.getController();
+        fdc.setProject(project);
+        fdc.setUser(user);
 
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Нови документ");
+        Scene scene = new Scene(root);
 
-            stage.initModality(Modality.APPLICATION_MODAL);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Нови документ");
 
-            stage.show();
-        
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.show();
 
     }
-    public static void loadFormReport() throws Exception {
+
+    public static void loadFormReport(Project project, LoggedUser user) throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormReport.fxml"));
+        Parent root = loader.load();
+
+        FormReportController fdc = loader.getController();
         
-            FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormReport.fxml"));
-            Parent root = loader.load();
-            
-            Scene scene = new Scene(root);
+        Scene scene = new Scene(root);
 
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Нови документ");
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Извјештаји за пројекат: " + project.getName());
 
-            stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initModality(Modality.APPLICATION_MODAL);
 
-            stage.show();
-        
+        stage.show();
+
     }
-    
+
     public static void loadFormUserAccounts(LoggedUser user) throws IOException {
-        
+
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormUserAccounts.fxml"));
         Parent root = loader.load();
         FormUserAccountsController controller = loader.getController();
         controller.setUser(user);
-        
+
         Scene scene = new Scene(root);
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Кориснички налози");
         stage.setResizable(false);
-        
+
         stage.show();
     }
-    
-    public static void showInformationDialog(String title, String message) {
-        Dialogs.create()
-                .owner(new Stage())
-                .title(title)
-                .masthead(null)
-                .message(message)
-                .showInformation();
+
+    public static void showInformationDialog(String title, String message) {     
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    public static void showErrorDialog(String title, String message) {
+        Alert alert = new Alert(AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
 }

@@ -16,10 +16,8 @@ import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 
 import javafx.beans.value.ObservableValue;
@@ -44,12 +42,9 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import projectguru.entities.Privileges;
@@ -158,13 +153,13 @@ public class TeamOfficeController {
             TreeItem<TaskNode> taskNode = null;
             if (treeTasks.getRoot() == null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), taskNode.getValue().getTask(), user, this);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -201,7 +196,7 @@ public class TeamOfficeController {
         }
     }
 
-    @FXML  
+    @FXML
     void btnAddActivityPressed(ActionEvent event) {
         if (treeTasks.getSelectionModel().getSelectedItem() != null) {
             TaskNode taskNode = treeTasks.getSelectionModel().getSelectedItem().getValue();
@@ -217,18 +212,19 @@ public class TeamOfficeController {
     }
 
     @FXML
-    void btnDokumPressed(ActionEvent event){
-        
+    void btnDokumPressed(ActionEvent event) {
+
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
-        try{
-            if(projectWrapper != null){
+        try {
+            if (projectWrapper != null) {
                 FormLoader.loadFormDocumentation(projectWrapper.getProject(), user);
             }
-        }catch(IOException ex){
-            Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE,null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
         }
-        catch(Exception e){}
     }
+
     @FXML
     void mItemKorisnickNaloziPressed(ActionEvent event) {
         try {
@@ -238,13 +234,18 @@ public class TeamOfficeController {
         }
 
     }
-    
+
     @FXML
-    void btnGetReportPressed(ActionEvent event){
+    void btnGetReportPressed(ActionEvent event) {
         try {
-            FormLoader.loadFormReport();
+            ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
+            if (item != null) {
+                FormLoader.loadFormReport(item.getProject(), user);
+            } else {
+                FormLoader.showInformationDialog("Обавјештење", "Изаберите пројекат за који желите генерисати извјештај");
+            }
         } catch (Exception ex) {
-            
+            FormLoader.showErrorDialog("Грешка у апликацији", "Не може да отвори форму за извјештај");
         }
     }
     /**
@@ -346,7 +347,7 @@ public class TeamOfficeController {
                             setGraphic(null);
                         } else if (t != null) {
                             setAlignment(Pos.CENTER);
-                            setText(t * 100 + "%");
+                            setText(String.format("%.2f",t * 100) + "%");
                             setGraphic(new ColoredProgressBar(t));
                         }
 
@@ -489,13 +490,13 @@ public class TeamOfficeController {
                     PieChart.Data worked;
                     PieChart.Data left;
                     if (root != null) {
-                        lblProjectCompleted.setText(root.getValue().getPartDone() * 100 + "%");
-                        chartPie.setTitle("Укупно одрађено: " + root.getValue().getPartDone() * 100 + "%");
+                        lblProjectCompleted.setText(String.format("%.2f ",(root.getValue().getPartDone() * 100)) + "%");
+                        chartPie.setTitle(String.format("Укупно одрађено: %.2f ",(root.getValue().getPartDone() * 100)) + "%");
                         worked = new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100);
                         left = new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100));
                     } else {
-                        lblProjectCompleted.setText("0.0 %");
-                        chartPie.setTitle("Укупно одрађено: 0.0 %");
+                        lblProjectCompleted.setText("0%");
+                        chartPie.setTitle("Укупно одрађено: 0%");
                         worked = new PieChart.Data("Одрађено", 0);
                         left = new PieChart.Data("Преостало", 100);
                     }

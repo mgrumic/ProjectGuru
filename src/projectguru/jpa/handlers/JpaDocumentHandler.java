@@ -16,6 +16,7 @@ import projectguru.entities.Document;
 import projectguru.entities.DocumentRevision;
 import projectguru.entities.WorksOnProject;
 import projectguru.entities.Privileges;
+import projectguru.entities.Project;
 import projectguru.entities.User;
 import projectguru.handlers.DocumentHandler;
 import projectguru.handlers.LoggedUser;
@@ -88,6 +89,41 @@ public class JpaDocumentHandler implements DocumentHandler {
         return true;
     }
 
+    @Override
+    public boolean addDocument(Project project, Document document) throws InsuficientPrivilegesException, StoringException {
+
+        if (!user.getProjectHandler().checkMemberPrivileges(project)) {
+            throw new InsuficientPrivilegesException();
+        }
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+
+            em.getTransaction().begin();
+
+            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+                throw new EntityDoesNotExistException("Project does not exist.");
+            }
+       
+            document.setIDProject(project);
+
+            em.persist(document);
+            em.getTransaction().commit();
+
+            return true;
+
+        } catch (Exception ex) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            ex.printStackTrace();
+
+            throw new StoringException(ex.getLocalizedMessage());
+        } finally {
+            em.close();
+        }
+    }
+    
     @Override
     public boolean editDocument(Document document) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
