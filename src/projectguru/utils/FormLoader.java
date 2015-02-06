@@ -172,6 +172,7 @@ public class FormLoader {
         fdc.setProject(project);
         fdc.setUser(user);
 
+
         Scene scene = new Scene(root);
 
         Stage stage = new Stage();
@@ -194,7 +195,6 @@ public class FormLoader {
         frc.setUser(user);
         
         Scene scene = new Scene(root);
-
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Извјештаји за пројекат: " + project.getName());

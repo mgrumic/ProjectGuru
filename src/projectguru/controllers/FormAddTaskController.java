@@ -177,6 +177,7 @@ public class FormAddTaskController implements Initializable {
 
             TaskHandler taskJpa = user.getTaskHandler();
             try {
+
                 boolean result;
                 if (edit) {
                     result = taskJpa.editSubtask(tmpTask);
@@ -219,10 +220,11 @@ public class FormAddTaskController implements Initializable {
     @FXML
     private Button btnBack;
 
-    @Override
+
 
     public void initialize(URL url, ResourceBundle rb
     ) {
+
 
         btnNext.setOnMouseClicked(eventOnClickNext);
         btnBack.setOnMouseClicked(eventOnClickBack);
@@ -262,6 +264,39 @@ public class FormAddTaskController implements Initializable {
 
     public void setController(TeamOfficeController controller) {
         this.controller = controller;
+
+    }
+
+    public void setEdit(boolean edit) {
+        this.edit = edit;
+        if (edit) {
+            name.setText(task.getName());
+            description.setText(task.getDescription());
+            start.setValue(Instant.ofEpochMilli(task.getStartDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            dedline.setValue(Instant.ofEpochMilli(task.getDeadline().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            if (task.getEndDate() != null) {
+                ends.setValue(Instant.ofEpochMilli(task.getEndDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+
+            menHours.setText(Integer.toString(task.getAssumedManHours()));
+//            allMembers = FXCollections.observableArrayList(
+//                    user.getTaskHandler().getAllMembers(task.getClosureTasksParents().get(0).getParent())
+//                    .stream()
+//                    .map((member) -> new TeamOfficeController.UserWrapper(member))
+//                    .collect(Collectors.toList())
+//            );
+//            user.getTaskHandler().getAllMembers(task.getClosureTasksParents().get(0).getParent());
+//
+//            allMembers.removeAll(FXCollections.observableArrayList(
+//                    user.getTaskHandler().getAllMembers(task)
+//                    .stream()
+//                    .map((member) -> new TeamOfficeController.UserWrapper(member))
+//                    .collect(Collectors.toList()))
+//            );
+
+//            selectedMembers = FXCollections.observableArrayList();
+        }
+
     }
 
     public void setEdit(boolean edit) {
