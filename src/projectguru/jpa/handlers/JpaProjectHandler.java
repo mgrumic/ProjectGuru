@@ -260,21 +260,17 @@ public class JpaProjectHandler implements ProjectHandler {
                     
                     task.getWorksOnTaskList().add(wot);
                 }
-                
-
             } else {
                 project.setIDRootTask(check);
+
             }
             em.getTransaction().commit();
             em.refresh(project);
-            em.refresh(task);
-
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
             ex.printStackTrace();
-
             throw new StoringException(ex.getLocalizedMessage());
         } finally {
             em.close();

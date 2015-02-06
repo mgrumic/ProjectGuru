@@ -143,21 +143,27 @@ public class FormAddTaskController implements Initializable {
 
             TaskHandler taskJpa = user.getTaskHandler();
             try {
-                boolean result = taskJpa.addSubtask(task, tmpTask);
-                if (result == true) {
-                    controller.loadTaskTree(project);
-                    if (selectedMembers != null) {
-                        Iterator<UserWrapper> itr = selectedMembers.iterator();
-                        while (itr.hasNext()) {
-                            taskJpa.addMember(
-                                    tmpTask,
-                                    itr.next().getUser()
-                            );
+                if (task != null) {
+                    boolean result = taskJpa.addSubtask(task, tmpTask);
+                    if (result == true) {
+                        if (selectedMembers != null) {
+                            Iterator<UserWrapper> itr = selectedMembers.iterator();
+                            while (itr.hasNext()) {
+                                taskJpa.addMember(
+                                        tmpTask,
+                                        itr.next().getUser()
+                                );
+                            }
                         }
                     }
+                }else {
+                    user.getProjectHandler().setRootTask(project, tmpTask);
                 }
+                controller.addNodeToTree(tmpTask);
+                
                 Stage stage = (Stage) btnFinish.getScene().getWindow();
                 stage.close();
+                
             } catch (EntityDoesNotExistException ex) {
                 Logger.getLogger(FormAddTaskController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (StoringException ex) {

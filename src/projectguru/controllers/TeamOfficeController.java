@@ -458,7 +458,7 @@ public class TeamOfficeController {
             }
         });
     }
-
+    
     private void recursiveTaskTreeLoad(TreeItem<TaskNode> root, TaskNode task) {
         List<TaskNode> children = task.getChildren();
         children.stream().forEach((child) -> {
@@ -468,6 +468,16 @@ public class TeamOfficeController {
         });
     }
 
+    public void addNodeToTree(Task subtask){
+        TreeItem<TaskNode> task = treeTasks.getSelectionModel().getSelectedItem();
+        TreeItem<TaskNode> node = new TreeItem<>(user.getTaskHandler().getTaskTree(subtask).getRoot());
+        if(task == null){
+             treeTasks.setRoot(node);   
+             loadProjects();
+        }else {
+            task.getChildren().add(node);
+        }
+    }
     private void setTime() {
         long ellapsed = System.currentTimeMillis();
         ellapsed -= time;
