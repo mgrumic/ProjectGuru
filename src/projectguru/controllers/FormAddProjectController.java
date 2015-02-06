@@ -174,6 +174,7 @@ public class FormAddProjectController implements Initializable {
             newProject.setStartDate(startDate);
             newProject.setEndDate(endDate);
 
+
             try {
                 ProjectHandler projectJpa = user.getProjectHandler();
                 if (edit) {
@@ -220,6 +221,7 @@ public class FormAddProjectController implements Initializable {
         btnFinish.setOnMouseClicked(eventOnClickFinish);
         btnHelp.setOnMouseClicked(eventOnClickHelp);
         start.setValue(Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+
     }
 
     public void setUser(LoggedUser user) {

@@ -114,7 +114,9 @@ public class FormLoader {
      * @param task
      * @throws IOException
      */
+
     public static void loadFormAddTask(Project project, Task task, LoggedUser user, TeamOfficeController controller, boolean edit) throws IOException {
+
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddTask.fxml"));
 
         Parent root = loader.load();
@@ -128,6 +130,7 @@ public class FormLoader {
         fatc.setTask(task);
         fatc.setController(controller);
         fatc.setEdit(edit);
+
         Scene scene = new Scene(root);
         //scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddtask.css").toExternalForm());
 
@@ -290,6 +293,7 @@ public class FormLoader {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
 
     public static void showErrorDialog(String title, String message) {
         Alert alert = new Alert(AlertType.ERROR);

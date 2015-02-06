@@ -46,6 +46,7 @@ import projectguru.handlers.exceptions.StoringException;
 import projectguru.utils.FormLoader;
 import projectguru.utils.ProjectGuruUtilities;
 
+
 /**
  * FXML Controller class
  *
@@ -100,7 +101,9 @@ public class FormAddTaskController implements Initializable {
             btnBack.setDisable(false);
         }
 
+
     };
+
 
     private final EventHandler<MouseEvent> eventOnClickBack = new EventHandler<MouseEvent>() {
         @Override
@@ -132,6 +135,7 @@ public class FormAddTaskController implements Initializable {
 
             if (strName == null
                     || strDescr == null
+
                     || strMenHours == null
                     || dedlineLDate == null) {
                 FormLoader.showInformationDialog("Напомена", "Нисте попунили сва поља!");
@@ -139,6 +143,7 @@ public class FormAddTaskController implements Initializable {
             }
             if (!ProjectGuruUtilities.tryParseInt(strMenHours)) {
                 FormLoader.showInformationDialog("Напомена", "Поље човјек/часова није коректно попуњено!");
+
                 return;
             }
             Integer intMenHours = (new Integer(strMenHours));
@@ -167,11 +172,11 @@ public class FormAddTaskController implements Initializable {
                     startDate,
                     endDate,
                     Date.from(dedlineLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+
             );
 
             TaskHandler taskJpa = user.getTaskHandler();
             try {
-
                 boolean result;
                 if (edit) {
                     result = taskJpa.editSubtask(tmpTask);
@@ -197,6 +202,7 @@ public class FormAddTaskController implements Initializable {
                 controller.loadTaskTree(project);
                 stage.close();
 
+
             } catch (EntityDoesNotExistException ex) {
                 Logger.getLogger(FormAddTaskController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (StoringException ex) {
@@ -214,13 +220,17 @@ public class FormAddTaskController implements Initializable {
     private Button btnBack;
 
     @Override
+
     public void initialize(URL url, ResourceBundle rb
     ) {
+
         btnNext.setOnMouseClicked(eventOnClickNext);
         btnBack.setOnMouseClicked(eventOnClickBack);
         btnFinish.setOnMouseClicked(eventOnClickFinish);
         btnHelp.setOnMouseClicked(eventOnClickHelp);
+
         start.setValue(Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+
     }
 
     public void setUser(LoggedUser user) {
@@ -283,6 +293,7 @@ public class FormAddTaskController implements Initializable {
 
 //            selectedMembers = FXCollections.observableArrayList();
         }
+
     }
 
 }

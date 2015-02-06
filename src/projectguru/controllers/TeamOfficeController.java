@@ -163,13 +163,17 @@ public class TeamOfficeController {
             TreeItem<TaskNode> taskNode = null;
             if (treeTasks.getRoot() == null) {
                 try {
+
                     FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this, false);
+
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
                 try {
+
                     FormLoader.loadFormAddTask(projectItem.getProject(), taskNode.getValue().getTask(), user, this, false);
+
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
