@@ -253,7 +253,7 @@ public class TeamOfficeController {
         if (treeTasks.getSelectionModel().getSelectedItem() != null) {
             TaskNode taskNode = treeTasks.getSelectionModel().getSelectedItem().getValue();
             try {
-                FormLoader.loadFormActivities(taskNode.getTask());
+                FormLoader.loadFormActivities(user, taskNode.getTask());
             } catch (IOException ex) {
                 Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
             }

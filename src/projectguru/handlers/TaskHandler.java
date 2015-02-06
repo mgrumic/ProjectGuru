@@ -54,7 +54,7 @@ public interface TaskHandler {
     public User getChef(Task task);
     public boolean addMember(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException;
     
-    public boolean addActivity(Task task, Activity activity) throws EntityDoesNotExistException, StoringException;
+    public boolean addActivity(Task task, Activity activity) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException;
     
     public boolean addTimetable(Timetable timetable) throws StoringException;
     public boolean editTimetable(Timetable timetable) throws StoringException, EntityDoesNotExistException;

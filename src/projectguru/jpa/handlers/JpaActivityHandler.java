@@ -94,7 +94,7 @@ public class JpaActivityHandler implements ActivityHandler {
             if (activity.getId() == null || (activity = em.find(Activity.class, activity.getId())) == null) {
                 throw new EntityDoesNotExistException("Activity does not exist.");
             }
-            if (checkActivityChefPrivileges(activity)) {
+            if (!(checkActivityChefPrivileges(activity))) {
                 throw new InsuficientPrivilegesException();
             }
             try {
@@ -208,41 +208,51 @@ public class JpaActivityHandler implements ActivityHandler {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
         try{
-        Query q = null;
         
-        String qstring = "SELECT act FROM Activity act, IN(act.worksOnTask.task) t subtaskstr1 WHERE (t.id = :idtask subtaskstr2) onlystr1";
+        String qtstr = "SELECT act FROM Activity act WHERE act.worksOnTask.worksOnTaskPK.iDTask = :idtask onlystr1 ";
+        String qsstr = "SELECT act FROM ClosureTasks ct, Activity act WHERE (act.worksOnTask.worksOnTaskPK.iDTask = ct.closureTasksPK.iDChild AND ct.closureTasksPK.iDParent = :idtask) onlystr1 ";
         
-        String subtaskstr1 = ", IN(t.closureTasksParents) clpr";
-        String subtaskstr2 = "OR clpr.closureTasksPK.iDParent = :idtask ";
         
-        String onlystr1 = "AND act.worksOnTask.username = :username";
+        String onlystr1 = "AND act.worksOnTask.worksOnTaskPK.username = :username";
+
+
+    
+        
+        if(onlyForCurrentUser){
+            qtstr = qtstr.replace("onlystr1", onlystr1);
+            qsstr = qsstr.replace("onlystr1", onlystr1);
+        }else{
+            qtstr = qtstr.replace("onlystr1", "");
+            qsstr = qsstr.replace("onlystr1", "");
+        }
+        
+        Query qt = em.createQuery(qtstr);
 
         if(onlyForCurrentUser){
-            qstring = qstring.replace("onlystr1", onlystr1);
-        }else{
-            qstring = qstring.replace("onlystr1", "");
+            qt.setParameter("username", user.getUser().getUsername());
         }
+        
+        qt.setParameter("idtask", task.getId());
+        
+         List<Activity> ret = qt.getResultList();
         
         if(includeSubtasks){
-            qstring = qstring.replace("subtaskstr1", subtaskstr1);
-            qstring = qstring.replace("subtaskstr2", subtaskstr2);
-        }else{
-            qstring = qstring.replace("subtaskstr1", "");
-            qstring = qstring.replace("subtaskstr2", "");
+             Query qs = em.createQuery(qsstr);
+
+            if(onlyForCurrentUser){
+                qs.setParameter("username", user.getUser().getUsername());
+            }
+
+            qs.setParameter("idtask", task.getId());
+            
+            List<Activity> sret = qs.getResultList();
+            
+            for(Activity r : sret){
+                ret.add(r);
+            }
         }
-        
-        q = em.createQuery(qstring, Activity.class);
-        
-        if(onlyForCurrentUser){
-            q.setParameter("username", user.getUser().getUsername());
-        }
-        
-        if(includeSubtasks){
-            q.setParameter("idtask", task.getId());
-        }
-        
-        List<Activity> ret = q.getResultList();
-        
+            
+       
         return ret;
         
         }catch(Exception e){

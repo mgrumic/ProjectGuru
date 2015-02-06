@@ -22,7 +22,11 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+<<<<<<< HEAD
 import javafx.stage.WindowEvent;
+=======
+import projectguru.controllers.FormActivitiesController;
+>>>>>>> FormActivities
 import projectguru.controllers.FormAddDocumentationController;
 import projectguru.controllers.FormAddExpenseOrIncomeController;
 import projectguru.controllers.FormAddMembersController;
@@ -95,21 +99,21 @@ public class FormLoader {
         stage.show();
     }
 
-    public static void loadFormActivities(Task task) throws IOException {
-        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormActivities.fxml"));
-
-        Parent root = loader.load();
-        Scene scene = new Scene(root);
-        scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formactivities.css").toExternalForm());
-
-        Stage stage = new Stage();
-        stage.setScene(scene);
-        stage.setTitle("Активност");
-
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setResizable(false);
-        stage.show();
-    }
+//    public static void loadFormActivities(Task task) throws IOException {
+//        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormActivities.fxml"));
+//
+//        Parent root = loader.load();
+//        Scene scene = new Scene(root);
+//        scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formactivities.css").toExternalForm());
+//
+//        Stage stage = new Stage();
+//        stage.setScene(scene);
+//        stage.setTitle("Активност");
+//
+//        stage.initModality(Modality.APPLICATION_MODAL);
+//        stage.setResizable(false);
+//        stage.show();
+//    }
 
     /**
      * Poziva se kada se dodaje podzadatak za neki zadatak
@@ -205,6 +209,25 @@ public class FormLoader {
         stage.setTitle("Извјештаји за пројекат: " + project.getName());
         stage.initModality(Modality.APPLICATION_MODAL);
 
+        stage.show();
+    }
+    
+    public static void loadFormActivities(LoggedUser user, Task task) throws IOException{
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormActivities.fxml"));
+        Parent root = loader.load();
+        FormActivitiesController controller = loader.getController();
+        controller.setTask(task);
+        controller.setLoggedUser(user);
+        controller.load();
+
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Активности за задатак " + task.getName());
+        //stage.setResizable(false);
+
+        controller.loadActivities();
+        
         stage.show();
     }
 

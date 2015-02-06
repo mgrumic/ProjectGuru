@@ -454,7 +454,7 @@ public class JpaTaskHandler implements TaskHandler {
     }
 
     @Override
-    public boolean addActivity(Task task, Activity activity) throws EntityDoesNotExistException, StoringException {
+    public boolean addActivity(Task task, Activity activity) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
         try {
@@ -462,29 +462,30 @@ public class JpaTaskHandler implements TaskHandler {
                 throw new EntityDoesNotExistException("Task does not exists in database.");
             }
 
-            if (checkMemberPrivileges(task)) {
-                try {
-                    em.getTransaction().begin();
-                    //prvi korak je da nadjem WorksOnTask za trenutnog korisnika  i ovaj task
-                    WorksOnTask wot = getMyWorksOnTask(task);
+            if (!checkMemberPrivileges(task)) {
+                throw new InsuficientPrivilegesException();
+            }
+            try {
+                em.getTransaction().begin();
+                //prvi korak je da nadjem WorksOnTask za trenutnog korisnika  i ovaj task
+                WorksOnTask wot = getMyWorksOnTask(task);
 
-                    assert (wot != null);
+                assert (wot != null);
 
-                    activity.setWorksOnTask(wot);
+                activity.setWorksOnTask(wot);
 
-                    if (activity.getId() == null || em.find(Activity.class, activity.getId()) == null) {
-                        em.persist(activity);
-                    } else {
-                        em.merge(activity);
-                    }
-                    em.getTransaction().commit();
-                    em.refresh(task);
-                } catch (Exception ex) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback();
-                    }
-                    throw new StoringException(ex.getLocalizedMessage());
+                if (activity.getId() == null || em.find(Activity.class, activity.getId()) == null) {
+                    em.persist(activity);
+                } else {
+                    em.merge(activity);
                 }
+                em.getTransaction().commit();
+                em.refresh(task);
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                throw new StoringException(ex.getLocalizedMessage());
             }
         } finally {
             em.close();
@@ -1043,12 +1044,12 @@ public class JpaTaskHandler implements TaskHandler {
                 em.getTransaction().begin();
 
                 if (!checkTaskChefPrivileges(task)) {
-                    throw new InsuficientPrivilegesException("User does not have sufficient privileges over task " + task.getName() + ".");
+                    throw new InsuficientPrivilegesException("User does not have sufficient privileges over task :" + task.getName() + ".");
                 }
 
                 Task active = getActiveTask(user.getUsername());
                 if (active != null && !checkTaskChefPrivileges(active)) {
-                    throw new InsuficientPrivilegesException("User does not have sufficient privileges over task " + active.getName() + ".");
+                    throw new InsuficientPrivilegesException("User does not have sufficient privileges over task :" + active.getName() + ".");
                 }
                 if (active != null) {
                     WorksOnTask wota = getWorksOnTask(active, user);
