@@ -80,20 +80,20 @@ public class JpaReportHandler implements ReportHandler{
                                     .setBorder(DynamicReports.stl.pen1Point())
                                     .setBackgroundColor(Color.LIGHT_GRAY);
         TextColumnBuilder<String> usernameColumn = 
-                Columns.column("Username", "username", DataTypes.stringType());
+                Columns.column("Корисничко име", "username", DataTypes.stringType());
         
         TextColumnBuilder<String> passColumn = 
-                Columns.column("Password", "password", DataTypes.stringType());
+                Columns.column("Шифра", "password", DataTypes.stringType());
         
         
         TextColumnBuilder<String> nameColumn = 
-                Columns.column("Name", "firstname", DataTypes.stringType());
+                Columns.column("Име", "firstname", DataTypes.stringType());
                 
         TextColumnBuilder<String> surnameColumn = 
-                Columns.column("Surname", "lastname", DataTypes.stringType());
+                Columns.column("Презиме", "lastname", DataTypes.stringType());
                 
         TextColumnBuilder<Integer> rowNumberColumn = 
-                DynamicReports.col.reportRowNumberColumn("No.")
+                DynamicReports.col.reportRowNumberColumn("Бр.")
                 .setFixedColumns(3)
                 .setHorizontalAlignment(HorizontalAlignment.RIGHT);
         
