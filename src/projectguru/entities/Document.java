@@ -60,6 +60,7 @@ public class Document implements Serializable {
     private Project iDProject;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "iDDocument", fetch = FetchType.LAZY)
     private List<DocumentRevision> documentRevisionList;
+ 
 
     public Document() {
     }
