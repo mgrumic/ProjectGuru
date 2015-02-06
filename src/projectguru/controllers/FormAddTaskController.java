@@ -8,7 +8,9 @@ package projectguru.controllers;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Iterator;
@@ -26,6 +28,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -41,6 +44,7 @@ import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.utils.FormLoader;
+import projectguru.utils.ProjectGuruUtilities;
 
 /**
  * FXML Controller class
@@ -61,7 +65,7 @@ public class FormAddTaskController implements Initializable {
     @FXML
     private TextField menHours;
     @FXML
-    private TextField description;
+    private TextArea description;
     @FXML
     private DatePicker start;
     @FXML
@@ -74,6 +78,8 @@ public class FormAddTaskController implements Initializable {
     private LoggedUser user;
     private Project project;
     private Task task;
+
+    private boolean edit = false;
 
     private ObservableList<TeamOfficeController.UserWrapper> allMembers;
     private ObservableList<TeamOfficeController.UserWrapper> selectedMembers;
@@ -119,53 +125,77 @@ public class FormAddTaskController implements Initializable {
         public void handle(MouseEvent t) {
             String strName = name.getText();
             String strDescr = description.getText();
-            LocalDate startDate = start.getValue();
-            LocalDate endDate = ends.getValue();
-            LocalDate dedlineDate = dedline.getValue();
+            LocalDate startLDate = start.getValue();
+            LocalDate endLDate = ends.getValue();
+            LocalDate dedlineLDate = dedline.getValue();
             String strMenHours = menHours.getText();
 
             if (strName == null
                     || strDescr == null
-                    || startDate == null
-                    || endDate == null
-                    || strMenHours == null) {
+                    || strMenHours == null
+                    || dedlineLDate == null) {
                 FormLoader.showInformationDialog("Напомена", "Нисте попунили сва поља!");
                 return;
             }
+            if (!ProjectGuruUtilities.tryParseInt(strMenHours)) {
+                FormLoader.showInformationDialog("Напомена", "Поље човјек/часова није коректно попуњено!");
+                return;
+            }
             Integer intMenHours = (new Integer(strMenHours));
+            Date startDate;
+            Date endDate = null;
+
+            if (startLDate == null) {
+                startDate = new Date();
+            } else {
+                startDate = Date.from(startLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            }
+            if (endLDate != null) {
+                endDate = Date.from(endLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            }
+
+            Integer id = null;
+            if (edit) {
+                id = task.getId();
+                System.out.println(id);
+            }
+
             Task tmpTask = new Task(
-                    null,
+                    id,
                     strName,
                     intMenHours,
-                    Date.from(startDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                    Date.from(endDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                    Date.from(dedlineDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                    startDate,
+                    endDate,
+                    Date.from(dedlineLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
             );
 
             TaskHandler taskJpa = user.getTaskHandler();
             try {
-                if (task != null) {
-                    boolean result = taskJpa.addSubtask(task, tmpTask);
-                    if (result == true) {
-                        if (selectedMembers != null) {
-                            Iterator<UserWrapper> itr = selectedMembers.iterator();
-                            while (itr.hasNext()) {
-                                taskJpa.addMember(
-                                        tmpTask,
-                                        itr.next().getUser()
-                                );
-                            }
-                        }
+
+                boolean result;
+                if (edit) {
+                    result = taskJpa.editSubtask(tmpTask);
+                } else {
+                    result = taskJpa.addSubtask(task, tmpTask);
+                }
+                if (selectedMembers != null && result == true) {
+                    Iterator<UserWrapper> itr = selectedMembers.iterator();
+                    while (itr.hasNext()) {
+                        taskJpa.addMember(
+                                tmpTask,
+                                itr.next().getUser()
+                        );
+
                     }
-                }else {
+                } else {
                     user.getProjectHandler().setRootTask(project, tmpTask);
                 }
                 controller.addNodeToTree(tmpTask);
-                
+
                 Stage stage = (Stage) btnFinish.getScene().getWindow();
                 controller.loadTaskTree(project);
                 stage.close();
-                
+
             } catch (EntityDoesNotExistException ex) {
                 Logger.getLogger(FormAddTaskController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (StoringException ex) {
@@ -183,11 +213,13 @@ public class FormAddTaskController implements Initializable {
     private Button btnBack;
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL url, ResourceBundle rb
+    ) {
         btnNext.setOnMouseClicked(eventOnClickNext);
         btnBack.setOnMouseClicked(eventOnClickBack);
         btnFinish.setOnMouseClicked(eventOnClickFinish);
         btnHelp.setOnMouseClicked(eventOnClickHelp);
+        start.setValue(Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
     }
 
     public void setUser(LoggedUser user) {
@@ -219,6 +251,37 @@ public class FormAddTaskController implements Initializable {
 
     public void setController(TeamOfficeController controller) {
         this.controller = controller;
+    }
+
+    public void setEdit(boolean edit) {
+        this.edit = edit;
+        if (edit) {
+            name.setText(task.getName());
+            description.setText(task.getDescription());
+            start.setValue(Instant.ofEpochMilli(task.getStartDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            dedline.setValue(Instant.ofEpochMilli(task.getDeadline().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            if (task.getEndDate() != null) {
+                ends.setValue(Instant.ofEpochMilli(task.getEndDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+
+            menHours.setText(Integer.toString(task.getAssumedManHours()));
+//            allMembers = FXCollections.observableArrayList(
+//                    user.getTaskHandler().getAllMembers(task.getClosureTasksParents().get(0).getParent())
+//                    .stream()
+//                    .map((member) -> new TeamOfficeController.UserWrapper(member))
+//                    .collect(Collectors.toList())
+//            );
+//            user.getTaskHandler().getAllMembers(task.getClosureTasksParents().get(0).getParent());
+//
+//            allMembers.removeAll(FXCollections.observableArrayList(
+//                    user.getTaskHandler().getAllMembers(task)
+//                    .stream()
+//                    .map((member) -> new TeamOfficeController.UserWrapper(member))
+//                    .collect(Collectors.toList()))
+//            );
+
+//            selectedMembers = FXCollections.observableArrayList();
+        }
     }
 
 }

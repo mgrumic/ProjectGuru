@@ -153,13 +153,13 @@ public class TeamOfficeController {
             TreeItem<TaskNode> taskNode = null;
             if (treeTasks.getRoot() == null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this, false);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
                 try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), taskNode.getValue().getTask(), user, this);
+                    FormLoader.loadFormAddTask(projectItem.getProject(), taskNode.getValue().getTask(), user, this, false);
                 } catch (IOException ex) {
                     Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -171,6 +171,31 @@ public class TeamOfficeController {
             FormLoader.showInformationDialog("Напомена", "Изаберите пројекат за који желите додати подзадатак !");
         }
 
+    }
+
+    private void actionOnEditTask() {
+        ProjectWrapper projectItem = listProjects.getSelectionModel().getSelectedItem();
+        if (projectItem != null) {
+            TreeItem<TaskNode> taskNode = null;
+            if (treeTasks.getRoot() == null) {
+                try {
+                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this, true);
+                } catch (IOException ex) {
+                    Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
+                try {
+                    FormLoader.loadFormAddTask(projectItem.getProject(), taskNode.getValue().getTask(), user, this, true);
+                } catch (IOException ex) {
+                    Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+
+                FormLoader.showInformationDialog("Напомена", "Изаберите задатак за који желите додати подзадатак !");
+            }
+        } else {
+            FormLoader.showInformationDialog("Напомена", "Изаберите пројекат за који желите додати подзадатак !");
+        }
     }
 
     @FXML
@@ -308,12 +333,22 @@ public class TeamOfficeController {
         });
 
         rootContextMenu = new ContextMenu();
+
         final MenuItem addSubtask = new MenuItem("Додај подзадатак");
         final MenuItem addActivity = new MenuItem("Додај активност");
+        final MenuItem editSubtask = new MenuItem("Прикажи задатак");
+
         addSubtask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 btnAddSubtaskPressed(event);
+            }
+        });
+        editSubtask.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+//                btnAddSubtaskPressed(event);
+                actionOnEditTask();
             }
         });
         addActivity.setOnAction(new EventHandler<ActionEvent>() {
@@ -322,7 +357,7 @@ public class TeamOfficeController {
                 btnAddActivityPressed(event);
             }
         });
-        rootContextMenu.getItems().addAll(addSubtask, addActivity);
+        rootContextMenu.getItems().addAll(addSubtask, addActivity, editSubtask);
 
         treeColumnTasks.setCellFactory(new Callback<TreeTableColumn<TaskNode, String>, TreeTableCell<TaskNode, String>>() {
             @Override

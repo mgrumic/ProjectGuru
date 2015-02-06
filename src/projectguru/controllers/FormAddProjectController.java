@@ -28,6 +28,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -63,7 +64,7 @@ public class FormAddProjectController implements Initializable {
     @FXML
     private TextField budget;
     @FXML
-    private TextField description;
+    private TextArea description;
     @FXML
     private DatePicker start;
     @FXML
@@ -123,14 +124,12 @@ public class FormAddProjectController implements Initializable {
 
             String strName = name.getText();
             String strDescr = description.getText();
-            LocalDate startDate = start.getValue();
-            LocalDate endDate = ends.getValue();
+            LocalDate startLDate = start.getValue();
+            LocalDate endLDate = ends.getValue();
             String strBudget = budget.getText();
 
             if (strName == null
                     || strDescr == null
-                    || startDate == null
-                    || endDate == null
                     || strBudget == null) {
                 FormLoader.showInformationDialog("Напомена", "Нисте попунили сва поља!");
                 return;
@@ -145,12 +144,25 @@ public class FormAddProjectController implements Initializable {
                 id = project.getId();
             }
 
+            Date startDate;
+            Date endDate = null;
+
+            if (startLDate == null) {
+                startDate = new Date();
+            } else {
+                startDate = Date.from(startLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            }
+
+            if (endLDate != null) {
+                endDate = Date.from(endLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            }
+
             Project newProject = new Project(
                     id,
                     strName,
                     BigDecimal.valueOf(dou.longValue()),
-                    Date.from(startDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
-                    Date.from(endDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()),
+                    startDate,
+                    endDate,
                     strDescr
             );
 
@@ -171,8 +183,8 @@ public class FormAddProjectController implements Initializable {
                         );
                     }
                 }
-                Stage stage = (Stage) btnFinish.getScene().getWindow();
                 controller.loadProjects();
+                Stage stage = (Stage) btnFinish.getScene().getWindow();
                 stage.close();
             } catch (InsuficientPrivilegesException ex) {
                 ex.printStackTrace();
@@ -199,6 +211,7 @@ public class FormAddProjectController implements Initializable {
         btnBack.setOnMouseClicked(eventOnClickBack);
         btnFinish.setOnMouseClicked(eventOnClickFinish);
         btnHelp.setOnMouseClicked(eventOnClickHelp);
+        start.setValue(Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
     }
 
     public void setUser(LoggedUser user) {
@@ -225,9 +238,16 @@ public class FormAddProjectController implements Initializable {
         if (project != null) {
             edit = true;
             name.setText(project.getName());
-            description.setText(project.getDescription());
+            
+            if (project.getDescription() != null) {
+                description.setText(project.getDescription());
+            }
+            
             start.setValue(Instant.ofEpochMilli(project.getStartDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
-            ends.setValue(Instant.ofEpochMilli(project.getEndDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            if (project.getEndDate() != null) {
+                ends.setValue(Instant.ofEpochMilli(project.getEndDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+            
             budget.setText(project.getBudget().toString());
             allMembers = FXCollections.observableArrayList(
                     user.getUserHandler().getAllUsers()
