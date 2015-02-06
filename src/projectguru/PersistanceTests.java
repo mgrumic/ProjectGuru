@@ -1,7 +1,7 @@
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * and open the template in the editor.b    
  */
 package projectguru;
 
@@ -30,6 +30,7 @@ import projectguru.handlers.exceptions.StoringException;
 import projectguru.jpa.JpaAccessManager;
 import projectguru.jpa.controllers.ProjectJpaController;
 import projectguru.jpa.controllers.TaskJpaController;
+import projectguru.jpa.controllers.UserJpaController;
 import projectguru.jpa.handlers.JpaProjectHandler;
 
 /**
@@ -54,17 +55,30 @@ class PersistanceTests {
         AccessManager.setInstance(jam);
 
         LoggedUser luser = AccessManager.getInstance().logUserIn("boca", "etf");
-        Task task = new TaskJpaController(jam.getFactory()).findTask(1);
+        TaskJpaController tjc = new TaskJpaController(jam.getFactory());
+        Task task = tjc.findTask(4);
 
-        TaskHandler th = luser.getTaskHandler();
-        task.setDescription(task.getDescription() + ".");
-        th.editSubtask(task);
-        task = th.getUpdatedTask(task);
-        task.setDescription(task.getDescription() + ".");
-        th.editSubtask(task);
-        pl(th.getWorkedManHoursOfTaskSubtree(task));
+        UserJpaController ujc = new UserJpaController(jam.getFactory());
         
+        TaskHandler th = luser.getTaskHandler();
+//        th.addMember(task, ujc.findUser("raja"));
+//        th.addMember(task, ujc.findUser("djudja"));
+//        th.addMember(task, ujc.findUser("mandja"));
+//        th.addMember(task, ujc.findUser("boca"));
+//        
+//        task = tjc.findTask(5);
+//        th.addMember(task, ujc.findUser("mandja"));
+//        th.addMember(task, ujc.findUser("boca"));
+//        
+//        
+//        task = tjc.findTask(6);
+//        th.addMember(task, ujc.findUser("raja"));
+//        th.addMember(task, ujc.findUser("djudja"));
 
+        
+        th.deleteSubtask(task);
+        
+        
     }
 
     

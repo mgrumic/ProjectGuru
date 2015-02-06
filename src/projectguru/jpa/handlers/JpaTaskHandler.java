@@ -20,6 +20,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import org.eclipse.jdt.internal.compiler.ast.TrueLiteral;
 import projectguru.AccessManager;
 import projectguru.entities.Activity;
 import projectguru.entities.ClosureTasks;
@@ -220,10 +221,84 @@ public class JpaTaskHandler implements TaskHandler {
     }
 
     @Override
-    public boolean deleteSubtask(Task task) throws EntityDoesNotExistException {
-        //pitanje je da li nam ovo treba, ne da mi se sad implementirati
+    public boolean deleteSubtask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        
+        if (!checkTaskChefPrivileges(task)) {
+            throw new InsuficientPrivilegesException("Not enough privileges to delete task");
+        }
+        
+        EntityManager em = emf.createEntityManager();
+        try {
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
+                throw new EntityDoesNotExistException("Task does not exists in database.");
+            }
 
+            try {
+                em.getTransaction().begin();
+                
+                deleteTaskHelper(task, em);
+                
+                em.remove(task);
+                
+                em.getTransaction().commit();
+           
+                
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+        } finally {
+                        
+            em.close();
+        }
+       
+        
         return false;
+    }
+    
+    private void deleteTaskHelper(Task task, EntityManager em){
+        
+        
+        for( ClosureTasks ct :task.getClosureTasksParents()){
+            em.remove(ct);
+        }
+        
+        task.getClosureTasksParents().clear();
+
+        for(ClosureTasks ct : task.getClosureTasksChildren()){
+            
+            deleteTaskHelper(ct.getChild(), em);
+                        
+            em.remove(ct.getChild());
+            
+            em.remove(ct);
+    
+        }
+        
+        task.getClosureTasksChildren().clear();
+        
+        for(WorksOnTask wot : task.getWorksOnTaskList()){
+            
+            for(Activity a : wot.getActivityList()){
+                em.remove(a);
+            }
+            
+            wot.getActivityList().clear();
+            
+            em.remove(wot);
+        }
+        
+        task.getWorksOnTaskList().clear();
+        
+        //Query q = em.createQuery("DELETE FROM Activity act WHERE act.worksOnTask.worksOnTaskPK.iDTask = :taskid ");
+        
+        //q.setParameter("taskid", task.getId());
+        
+        //q.executeUpdate();
+                
     }
 
     @Override
@@ -234,6 +309,9 @@ public class JpaTaskHandler implements TaskHandler {
             return false;
         }
 
+        boolean previousChefFound = false;
+        boolean chefSet = false;
+        
         EntityManager em = emf.createEntityManager();
         try {
             if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
@@ -244,20 +322,39 @@ public class JpaTaskHandler implements TaskHandler {
                 throw new EntityDoesNotExistException("User does not exists in database.");
             }
             try {
+                em.getTransaction().begin();
                 for (WorksOnTask wot : task.getWorksOnTaskList()) {
                     if (wot.getWorksOnTaskPK().getUsername().equals(user.getUsername())) {
                         
                         wot.setPrivileges(Privileges.CHEF.ordinal());
 
-                        em.getTransaction().begin();
+                        
                         em.merge(wot);
-                        em.getTransaction().commit();
-                        em.refresh(task);
-                        em.refresh(user);
-
-                        return true;
+                        
+                       chefSet = true;
+                       
+                       if(previousChefFound){
+                           break;
+                       }
+                       
+                    }else if(wot.getPrivileges() == Privileges.CHEF.ordinal()){
+                        
+                        wot.setPrivileges(Privileges.MEMBER.ordinal());
+                        
+                        previousChefFound = true;
+                        
+                        if(chefSet){
+                            break;
+                        }
                     }
                 }
+            
+                if(chefSet){
+                    em.getTransaction().commit();
+                }else{
+                    em.getTransaction().rollback();
+                }
+                
             } catch (Exception ex) {
                 if (em.getTransaction().isActive()) {
                     em.getTransaction().rollback();
@@ -265,6 +362,7 @@ public class JpaTaskHandler implements TaskHandler {
                 throw new StoringException(ex.getLocalizedMessage());
             }
         } finally {
+                        
             em.close();
         }
         //TODO: razmisliti da li da omogucimo da se za sefa postavi neko ko nije clan
@@ -339,7 +437,7 @@ public class JpaTaskHandler implements TaskHandler {
 
                 em.persist(nwot);
                 em.getTransaction().commit();
-//                em.refresh(task);
+                em.refresh(task);
                 em.refresh(user);
                 return true;
             } catch (Exception ex) {

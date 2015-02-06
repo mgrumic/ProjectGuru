@@ -48,7 +48,7 @@ public interface TaskHandler {
      */
     public boolean addSubtask(Task task, Task subtask) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException;
     public boolean editSubtask(Task task) throws EntityDoesNotExistException, StoringException;
-    public boolean deleteSubtask(Task task) throws EntityDoesNotExistException;
+    public boolean deleteSubtask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
     
     public boolean setChef(Task task, User user) throws EntityDoesNotExistException, StoringException;
     public User getChef(Task task);
