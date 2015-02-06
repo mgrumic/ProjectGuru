@@ -153,5 +153,5 @@ public interface TaskHandler {
     public enum OnBusyWorkers {
         THROW_EXCEPTION, TRANSFER_FROM_PARENT_TASK, SIMPLE
     }
-    
+    public List<User> getAllMembers(Task task);
 }

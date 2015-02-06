@@ -175,15 +175,22 @@ public class TeamOfficeController {
 
     @FXML
     void btnAddMemberPressed(ActionEvent event) {
-
+        try {
+            FormLoader.loadFormAddMembersOnProjects(user,
+                    listProjects.getSelectionModel().getSelectedItem().getProject(),
+                    this
+            );
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @FXML
     void btnNewProjectPressed(ActionEvent event) {
         try {
-            FormLoader.loadFormAddProject(user, this);
+            FormLoader.loadFormAddProject(user, null, this);
         } catch (IOException ex) {
-
+            ex.printStackTrace();
         }
     }
 
@@ -192,7 +199,11 @@ public class TeamOfficeController {
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
         if (projectWrapper != null) {
             Project project = projectWrapper.getProject();
-
+            try {
+                FormLoader.loadFormAddProject(user, project, this);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -617,6 +628,16 @@ public class TeamOfficeController {
         @Override
         public String toString() {
             return user.getUsername();
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (!(object instanceof UserWrapper)) {
+                return false;
+            }
+
+            UserWrapper other = (UserWrapper) object;
+            return user.equals(other.getUser());
         }
 
     }
