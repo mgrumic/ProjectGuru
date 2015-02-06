@@ -163,7 +163,6 @@ public class TeamOfficeController {
             TreeItem<TaskNode> taskNode = null;
             if (treeTasks.getRoot() == null) {
                 try {
-
                     FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this, false);
 
                 } catch (IOException ex) {

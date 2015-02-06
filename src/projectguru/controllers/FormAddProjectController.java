@@ -99,7 +99,6 @@ public class FormAddProjectController implements Initializable {
             btnNext.setDisable(true);
             btnBack.setDisable(false);
         }
-
     };
 
     private final EventHandler<MouseEvent> eventOnClickBack = new EventHandler<MouseEvent>() {
@@ -134,12 +133,14 @@ public class FormAddProjectController implements Initializable {
                     || strDescr == null
                     || strBudget == null) {
                 FormLoader.showInformationDialog("Напомена", "Нисте попунили сва поља!");
+
                 return;
             }
             if (!ProjectGuruUtilities.tryParseDouble(strBudget)) {
                 FormLoader.showInformationDialog("Напомена", "Поље буџет није коректно попуњено!");
                 return;
             }
+
             Double dou = (new Double(strBudget));
             Integer id = null;
             Project newProject = null;
@@ -155,6 +156,7 @@ public class FormAddProjectController implements Initializable {
             } else {
                 newProject = new Project();
             }
+
             Date startDate;
             Date endDate = null;
 
@@ -258,7 +260,7 @@ public class FormAddProjectController implements Initializable {
             if (project.getEndDate() != null) {
                 ends.setValue(Instant.ofEpochMilli(project.getEndDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
             }
-            
+
             budget.setText(project.getBudget().toString());
             allMembers = FXCollections.observableArrayList(
                     user.getUserHandler().getAllUsers()

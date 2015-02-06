@@ -56,6 +56,7 @@ public class FormLoader {
         fapc.setController(controller);
         fapc.setProject(project);
 
+
         Scene scene = new Scene(root);
         scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddproject.css").toExternalForm());
 
@@ -65,6 +66,7 @@ public class FormLoader {
 
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
+
 
         stage.show();
     }
@@ -88,6 +90,7 @@ public class FormLoader {
 
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
+
 
         stage.show();
     }
@@ -198,7 +201,6 @@ public class FormLoader {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Извјештаји за пројекат: " + project.getName());
-
         stage.initModality(Modality.APPLICATION_MODAL);
 
         stage.show();

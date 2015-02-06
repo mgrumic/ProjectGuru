@@ -135,7 +135,6 @@ public class FormAddTaskController implements Initializable {
 
             if (strName == null
                     || strDescr == null
-
                     || strMenHours == null
                     || dedlineLDate == null) {
                 FormLoader.showInformationDialog("Напомена", "Нисте попунили сва поља!");
@@ -203,7 +202,6 @@ public class FormAddTaskController implements Initializable {
                 controller.loadTaskTree(project);
                 stage.close();
 
-
             } catch (EntityDoesNotExistException ex) {
                 Logger.getLogger(FormAddTaskController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (StoringException ex) {
@@ -224,6 +222,7 @@ public class FormAddTaskController implements Initializable {
 
     public void initialize(URL url, ResourceBundle rb
     ) {
+
 
 
         btnNext.setOnMouseClicked(eventOnClickNext);
