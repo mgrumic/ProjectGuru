@@ -27,6 +27,7 @@ public abstract class LoggedUser {
     public abstract DocumentHandler getDocumentHandler();
     public abstract boolean startWorkSession();
     public abstract boolean endWorkSession();
+    public abstract ReportHandler getReportHandler();
     
      public User getUser() {
         return user;

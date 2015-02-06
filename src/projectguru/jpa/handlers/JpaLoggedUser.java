@@ -10,6 +10,7 @@ import projectguru.handlers.ActivityHandler;
 import projectguru.handlers.DocumentHandler;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.ProjectHandler;
+import projectguru.handlers.ReportHandler;
 import projectguru.handlers.TaskHandler;
 import projectguru.handlers.UserHandler;
 
@@ -24,7 +25,7 @@ public class JpaLoggedUser extends LoggedUser {
     protected UserHandler userHandler;
     protected ActivityHandler activityHandler;
     protected DocumentHandler documentHandler;
-    
+    protected ReportHandler reportHandler;
     
     public JpaLoggedUser(User user) {
         this.user = user;
@@ -34,7 +35,7 @@ public class JpaLoggedUser extends LoggedUser {
         userHandler = new JpaUserHandler(this);
         activityHandler = new JpaActivityHandler(this);
         documentHandler = new JpaDocumentHandler(this);
-        
+        reportHandler = new JpaReportHandler(this);
         loggedIn = false;
         
     }
@@ -66,6 +67,11 @@ public class JpaLoggedUser extends LoggedUser {
     }
 
     @Override
+    public ReportHandler getReportHandler() {
+        return reportHandler;
+    }
+    
+    @Override
     public DocumentHandler getDocumentHandler() {
         return documentHandler;
     }
@@ -79,6 +85,7 @@ public class JpaLoggedUser extends LoggedUser {
     public boolean endWorkSession() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
     
     
 }

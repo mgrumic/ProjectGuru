@@ -5,10 +5,13 @@
  */
 package projectguru.handlers;
 
+import projectguru.utils.ReportType;
+
 /**
  *
  * @author medlan
  */
 public interface ReportHandler {
-    public void generateReport(String query);
+    public void generateReport(ReportType rt);
+    public void showReport();
 }

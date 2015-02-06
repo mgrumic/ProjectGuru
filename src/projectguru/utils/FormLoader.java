@@ -178,7 +178,9 @@ public class FormLoader {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormReport.fxml"));
         Parent root = loader.load();
 
-        FormReportController fdc = loader.getController();
+        FormReportController frc = loader.getController();
+        frc.setProject(project);
+        frc.setUser(user);
         
         Scene scene = new Scene(root);
 

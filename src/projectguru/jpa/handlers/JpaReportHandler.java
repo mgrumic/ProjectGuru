@@ -6,12 +6,11 @@
 package projectguru.jpa.handlers;
 import projectguru.handlers.ReportHandler;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 
 import java.awt.Color;
-import net.sf.dynamicreports.report.builder.column.PercentageColumnBuilder;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.column.TextColumnBuilder;
@@ -22,32 +21,58 @@ import net.sf.dynamicreports.report.builder.component.Components;
 import net.sf.dynamicreports.report.builder.datatype.DataTypes;
 import net.sf.dynamicreports.report.constant.HorizontalAlignment;
 import net.sf.dynamicreports.report.constant.VerticalAlignment;
-import net.sf.dynamicreports.report.exception.DRException;
-import net.sf.dynamicreports.report.builder.chart.Bar3DChartBuilder;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilders;
-import org.eclipse.persistence.sessions.Session;
 import projectguru.AccessManager;
+import projectguru.entities.Project;
+import projectguru.handlers.LoggedUser;
 import projectguru.jpa.JpaAccessManager;
+import projectguru.utils.ReportType;
 /**
  *
  * @author medlan
  */
 public class JpaReportHandler implements ReportHandler{
+    private JasperReportBuilder report;
+    private LoggedUser user;
+    private Project project;
+    
+    public JpaReportHandler(LoggedUser user){
+        this.user = user;
+        this.project = null;
+        this.report = null;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+    
+    
     
     @Override
-    public void generateReport(String query){
+    public void showReport(){
+        
+        try{
+            report.show(false);
+        }catch(Exception ex){
+            System.out.println("Message: " + ex.getMessage());
+        }
+    }
+    
+    @Override
+    public void generateReport(ReportType type){
         Connection connection = null;
         try{
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/baza","student", "student");
+            EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+            EntityManager em = emf.createEntityManager();
+            em.getTransaction().begin();
+            connection = em.unwrap(Connection.class);
+            em.getTransaction().commit();
         }catch(Exception ex){
            System.out.println(ex.getMessage());
         }
        
-        JasperReportBuilder report = DynamicReports.report();
+        report = DynamicReports.report();
         
-        StyleBuilder leftAligned = DynamicReports.stl.style().setAlignment(
-                HorizontalAlignment.LEFT, VerticalAlignment.TOP);
         StyleBuilder boldStyle = DynamicReports.stl.style().bold();
         StyleBuilder boldCenteredStyle = DynamicReports.stl.style(boldStyle)
                 .setHorizontalAlignment(HorizontalAlignment.CENTER);
@@ -102,20 +127,14 @@ public class JpaReportHandler implements ReportHandler{
                         cmp.horizontalList()
                         .add(cmp.image(getClass().getResourceAsStream("/projectguru/images/pg.png"))
                             .setFixedDimension(148, 82),
-                            cmp.text("ProjectGURU").setStyle(titleStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
-                            cmp.text("Report").setStyle(titleStyle).setHorizontalAlignment(HorizontalAlignment.RIGHT))
+                            cmp.text(this.project.getName()).setStyle(titleStyle).setHorizontalAlignment(HorizontalAlignment.LEFT),
+                            cmp.text(type.getText()).setStyle(titleStyle).setHorizontalAlignment(HorizontalAlignment.RIGHT))
                         .newRow()
                         .add(cmp.filler().setStyle(DynamicReports.stl.style().setTopBorder(DynamicReports.stl.pen2Point())).setFixedHeight(10)))
                 .pageFooter(Components.pageXofY().setStyle(boldCenteredStyle))
                 .setColumnTitleStyle(columnTitleStyle)
                 .groupBy(passGroup)
                 .setHighlightDetailEvenRows(Boolean.TRUE)
-                .setDataSource(query, connection);
-        try{
-            report.show();
-        }catch(DRException ex){
-            System.out.println("Message: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+        .setDataSource("select * from user", connection);
     }
 }
