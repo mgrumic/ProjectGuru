@@ -384,7 +384,8 @@ public class TeamOfficeController {
         final MenuItem addSubtask = new MenuItem("Додај подзадатак");
         final MenuItem addActivity = new MenuItem("Додај активност");
         final MenuItem editSubtask = new MenuItem("Прикажи задатак");
-
+        final MenuItem activateTask = new MenuItem("Aктивирај задатак");
+        
         addSubtask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -404,7 +405,20 @@ public class TeamOfficeController {
                 btnAddActivityPressed(event);
             }
         });
-        rootContextMenu.getItems().addAll(addSubtask, addActivity, editSubtask);
+        activateTask.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
+                if(taskNode != null){
+                    try {
+                        FormLoader.loadFormSetActiveTask(taskNode.getValue().getTask(), user);
+                    } catch (IOException ex) {
+                        Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+        rootContextMenu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask);
 
         treeColumnTasks.setCellFactory(new Callback<TreeTableColumn<TaskNode, String>, TreeTableCell<TaskNode, String>>() {
             @Override
@@ -418,7 +432,10 @@ public class TeamOfficeController {
                             setContextMenu(null);
                         } else if (t != null) {
                             setText(t);
-                            setContextMenu(rootContextMenu);
+                            TaskNode node = this.getTreeTableRow().getItem();
+                            if(node != null && user.getTaskHandler().checkTaskChefPrivileges(node.getTask())){
+                                setContextMenu(rootContextMenu);
+                            }
                         }
 
                     }

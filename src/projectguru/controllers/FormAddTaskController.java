@@ -158,21 +158,16 @@ public class FormAddTaskController implements Initializable {
                 endDate = Date.from(endLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             }
 
-            Integer id = null;
+            Task tmpTask = null;
             if (edit) {
-                id = task.getId();
-                System.out.println(id);
+                tmpTask = user.getTaskHandler().getUpdatedTask(task);
             }
-
-            Task tmpTask = new Task(
-                    id,
-                    strName,
-                    intMenHours,
-                    startDate,
-                    endDate,
-                    Date.from(dedlineLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
-
-            );
+            tmpTask.setName(strName);
+            tmpTask.setStartDate(startDate);
+            tmpTask.setEndDate(endDate);
+            tmpTask.setDescription(strDescr);
+            tmpTask.setDeadline(Date.from(dedlineLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+            tmpTask.setAssumedManHours(Integer.parseInt(strMenHours));
 
             TaskHandler taskJpa = user.getTaskHandler();
             try {
@@ -181,7 +176,13 @@ public class FormAddTaskController implements Initializable {
                 if (edit) {
                     result = taskJpa.editSubtask(tmpTask);
                 } else {
-                    result = taskJpa.addSubtask(task, tmpTask);
+                    if(task == null){
+                        project.setIDRootTask(tmpTask);
+                        user.getProjectHandler().setRootTask(project, tmpTask);
+                        result = true;
+                    }else {
+                        result = taskJpa.addSubtask(task, tmpTask);
+                    }
                 }
                 if (selectedMembers != null && result == true) {
                     Iterator<UserWrapper> itr = selectedMembers.iterator();

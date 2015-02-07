@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="483.0" prefWidth="364.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="projectguru.controllers.FormSetActiveTaskController">
+    <stylesheets>
+        <URL value="@/projectguru/css/formsetactivetask.css" />
+    </stylesheets>
+   <children>
+      <ListView fx:id="listMembers" layoutX="42.0" layoutY="58.0" prefHeight="295.0" prefWidth="265.0" />
+      <Button fx:id="btnActivateForMember" layoutX="42.0" layoutY="378.0" mnemonicParsing="false" onAction="#btnActivateForMemberPressed" prefHeight="25.0" prefWidth="265.0" text="Активирај за изабраног члана" />
+      <Button fx:id="btnActivateForAll" layoutX="42.0" layoutY="416.0" mnemonicParsing="false" onAction="#btnActivateForAllPressed" prefHeight="25.0" prefWidth="265.0" text="Активирај за све чланове" />
+      <Label layoutX="42.0" layoutY="38.0" prefHeight="17.0" prefWidth="265.0" text="Чланови задатка:" />
+   </children>
+</AnchorPane>

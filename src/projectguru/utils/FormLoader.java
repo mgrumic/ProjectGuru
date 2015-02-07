@@ -33,6 +33,7 @@ import projectguru.controllers.FormAddTaskController;
 import projectguru.controllers.FormDocumentationController;
 import projectguru.controllers.FormFinancesOverviewController;
 import projectguru.controllers.FormReportController;
+import projectguru.controllers.FormSetActiveTaskController;
 import projectguru.controllers.FormUserAccountsController;
 import projectguru.controllers.TeamOfficeController;
 import projectguru.entities.Activity;
@@ -312,6 +313,22 @@ public class FormLoader {
 
     }
 
+    public static void loadFormSetActiveTask(Task task, LoggedUser user) throws IOException{
+        
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormSetActiveTask.fxml"));
+        Parent root = loader.load();
+        FormSetActiveTaskController controller = loader.getController();
+        controller.setUserAndTask(user, task);
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Активирај задатак " + task.getName());
+        stage.setResizable(false);
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.show();
+    }
     public static void showInformationDialog(String title, String message) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle(title);
@@ -363,4 +380,5 @@ public class FormLoader {
         return view;
     }
 
+    
 }
