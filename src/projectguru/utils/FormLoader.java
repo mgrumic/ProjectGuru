@@ -148,12 +148,13 @@ public class FormLoader {
 
     public static void loadFormDocumentation(Project project, LoggedUser user) throws Exception {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormDocumentation.fxml"));
+    //    loader.setController(new FormDocumentationController(allDocuments));
+       
         Parent root = loader.load();
-
         FormDocumentationController fdc = loader.getController();
         fdc.setProject(project);
         fdc.setUser(user);
-
+        fdc.loadDocum();
         Scene scene = new Scene(root);
 
         Stage stage = new Stage();
@@ -174,6 +175,7 @@ public class FormLoader {
         FormAddDocumentationController fdc = loader.getController();
         fdc.setProject(project);
         fdc.setUser(user);
+        fdc.loadDocum();
 
 
         Scene scene = new Scene(root);

@@ -48,11 +48,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import projectguru.entities.Document;
+import projectguru.entities.DocumentRevision;
 import projectguru.entities.Privileges;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
 import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
+import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
@@ -263,7 +266,16 @@ public class TeamOfficeController {
     @FXML
     void btnDocumentsPressed(ActionEvent event) {
 
+        
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
+//        
+//        ObservableList<DocumentWrapper> docw= FXCollections.observableArrayList(
+//                    listProjects.getSelectionModel().getSelectedItem().getProject().getDocumentList()
+//                    .stream()
+//                    .map((member) -> new TeamOfficeController.DocumentWrapper(member))
+//                    .collect(Collectors.toList())
+//            );
+       
         try {
             if (projectWrapper != null) {
                 FormLoader.loadFormDocumentation(projectWrapper.getProject(), user);
@@ -428,7 +440,7 @@ public class TeamOfficeController {
                             setGraphic(null);
                         } else if (t != null) {
                             setAlignment(Pos.CENTER);
-                            setText(String.format("%.2f",t * 100) + "%");
+                            setText(String.format("%.2f", t * 100) + "%");
                             setGraphic(new ColoredProgressBar(t));
                         }
 
@@ -542,7 +554,7 @@ public class TeamOfficeController {
             }
         });
     }
-    
+
     private void recursiveTaskTreeLoad(TreeItem<TaskNode> root, TaskNode task) {
         List<TaskNode> children = task.getChildren();
         children.stream().forEach((child) -> {
@@ -552,12 +564,13 @@ public class TeamOfficeController {
         });
     }
 
-    public void addNodeToTree(Task subtask){
+    public void addNodeToTree(Task subtask) {
         TreeItem<TaskNode> task = treeTasks.getSelectionModel().getSelectedItem();
         TreeItem<TaskNode> node = new TreeItem<>(user.getTaskHandler().getTaskTree(subtask).getRoot());
         if(task == null || treeTasks.getRoot() == null){
              treeTasks.setRoot(node);
         }else {
+
             task.getChildren().add(node);
         }
         ProjectWrapper project = listProjects.getSelectionModel().getSelectedItem();
@@ -566,7 +579,9 @@ public class TeamOfficeController {
             listProjects.getSelectionModel().select(project);
         }
     }
+
     
+
     private void setTime() {
         long ellapsed = System.currentTimeMillis();
         ellapsed -= time;
@@ -589,8 +604,8 @@ public class TeamOfficeController {
                     PieChart.Data worked;
                     PieChart.Data left;
                     if (root != null) {
-                        lblProjectCompleted.setText(String.format("%.2f ",(root.getValue().getPartDone() * 100)) + "%");
-                        chartPie.setTitle(String.format("Укупно одрађено: %.2f ",(root.getValue().getPartDone() * 100)) + "%");
+                        lblProjectCompleted.setText(String.format("%.2f ", (root.getValue().getPartDone() * 100)) + "%");
+                        chartPie.setTitle(String.format("Укупно одрађено: %.2f ", (root.getValue().getPartDone() * 100)) + "%");
                         worked = new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100);
                         left = new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100));
                     } else {
@@ -735,6 +750,49 @@ public class TeamOfficeController {
 
     }
 
+    public static class DocumentWrapper {
+
+        private Document document;
+
+        public DocumentWrapper(Document document) {
+            this.document = document;
+        }
+
+        public Document getDocument() {
+            return document;
+        }
+
+        public void setDocument(Document document) {
+            this.document = document;
+        }
+
+        @Override
+        public String toString() {
+            return document.getName();
+        }
+    }
+
+    public static class DocumentRevisionWrapper {
+
+        private DocumentRevision document;
+
+        public DocumentRevisionWrapper(DocumentRevision document) {
+            this.document = document;
+        }
+
+        public DocumentRevision getDocument() {
+            return document;
+        }
+
+        public void setDocument(DocumentRevision document) {
+            this.document = document;
+        }
+
+        @Override
+        public String toString() {
+            return document.getDatePosted().toString();
+        }
+    }
     private static class ColoredProgressBar extends ProgressBar {
 
         public ColoredProgressBar(double initValue) {

@@ -66,6 +66,7 @@ public class JpaDocumentHandler implements DocumentHandler {
             try {
                 em.getTransaction().begin();
                 if (revision.getId() == null || (revision = em.find(DocumentRevision.class, revision.getId())) == null) {
+                    revision.setIDDocument(original);
                     em.persist(revision);
                     em.flush();
                 }
@@ -109,7 +110,8 @@ public class JpaDocumentHandler implements DocumentHandler {
 
             em.persist(document);
             em.getTransaction().commit();
-
+            em.refresh(document);
+            System.out.println(document);
             return true;
 
         } catch (Exception ex) {

@@ -66,11 +66,12 @@ public class DocumentRevision implements Serializable {
         this.id = id;
     }
 
-    public DocumentRevision(Integer id, int number, byte[] binData, Date datePosted) {
+    public DocumentRevision(Integer id, int number, byte[] binData, Date datePosted, String description) {
         this.id = id;
         this.number = number;
         this.binData = binData;
         this.datePosted = datePosted;
+        this.description = description;
     }
 
     public Integer getId() {

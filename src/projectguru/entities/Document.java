@@ -69,10 +69,11 @@ public class Document implements Serializable {
         this.id = id;
     }
 
-    public Document(Integer id, String name, Date postedDate) {
+    public Document(Integer id, String name, Date postedDate, String description) {
         this.id = id;
         this.name = name;
         this.postedDate = postedDate;
+        this.description = description;
     }
 
     public Integer getId() {

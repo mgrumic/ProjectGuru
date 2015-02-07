@@ -14,14 +14,14 @@
     </stylesheets>
     <children>
         <Label fx:id="labDocum" layoutX="23.0" layoutY="26.0" text="Документ:" />
-        <ListView fx:id="listViewRevision" layoutX="23.0" layoutY="117.0" prefHeight="233.0" prefWidth="357.0" />
-        <Button fx:id="buttonOpen" layoutX="517.0" layoutY="370.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="89.0" text="Отвори " />
+        <ListView fx:id="listViewRevision" layoutX="16.0" layoutY="128.0" prefHeight="205.0" prefWidth="364.0" />
+        <Button fx:id="buttonOpen" layoutX="517.0" layoutY="370.0" mnemonicParsing="false" onAction="#openFile" prefHeight="25.0" prefWidth="89.0" text="Отвори " />
         <Button fx:id="ButtonAdd" layoutX="625.0" layoutY="369.0" mnemonicParsing="false" onAction="#buttonAddDocPressed" prefHeight="25.0" prefWidth="89.0" text="Додај" />
-        <ChoiceBox fx:id="choiceBoxDocum" layoutX="23.0" layoutY="52.0" prefHeight="25.0" prefWidth="357.0" />
       <Label layoutX="407.0" layoutY="100.0" text="Датум додавања :" />
       <Label fx:id="labelDate" layoutX="524.0" layoutY="100.0" />
       <Label layoutX="409.0" layoutY="136.0" text="Опис:" />
       <Label fx:id="labesDescription" layoutX="458.0" layoutY="136.0" prefHeight="213.0" prefWidth="254.0" />
-      <Label layoutX="23.0" layoutY="91.0" text="Ревизије:" />
+      <Label layoutX="14.0" layoutY="100.0" text="Ревизије:" />
+      <ChoiceBox fx:id="choiceBoxDocum" layoutX="14.0" layoutY="56.0" prefHeight="25.0" prefWidth="364.0" />
     </children>
 </AnchorPane>

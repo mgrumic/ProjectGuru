@@ -11,13 +11,20 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -25,6 +32,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import projectguru.controllers.TeamOfficeController.DocumentWrapper;
 import projectguru.entities.Document;
 import projectguru.entities.DocumentRevision;
 import projectguru.entities.Project;
@@ -42,19 +50,19 @@ import projectguru.handlers.exceptions.StoringException;
  * @author win7
  */
 public class FormAddDocumentationController implements Initializable {
-    
+
     protected LoggedUser user;
     protected Project project;
     protected final FileChooser fileChooser = new FileChooser();
     private FormDocumentationController controller;
     private File file;
-    
+
     @FXML
     private AnchorPane anchor;
     @FXML
     private Label label;
     @FXML
-    private ChoiceBox<?> chooseBoxRevisionOn;
+    private ChoiceBox<DocumentWrapper> chooseBoxRevisionOn;
     @FXML
     private TextField textBoxName;
     @FXML
@@ -67,14 +75,32 @@ public class FormAddDocumentationController implements Initializable {
     private Button btnSave;
     @FXML
     private Button btnCancel;
+    @FXML
+    private CheckBox checkBoxRev;
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-    }    
-    
+        textBoxDesc.setDisable(false);
+        textBoxName.setDisable(false);
+        chooseBoxRevisionOn.setDisable(true);
+
+    }
+
+    public void loadDocum() {
+        List<Document> listAll = project.getDocumentList();
+        List<TeamOfficeController.DocumentWrapper> dwList = new ArrayList<TeamOfficeController.DocumentWrapper>();
+        for (int i = 0; i < listAll.size(); i++) {
+            dwList.add(new TeamOfficeController.DocumentWrapper(listAll.get(i)));
+        }
+
+        ObservableList<TeamOfficeController.DocumentWrapper> docw = FXCollections.observableArrayList(dwList);
+        chooseBoxRevisionOn.setItems(docw);
+        chooseBoxRevisionOn.getSelectionModel().selectFirst();
+    }
+
     public void setUser(LoggedUser user) {
         this.user = user;
     }
@@ -89,32 +115,68 @@ public class FormAddDocumentationController implements Initializable {
         fileChooser.setTitle("Open Resource File");
         file = fileChooser.showOpenDialog(null);
         this.textBoxDocPath.setText(file.getPath());
-     
+
     }
 
     @FXML
     private void btnSavePressed(ActionEvent event) {
-      try{
-      byte[] fajl = Files.readAllBytes(Paths.get(file.getPath())); 
-      String desc = this.textBoxDesc.getText();
-      String name = this.textBoxName.getText();
-      Date date = new Date();
-      
-      Document d = new Document(null, name, date);
-      DocumentRevision drev = new DocumentRevision(null,1,fajl,date);
-      ProjectHandler prJpa = user.getProjectHandler(); 
-      prJpa.addDocument(project, d);
-     // Document d = prJpa.g treba mi metoda koja vraca zadnji dokument
-      DocumentHandler docJpa = user.getDocumentHandler();
-      docJpa.addRevision(d,drev);
-      
-      }catch(IOException e){ e.printStackTrace();}
-      catch(EntityDoesNotExistException e){e.printStackTrace();}
-      catch(InsuficientPrivilegesException i){i.printStackTrace();}
-      catch(StoringException s){s.printStackTrace();}
-       Stage stage = (Stage) btnSave.getScene().getWindow();
-                //controller.loadDocum;
-                stage.close();
-    
+        try {
+            if (!checkBoxRev.isSelected()) {
+
+                byte[] fajl = Files.readAllBytes(Paths.get(file.getPath()));
+                String desc = this.textBoxDesc.getText();
+                String name = this.textBoxName.getText();
+                Date date = new Date();
+
+                Document d = new Document(null, name, date, desc);
+                DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, desc);
+                //ProjectHandler prJpa = user.getProjectHandler(); 
+                //prJpa.addDocument(project, d);
+                //treba mi metoda koja vraca zadnji dokument
+                DocumentHandler docJpa = user.getDocumentHandler();
+
+                docJpa.addDocument(project, d);
+                docJpa.addRevision(d, drev);
+
+            } else {
+
+                TeamOfficeController.DocumentWrapper dw = chooseBoxRevisionOn.getItems().get(chooseBoxRevisionOn.getSelectionModel().getSelectedIndex());
+
+                byte[] fajl = Files.readAllBytes(Paths.get(file.getPath()));
+                String desc = this.textBoxDesc.getText();
+                Date date = new Date();
+                Document doc = dw.getDocument();
+                DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, desc);
+                DocumentHandler docJpa = user.getDocumentHandler();
+                docJpa.addRevision(doc, drev);
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (EntityDoesNotExistException e) {
+            e.printStackTrace();
+        } catch (InsuficientPrivilegesException i) {
+            i.printStackTrace();
+        } catch (StoringException s) {
+            s.printStackTrace();
+        }
+        Stage stage = (Stage) btnSave.getScene().getWindow();
+        stage.close();
+
+    }
+
+    @FXML
+    private void checkBoxRevPressed(ActionEvent event) {
+        if (checkBoxRev.isSelected()) {
+            textBoxDesc.setDisable(true);
+            textBoxName.setDisable(true);
+            chooseBoxRevisionOn.setDisable(false);
+
+        } else {
+            textBoxDesc.setDisable(false);
+            textBoxName.setDisable(false);
+            chooseBoxRevisionOn.setDisable(true);
+        }
     }
 }
