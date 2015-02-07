@@ -22,11 +22,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-<<<<<<< HEAD
 import javafx.stage.WindowEvent;
-=======
 import projectguru.controllers.FormActivitiesController;
->>>>>>> FormActivities
 import projectguru.controllers.FormAddDocumentationController;
 import projectguru.controllers.FormAddExpenseOrIncomeController;
 import projectguru.controllers.FormAddMembersController;
