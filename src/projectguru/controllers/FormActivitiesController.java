@@ -39,6 +39,7 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import javafx.util.converter.FormatStringConverter;
 import netscape.security.Privilege;
+import projectguru.controllers.util.SerbianLocalDateStringConverter;
 import projectguru.entities.Activity;
 import projectguru.entities.Task;
 import projectguru.entities.User;
@@ -152,28 +153,7 @@ public class FormActivitiesController implements Initializable {
         columnRemark.setCellValueFactory((rowData) -> rowData.getValue().getRemark());
         columnTaskName.setCellValueFactory((rowData) -> rowData.getValue().getTaskName());
         
-        dpDate.setConverter(new StringConverter<LocalDate>()
-                            {
-                                private final DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("dd.MM.yyyy.");
-
-                                @Override
-                                public String toString(LocalDate localDate)
-                                {
-                                    if(localDate==null)
-                                        return "";
-                                    return dateTimeFormatter.format(localDate);
-                                }
-
-                                @Override
-                                public LocalDate fromString(String dateString)
-                                {
-                                    if(dateString==null || dateString.trim().isEmpty())
-                                    {
-                                        return null;
-                                    }
-                                    return LocalDate.parse(dateString,dateTimeFormatter);
-                                }
-                            });
+        dpDate.setConverter(new SerbianLocalDateStringConverter());
         
         
 
