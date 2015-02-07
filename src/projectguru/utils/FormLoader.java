@@ -205,7 +205,8 @@ public class FormLoader {
         stage.setScene(scene);
         stage.setTitle("Извјештаји за пројекат: " + project.getName());
         stage.initModality(Modality.APPLICATION_MODAL);
-
+        stage.setResizable(false);
+        
         stage.show();
     }
     
@@ -242,6 +243,7 @@ public class FormLoader {
         stage.setResizable(false);
 
         stage.initModality(Modality.APPLICATION_MODAL);
+
         stage.show();
     }
 
