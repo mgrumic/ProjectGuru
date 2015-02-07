@@ -13,7 +13,7 @@
          <top>
             <Pane prefHeight="41.0" prefWidth="433.0" BorderPane.alignment="CENTER">
                <children>
-                  <Label layoutX="38.0" layoutY="10.0" text="Нови пројекат:">
+                  <Label fx:id="lblFormName" layoutX="38.0" layoutY="10.0" text="Нови пројекат:">
                      <font>
                         <Font name="System Bold" size="15.0" />
                      </font>

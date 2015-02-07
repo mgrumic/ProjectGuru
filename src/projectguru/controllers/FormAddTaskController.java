@@ -187,7 +187,8 @@ public class FormAddTaskController implements Initializable {
                         );
 
                     }
-                } else {
+                }else {
+                    project.setIDRootTask(tmpTask);
                     user.getProjectHandler().setRootTask(project, tmpTask);
                 }
                 controller.addNodeToTree(tmpTask);

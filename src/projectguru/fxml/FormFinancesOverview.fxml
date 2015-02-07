@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="273.0" prefWidth="537.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormFinancesOverviewController">
+    <stylesheets>
+        <URL value="@/projectguru/css/formfinancesoverview.css" />
+    </stylesheets>
+   <children>
+      <Label fx:id="lblProjectName" layoutX="45.0" layoutY="39.0" text="Назив пројекта">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <GridPane layoutX="44.0" layoutY="83.0" prefHeight="126.0" prefWidth="448.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="243.0" minWidth="10.0" prefWidth="215.0" />
+          <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" maxWidth="181.0" minWidth="10.0" prefWidth="159.0" />
+            <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" maxWidth="181.0" minWidth="10.0" prefWidth="159.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Планирани буџет (KM): " />
+            <Label fx:id="lblBudget" GridPane.columnIndex="1" />
+            <Label text="Укупно прихода   (KM):" GridPane.rowIndex="1" />
+            <Label prefHeight="17.0" prefWidth="171.0" text="Укупно трошкова (KM):" GridPane.rowIndex="2" />
+            <Label fx:id="lblTotalIncomes" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label fx:id="lblTotalExpenses" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Трошкови на активности (KM):" GridPane.rowIndex="5" />
+            <Label fx:id="lblActivityExpenses" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Button fx:id="btnIncomes" mnemonicParsing="false" onAction="#btnIncomesPressed" prefHeight="25.0" prefWidth="140.0" text="Приходи" GridPane.columnIndex="2" />
+            <Button fx:id="btnExpenses" mnemonicParsing="false" onAction="#btnExpensesPressed" prefHeight="25.0" prefWidth="142.0" text="Трошкови" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Label prefHeight="17.0" prefWidth="170.0" text="Приходи од активности   (KM):" GridPane.rowIndex="4" />
+            <Label fx:id="lblActivityIncomes" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

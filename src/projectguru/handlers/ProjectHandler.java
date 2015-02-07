@@ -63,7 +63,7 @@ public interface ProjectHandler {
     public boolean addExpense(Project project, Expense exp) throws StoringException;
 
     public boolean addIncome(Project project, Income inc) throws StoringException;
-
+            
     public Project getUpdatedProject(Project project) throws EntityDoesNotExistException;
 
     public User getUpdatedUser(User user) throws EntityDoesNotExistException;

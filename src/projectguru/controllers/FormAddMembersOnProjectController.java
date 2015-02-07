@@ -53,7 +53,7 @@ public class FormAddMembersOnProjectController implements Initializable {
         @Override
         public void handle(MouseEvent t) {
             FormLoader.showInformationDialog("Помоћ", "Све чланове које желите да додате"
-                    + "превуците у лијеву листу");
+                    + "превуците у десну листу");
         }
     };
     private final EventHandler<MouseEvent> eventOnClickAdd = new EventHandler<MouseEvent>() {

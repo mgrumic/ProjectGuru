@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,6 +67,9 @@ public class TeamOfficeController {
     @FXML
     private ResourceBundle resources;
 
+    @FXML
+    private Label lblStatusLabel;
+    
     @FXML
     private URL location;
 
@@ -143,8 +147,14 @@ public class TeamOfficeController {
     @FXML
     private MenuItem mItemKorisnickiNalozi;
     @FXML
-    private Button getReportTest;
+    private Button btnGetReport;
 
+    @FXML
+    private Button btnDocuments;
+    
+    @FXML
+    private Button btnFinances;
+    
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
 
@@ -248,7 +258,7 @@ public class TeamOfficeController {
     }
 
     @FXML
-    void btnDokumPressed(ActionEvent event) {
+    void btnDocumentsPressed(ActionEvent event) {
 
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
         try {
@@ -284,6 +294,21 @@ public class TeamOfficeController {
             FormLoader.showErrorDialog("Грешка у апликацији", "Не може да отвори форму за извјештај");
         }
     }
+    
+    @FXML
+    void btnFinancesPressed(ActionEvent event) {
+        try {
+            ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
+            if (item != null) {
+                FormLoader.loadFormFinancesOverview(item.getProject(), user);
+            } else {
+                FormLoader.showInformationDialog("Обавјештење", "Изаберите пројекат за који желите погледати финансије");
+            }
+        } catch (Exception ex) {
+            FormLoader.showErrorDialog("Грешка у апликацији", "Не може да отвори форму за преглед финансија");
+        }
+    }
+    
     /**
      * Moje varijable
      */
@@ -316,6 +341,13 @@ public class TeamOfficeController {
                 .getResourceAsStream("/projectguru/images/add_project.png"))));
         btnEditProject.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/edit.png"))));
+        btnDocuments.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/documents.png"))));
+        btnGetReport.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/report.png"))));
+        btnFinances.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/finances.png"))));
+        
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
@@ -476,6 +508,9 @@ public class TeamOfficeController {
                 .collect(Collectors.toList())
         );
         listProjects.setItems(projects);
+        if(projects.size() == 1){
+            listProjects.getSelectionModel().select(0);
+        }
     }
 
     public void loadMembers(Project project) {
@@ -517,13 +552,18 @@ public class TeamOfficeController {
     public void addNodeToTree(Task subtask){
         TreeItem<TaskNode> task = treeTasks.getSelectionModel().getSelectedItem();
         TreeItem<TaskNode> node = new TreeItem<>(user.getTaskHandler().getTaskTree(subtask).getRoot());
-        if(task == null){
-             treeTasks.setRoot(node);   
-             loadProjects();
+        if(task == null || treeTasks.getRoot() == null){
+             treeTasks.setRoot(node);
         }else {
             task.getChildren().add(node);
         }
+        ProjectWrapper project = listProjects.getSelectionModel().getSelectedItem();
+        loadProjects();
+        if(project != null && projects.contains(project)){
+            listProjects.getSelectionModel().select(project);
+        }
     }
+    
     private void setTime() {
         long ellapsed = System.currentTimeMillis();
         ellapsed -= time;
@@ -642,6 +682,22 @@ public class TeamOfficeController {
         public String toString() {
             return project.getName();
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ProjectWrapper other = (ProjectWrapper) obj;
+            if (!project.getId().equals(other.getProject().getId())) {
+                return false;
+            }
+            return true;
+        }
+        
     }
 
     public static class UserWrapper {
@@ -670,7 +726,6 @@ public class TeamOfficeController {
             if (!(object instanceof UserWrapper)) {
                 return false;
             }
-
             UserWrapper other = (UserWrapper) object;
             return user.equals(other.getUser());
         }

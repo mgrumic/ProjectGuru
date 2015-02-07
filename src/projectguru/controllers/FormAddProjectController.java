@@ -73,7 +73,9 @@ public class FormAddProjectController implements Initializable {
     private Button btnHelp;
     @FXML
     private Button btnBack;
-
+    @FXML
+    private Label lblFormName;
+    
     private LoggedUser user;
 
     private ObservableList<UserWrapper> allMembers = null;
@@ -140,10 +142,19 @@ public class FormAddProjectController implements Initializable {
             }
             Double dou = (new Double(strBudget));
             Integer id = null;
+            Project newProject = null;
+            /*
+             *   Ukoliko se radi edit, moras dovuci projekat iz baze
+             */
             if (edit) {
-                id = project.getId();
+                try {
+                    newProject = user.getProjectHandler().getUpdatedProject(project);
+                } catch (EntityDoesNotExistException ex) {
+                    FormLoader.showInformationDialog("Грешка", "Пројекат не посотји");
+                }
+            } else {
+                newProject = new Project();
             }
-
             Date startDate;
             Date endDate = null;
 
@@ -156,15 +167,12 @@ public class FormAddProjectController implements Initializable {
             if (endLDate != null) {
                 endDate = Date.from(endLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             }
-
-            Project newProject = new Project(
-                    id,
-                    strName,
-                    BigDecimal.valueOf(dou.longValue()),
-                    startDate,
-                    endDate,
-                    strDescr
-            );
+            
+            newProject.setBudget(BigDecimal.valueOf(dou.longValue()));
+            newProject.setDescription(strDescr);
+            newProject.setName(strName);
+            newProject.setStartDate(startDate);
+            newProject.setEndDate(endDate);
 
             try {
                 ProjectHandler projectJpa = user.getProjectHandler();
@@ -237,6 +245,7 @@ public class FormAddProjectController implements Initializable {
         this.project = project;
         if (project != null) {
             edit = true;
+            lblFormName.setText("Промјена ставки пројекта");
             name.setText(project.getName());
             
             if (project.getDescription() != null) {
@@ -264,6 +273,8 @@ public class FormAddProjectController implements Initializable {
             );
 
             selectedMembers = FXCollections.observableArrayList();
+        }else {
+            lblFormName.setText("Нови пројекат ");
         }
 
     }

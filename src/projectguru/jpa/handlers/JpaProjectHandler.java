@@ -265,7 +265,6 @@ public class JpaProjectHandler implements ProjectHandler {
 
             }
             em.getTransaction().commit();
-            em.refresh(project);
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -470,7 +469,6 @@ public class JpaProjectHandler implements ProjectHandler {
             em.persist(exp);
             em.getTransaction().commit();
 
-            em.refresh(project);
             return true;
         } catch (Exception ex) {
 
