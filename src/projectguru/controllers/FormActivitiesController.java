@@ -265,6 +265,13 @@ public class FormActivitiesController implements Initializable {
     }
     
     private void deleteActivity(){
+        
+        if(! FormLoader.showConfirmationDialog("Да ли сте сигурни?", "Да ли сте сигурни да желите обрисати ову активност.")){
+            
+            return;
+            
+        }
+        
          Activity act = tblActivities.getSelectionModel().getSelectedItem().getActivity();
          
         try {
@@ -343,12 +350,21 @@ public class FormActivitiesController implements Initializable {
 
         Activity act = new Activity();
         
+        if(txtName.getText().isEmpty()){
+            FormLoader.showInformationDialog("Задатак нема име", "Додајте име за задатак.");
+            return;
+        }else{
+            act.setName(txtName.getText());
+        }
+        
+        
+        
         Date date = Date.from(dpDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
         
         act.setCreationDate(date);
         
         act.setDescription(txtDescription.getText());
-        act.setName(txtName.getText());
+        
         act.setRemark(txtRemark.getText());
 
                 
@@ -419,8 +435,10 @@ public class FormActivitiesController implements Initializable {
                 
                 @Override
                 public void updateItem(final LocalDate item, boolean empty){
-                    if( item != null){
+                    if( item != null && !empty){
                         setText(converter.toString(item));
+                    }else{
+                        setText("");
                     }
                 }
             };
