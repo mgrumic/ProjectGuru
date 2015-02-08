@@ -8,6 +8,7 @@ package projectguru.controllers;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -57,6 +58,7 @@ import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
+import projectguru.handlers.exceptions.StoringException;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
 import projectguru.utils.FormLoader;
@@ -72,7 +74,7 @@ public class TeamOfficeController {
 
     @FXML
     private Label lblStatusLabel;
-    
+
     @FXML
     private URL location;
 
@@ -154,10 +156,10 @@ public class TeamOfficeController {
 
     @FXML
     private Button btnDocuments;
-    
+
     @FXML
     private Button btnFinances;
-    
+
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
 
@@ -266,7 +268,6 @@ public class TeamOfficeController {
     @FXML
     void btnDocumentsPressed(ActionEvent event) {
 
-        
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
 //        
 //        ObservableList<DocumentWrapper> docw= FXCollections.observableArrayList(
@@ -275,7 +276,7 @@ public class TeamOfficeController {
 //                    .map((member) -> new TeamOfficeController.DocumentWrapper(member))
 //                    .collect(Collectors.toList())
 //            );
-       
+
         try {
             if (projectWrapper != null) {
                 FormLoader.loadFormDocumentation(projectWrapper.getProject(), user);
@@ -309,7 +310,7 @@ public class TeamOfficeController {
             FormLoader.showErrorDialog("Грешка у апликацији", "Не може да отвори форму за извјештај");
         }
     }
-    
+
     @FXML
     void btnFinancesPressed(ActionEvent event) {
         try {
@@ -323,16 +324,18 @@ public class TeamOfficeController {
             FormLoader.showErrorDialog("Грешка у апликацији", "Не може да отвори форму за преглед финансија");
         }
     }
-    
+
     /**
      * Moje varijable
      */
     private static LoggedUser user;
     private ObservableList<ProjectWrapper> projects;
     private ObservableList<UserWrapper> members;
-    private long time = System.currentTimeMillis();
-    private Timeline timeline;
     private ContextMenu rootContextMenu;
+    private long time = System.currentTimeMillis();
+    private Timeline clockTimeline;
+    private Timeline activeTaskTimeline;
+    private Task activeTask = null;
 
     private static final ImageView rootImage = new ImageView(new Image(TeamOfficeController.class
             .getResourceAsStream("/projectguru/images/root.png")));
@@ -362,7 +365,7 @@ public class TeamOfficeController {
                 .getResourceAsStream("/projectguru/images/report.png"))));
         btnFinances.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/finances.png"))));
-        
+
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
@@ -385,7 +388,7 @@ public class TeamOfficeController {
         final MenuItem addActivity = new MenuItem("Додај активност");
         final MenuItem editSubtask = new MenuItem("Прикажи задатак");
         final MenuItem activateTask = new MenuItem("Aктивирај задатак");
-        
+
         addSubtask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -409,7 +412,7 @@ public class TeamOfficeController {
             @Override
             public void handle(ActionEvent event) {
                 TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
-                if(taskNode != null){
+                if (taskNode != null) {
                     try {
                         FormLoader.loadFormSetActiveTask(taskNode.getValue().getTask(), user);
                     } catch (IOException ex) {
@@ -433,7 +436,7 @@ public class TeamOfficeController {
                         } else if (t != null) {
                             setText(t);
                             TaskNode node = this.getTreeTableRow().getItem();
-                            if(node != null && user.getTaskHandler().checkTaskChefPrivileges(node.getTask())){
+                            if (node != null && user.getTaskHandler().checkTaskChefPrivileges(node.getTask())) {
                                 setContextMenu(rootContextMenu);
                             }
                         }
@@ -457,7 +460,7 @@ public class TeamOfficeController {
                             setGraphic(null);
                         } else if (t != null) {
                             setAlignment(Pos.CENTER);
-                            setText(String.format("%.2f", t * 100) + "%");
+                            setText(String.format("%5.2f", t * 100) + "%");
                             setGraphic(new ColoredProgressBar(t));
                         }
 
@@ -481,18 +484,6 @@ public class TeamOfficeController {
 
         accProjects.setExpandedPane(accProjects.getPanes().get(0));
         accMembers.setExpandedPane(accMembers.getPanes().get(0));
-
-        timeline = new Timeline();
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.getKeyFrames().add(
-                new KeyFrame(Duration.seconds(1),
-                        new EventHandler() {
-                            @Override
-                            public void handle(Event event) {
-                                setTime();
-                            }
-                        }));
-        timeline.playFromStart();
 
         tfSearchProjects.textProperty().addListener(new ChangeListener() {
             public void changed(ObservableValue observable, Object oldVal,
@@ -518,6 +509,30 @@ public class TeamOfficeController {
                 }
             }
         });
+
+        /**
+         * Dio zaduzen za satnicu
+         */
+        clockTimeline = new Timeline();
+        clockTimeline.setCycleCount(Timeline.INDEFINITE);
+        clockTimeline.getKeyFrames().add(
+                new KeyFrame(Duration.seconds(1),
+                        new EventHandler() {
+                            @Override
+                            public void handle(Event event) {
+                                setTime();
+                            }
+                        }));
+        activeTaskTimeline = new Timeline();
+        activeTaskTimeline.setCycleCount(Timeline.INDEFINITE);
+        activeTaskTimeline.getKeyFrames().add(
+                new KeyFrame(Duration.seconds(60),
+                        new EventHandler() {
+                            @Override
+                            public void handle(Event event) {
+                               checkActiveTask();
+                            }
+                        }));
     }
 
     public void setUser(LoggedUser user) {
@@ -529,7 +544,7 @@ public class TeamOfficeController {
         }
         loadProjects();
         listProjects.getSelectionModel().select(0);
-
+        
     }
 
     public void loadProjects() {
@@ -540,7 +555,7 @@ public class TeamOfficeController {
                 .collect(Collectors.toList())
         );
         listProjects.setItems(projects);
-        if(projects.size() == 1){
+        if (projects.size() == 1) {
             listProjects.getSelectionModel().select(0);
         }
     }
@@ -584,20 +599,22 @@ public class TeamOfficeController {
     public void addNodeToTree(Task subtask) {
         TreeItem<TaskNode> task = treeTasks.getSelectionModel().getSelectedItem();
         TreeItem<TaskNode> node = new TreeItem<>(user.getTaskHandler().getTaskTree(subtask).getRoot());
-        if(task == null || treeTasks.getRoot() == null){
-             treeTasks.setRoot(node);
-        }else {
+        if (task == null || treeTasks.getRoot() == null) {
+            treeTasks.setRoot(node);
+        } else {
 
             task.getChildren().add(node);
         }
         ProjectWrapper project = listProjects.getSelectionModel().getSelectedItem();
         loadProjects();
-        if(project != null && projects.contains(project)){
+        if (project != null && projects.contains(project)) {
             listProjects.getSelectionModel().select(project);
         }
     }
 
-    
+    private void restartClock() {
+        time = System.currentTimeMillis();
+    }
 
     private void setTime() {
         long ellapsed = System.currentTimeMillis();
@@ -695,6 +712,66 @@ public class TeamOfficeController {
     }
 
     /**
+     * Active task stuff
+     */
+    public void startActiveTask() {
+        activeTask = user.getTaskHandler().getActiveTask();
+        if(activeTask == null){
+                FormLoader.showInformationDialog("Обавјештење", "Тренутно немате активни задатак.\n"
+                    + "Поновна провјера се врши за 5 минута.\n"
+                    + "Уколико добијете почеће вам се рачунати вријеме.\n"
+                    + "За више информација кликните на дугме за активни задатак.\n");
+        }else {
+            FormLoader.showInformationDialog("Обавјештење", "Почео је ваш рад на активном задатку.\n"
+                    + "За више информација кликните на дугме \n за активни задатак.\n");
+            clockTimeline.playFromStart();
+        }
+        activeTaskTimeline.playFromStart();
+    }
+    
+    private void checkActiveTask(){
+        Task check = user.getTaskHandler().getActiveTask();
+        if(check == null){
+            if(activeTask != null){
+                FormLoader.showInformationDialog("Обавјештење", "Тренутно немате активни задатак.\n"
+                    + "Поновна провјера се врши за 5 минута.\n"
+                    + "За више информација кликните на дугме \n за активни задатак.\n");
+            }
+            activeTask = check;
+            clockTimeline.stop();
+        }else {
+            if(activeTask == null){
+                restartClock();
+                clockTimeline.playFromStart();
+                FormLoader.showInformationDialog("Обавјештење", "Почео је ваш рад на активном задатку.\n"
+                    + "За више информација кликните на дугме \n за активни задатак.\n");
+                try {
+                    user.getTaskHandler().createNewTimetableEntry(new Date(), new Date());
+                } catch (StoringException ex) {
+                    FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа нове сатнице у базу.");
+                }
+            }else if(!check.getId().equals(activeTask.getId())){
+                restartClock();
+                clockTimeline.playFromStart();
+                FormLoader.showInformationDialog("Обавјештење", "Дошло је до промјене вашег \n активног задатка. "
+                    + "За више информација кликните на дугме \n за активни задатак.");
+                try {
+                    user.getTaskHandler().createNewTimetableEntry(new Date(), new Date());
+                } catch (StoringException ex) {
+                    FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа нове сатнице у базу.");
+                }
+            }else {
+                try {
+                    user.getTaskHandler().updateActiveTime(new Date());
+                } catch (StoringException ex) {
+                    FormLoader.showErrorDialog("Грешка", "Грешка приликом продужења сатнице у бази.");
+                }
+            }
+        }
+        activeTask = check;
+    }
+
+    /**
      * Moje private Wrapper klase
      */
     private static class ProjectWrapper {
@@ -732,7 +809,7 @@ public class TeamOfficeController {
             }
             return true;
         }
-        
+
     }
 
     public static class UserWrapper {
@@ -810,6 +887,7 @@ public class TeamOfficeController {
             return document.getDatePosted().toString();
         }
     }
+
     private static class ColoredProgressBar extends ProgressBar {
 
         public ColoredProgressBar(double initValue) {
@@ -825,4 +903,5 @@ public class TeamOfficeController {
             getStyleClass().add(cssClass);
         }
     }
+
 }

@@ -37,8 +37,10 @@ public class ProjectGuru {
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.DECORATED);
         
+        primaryStage.setMaximized(true);
         primaryStage.show();
         
-        primaryStage.setMaximized(true);
+        controller.startActiveTask();
+        
     }
 }
