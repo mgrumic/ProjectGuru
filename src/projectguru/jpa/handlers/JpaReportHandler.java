@@ -52,7 +52,7 @@ public class JpaReportHandler implements ReportHandler{
     public void showReport(){
         
         try{
-            report.show(false);
+            report.show();
         }catch(Exception ex){
             System.out.println("Message: " + ex.getMessage());
         }
