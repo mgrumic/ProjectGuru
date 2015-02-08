@@ -57,9 +57,9 @@
          <bottom>
             <AnchorPane prefHeight="54.0" prefWidth="380.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="btnFinish" layoutX="375.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="67.0" text="Креирај " AnchorPane.rightAnchor="152.0" />
-                  <Button fx:id="btnNext" layoutX="269.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Даље&gt;" AnchorPane.rightAnchor="240.0" />
-                  <Button fx:id="btnHelp" layoutX="487.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Помоћ" AnchorPane.rightAnchor="47.0" />
+                  <Button fx:id="btnFinish" layoutX="375.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="81.0" text="Креирај " AnchorPane.rightAnchor="152.0" />
+                  <Button fx:id="btnNext" layoutX="269.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="71.0" text="Даље&gt;" AnchorPane.rightAnchor="240.0" />
+                  <Button fx:id="btnHelp" layoutX="487.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Помоћ" AnchorPane.rightAnchor="47.0" />
                   <Button fx:id="btnBack" disable="true" layoutX="193.0" layoutY="18.0" mnemonicParsing="false" text="&lt;Назад" AnchorPane.rightAnchor="319.0" />
                   <Separator layoutX="48.0" layoutY="-1.0" prefHeight="1.0" prefWidth="503.0" AnchorPane.rightAnchor="47.0" />
                </children>

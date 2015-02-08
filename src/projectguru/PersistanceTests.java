@@ -88,7 +88,7 @@ class PersistanceTests {
         AccessManager.setInstance(jam);
         
         LoggedUser loggedUser = AccessManager.getInstance().logUserIn("admin", "admin");
-      /*  
+  
         User kors[] = new User[7];
         kors[0] = new User("boca", "etf", "Александар", "Вукотић", 4, true);
         kors[1] = new User("raja", "etf", "Марко", "Грумић", 2, true);
@@ -101,11 +101,11 @@ class PersistanceTests {
         for(User u : kors){
             loggedUser.getUserHandler().addUser(u);
         }
-*/
+
+       System.exit(0);  
         
-        
-        loggedUser = AccessManager.getInstance().logUserIn("boca", "etf");
-        ProjectHandler jpa = loggedUser.getProjectHandler();
+//        loggedUser = AccessManager.getInstance().logUserIn("boca", "etf");
+//        ProjectHandler jpa = loggedUser.getProjectHandler();
         
 //        pl(project);
 //        pl("Chef privileges: ");
@@ -116,38 +116,38 @@ class PersistanceTests {
 //        pl(jpa.checkInsightPrivileges(project));
         
         
-        Project novi = new Project();
-        novi.setName("Наш пројекат!");
-        novi.setBudget(new BigDecimal(10000.00));
-        novi.setStartDate(java.sql.Date.valueOf("2015-1-2"));
-        novi.setEndDate(java.sql.Date.valueOf("2015-2-10"));
-        novi.setDescription("Опааааа ! ");
-        
-        
-        jpa.createProject(novi);
-        novi = jpa.getUpdatedProject(novi);
-        
+//        Project novi = new Project();
+//        novi.setName("Наш пројекат!");
+//        novi.setBudget(new BigDecimal(10000.00));
+//        novi.setStartDate(java.sql.Date.valueOf("2015-1-2"));
+//        novi.setEndDate(java.sql.Date.valueOf("2015-2-10"));
+//        novi.setDescription("Опааааа ! ");
+//        
+//        
+//        jpa.createProject(novi);
+//        novi = jpa.getUpdatedProject(novi);
+//        
        // for(User u : kors){
       //      jpa.addMember(novi, u);
       //  }
         
         
+//        
+//        jpa.setPrivileges(novi, loggedUser.getUser(), Privileges.CHEF);
+//        
+//        Document doc1 = new Document();
+//        doc1.setDescription("Нови документ тест1 ! ");
+//        doc1.setName("Нови документ и сад може да стане 50 карактера!");
+//        doc1.setPostedDate(java.sql.Date.valueOf("2015-1-2"));
         
-        jpa.setPrivileges(novi, loggedUser.getUser(), Privileges.CHEF);
-        
-        Document doc1 = new Document();
-        doc1.setDescription("Нови документ тест1 ! ");
-        doc1.setName("Нови документ и сад може да стане 50 карактера!");
-        doc1.setPostedDate(java.sql.Date.valueOf("2015-1-2"));
-        
-        Document doc2 = new Document();
-        doc2.setDescription("Нови документ!");
-        doc2.setName("Нови документ");
-        doc2.setPostedDate(java.sql.Date.valueOf("2015-1-2"));
-        
-        jpa.addDocument(novi, doc1);
-        
-        System.out.println("DOKUMENT ID USING MY SHIT: " + doc1.getId());
+//        Document doc2 = new Document();
+//        doc2.setDescription("Нови документ!");
+//        doc2.setName("Нови документ");
+//        doc2.setPostedDate(java.sql.Date.valueOf("2015-1-2"));
+//        
+//        jpa.addDocument(novi, doc1);
+//        
+//        System.out.println("DOKUMENT ID USING MY SHIT: " + doc1.getId());
      /*   
         jpa.addDocument(novi, doc2);
         
@@ -283,7 +283,7 @@ class PersistanceTests {
         }
         */
         
-        System.exit(0);  
+        //System.exit(0);  
         
     }
     
