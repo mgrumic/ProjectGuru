@@ -58,6 +58,7 @@ import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
+import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
@@ -71,34 +72,24 @@ public class TeamOfficeController {
 
     @FXML
     private ResourceBundle resources;
-
     @FXML
     private Label lblStatusLabel;
-
     @FXML
     private URL location;
-
     @FXML
     private Label label;
-
     @FXML
     private ListView<UserWrapper> listMembers;
-
     @FXML
     private ListView<ProjectWrapper> listProjects;
-
     @FXML
     private Accordion accProjects;
-
     @FXML
     private Accordion accMembers;
-
     @FXML
     private AnchorPane rightPane;
-
     @FXML
     private AnchorPane leftPane;
-
     @FXML
     private TreeTableView<TaskNode> treeTasks;
     @FXML
@@ -107,7 +98,6 @@ public class TeamOfficeController {
     private TreeTableColumn<TaskNode, String> treeColumnDescription;
     @FXML
     private TreeTableColumn<TaskNode, Double> treeColumnCompleted;
-
     @FXML
     private Label lblTime;
     @FXML
@@ -126,7 +116,6 @@ public class TeamOfficeController {
     private TextField tfSearchProjects;
     @FXML
     private TextField tfSearchMembers;
-    
     @FXML
     private Label lblProjectName;
     @FXML
@@ -153,12 +142,12 @@ public class TeamOfficeController {
     private MenuItem mItemKorisnickiNalozi;
     @FXML
     private Button btnGetReport;
-
     @FXML
     private Button btnDocuments;
-
     @FXML
     private Button btnFinances;
+    @FXML
+    private Button btnCurrentTask;
 
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
@@ -269,14 +258,6 @@ public class TeamOfficeController {
     void btnDocumentsPressed(ActionEvent event) {
 
         ProjectWrapper projectWrapper = listProjects.getSelectionModel().getSelectedItem();
-//        
-//        ObservableList<DocumentWrapper> docw= FXCollections.observableArrayList(
-//                    listProjects.getSelectionModel().getSelectedItem().getProject().getDocumentList()
-//                    .stream()
-//                    .map((member) -> new TeamOfficeController.DocumentWrapper(member))
-//                    .collect(Collectors.toList())
-//            );
-
         try {
             if (projectWrapper != null) {
                 FormLoader.loadFormDocumentation(projectWrapper.getProject(), user);
@@ -325,8 +306,16 @@ public class TeamOfficeController {
         }
     }
 
-    
-    
+    @FXML
+    void btnCurrentTaskPressed(ActionEvent event) {
+        if (activeTask == null) {
+            FormLoader.showInformationDialog("Активни задатак", "Тренутно немате активног задатка !");
+        } else {
+            activeTask = user.getTaskHandler().getUpdatedTask(activeTask);
+            FormLoader.showExtendedInformationDialog("Активни задатак", "Задатак: " + activeTask.getName(), activeTask.getDescription());
+        }
+    }
+
     /**
      * Moje varijable
      */
@@ -334,10 +323,13 @@ public class TeamOfficeController {
     private ObservableList<ProjectWrapper> projects;
     private ObservableList<UserWrapper> members;
     private ContextMenu rootContextMenu;
+
     private long time = System.currentTimeMillis();
     private Timeline clockTimeline;
     private Timeline activeTaskTimeline;
     private Task activeTask = null;
+    //sekunde nakon kojih tajmer vrsi provjeru pozadiniskog zadatka
+    private long seconds = 60;
 
     private static final ImageView rootImage = new ImageView(new Image(TeamOfficeController.class
             .getResourceAsStream("/projectguru/images/root.png")));
@@ -367,6 +359,8 @@ public class TeamOfficeController {
                 .getResourceAsStream("/projectguru/images/report.png"))));
         btnFinances.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/finances.png"))));
+        btnCurrentTask.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/active_task.png"))));
 
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
@@ -478,7 +472,7 @@ public class TeamOfficeController {
         );
         treeColumnDescription.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<TaskNode, String> param)
-                -> new ReadOnlyStringWrapper(param.getValue().getValue().getTask().getDescription())
+                -> new ReadOnlyStringWrapper(param.getValue().getValue().getTask().getDescription().replaceAll("\n", " "))
         );
         treeColumnCompleted.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<TaskNode, Double> param)
@@ -532,7 +526,7 @@ public class TeamOfficeController {
                         new EventHandler() {
                             @Override
                             public void handle(Event event) {
-                               checkActiveTask();
+                                checkActiveTask();
                             }
                         }));
     }
@@ -546,7 +540,7 @@ public class TeamOfficeController {
         }
         loadProjects();
         listProjects.getSelectionModel().select(0);
-        
+
     }
 
     public void loadProjects() {
@@ -663,7 +657,13 @@ public class TeamOfficeController {
                     lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
                     lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
                     lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
-                    lblNumActivities.setText("");
+                    try {
+                        lblNumActivities.setText((root != null) ? (user.getActivityHandler().findActivitiesForTask(root.getValue().getTask(), true, false)).size() + "" : "0");
+                    } catch (InsuficientPrivilegesException ex) {
+                        FormLoader.showInformationDialog("Обавјештење", "Немате довољно привилегија да бисте видјели број активности.");
+                    } catch (StoringException ex) {
+                        FormLoader.showErrorDialog("Грешка", "Грешка приликом добављања активности иѕ баѕе");
+                    }
                     ObservableList<UserWrapper> userList = FXCollections.observableArrayList(
                             user.getProjectHandler().getAllChefs(project)
                             .stream()
@@ -718,51 +718,56 @@ public class TeamOfficeController {
      */
     public void startActiveTask() {
         activeTask = user.getTaskHandler().getActiveTask();
-        if(activeTask == null){
-                FormLoader.showInformationDialog("Обавјештење", "Тренутно немате активни задатак.\n"
-                    + "Поновна провјера се врши за 5 минута.\n"
-                    + "Уколико добијете почеће вам се рачунати вријеме.\n"
+        if (activeTask == null) {
+            FormLoader.showExtendedInformationDialog("Обавјештење", " ","Тренутно немате активни задатак.\n"
+                    + "Поновна провјера се врши за " + seconds / 60 + " мин.\n"
+                    + "Уколико добијете задатак почеће вам се рачунати вријеме.\n"
                     + "За више информација кликните на дугме за активни задатак.\n");
-        }else {
-            FormLoader.showInformationDialog("Обавјештење", "Почео је ваш рад на активном задатку.\n"
-                    + "За више информација кликните на дугме \n за активни задатак.\n");
+        } else {
             clockTimeline.playFromStart();
+            FormLoader.showExtendedInformationDialog("Обавјештење", " ", "Почео је ваш рад на активном задатку.\n"
+                    + "За више информација кликните на дугме за активни задатак.\n");
+            try {
+                    user.getTaskHandler().createNewTimetableEntry(new Date(), new Date());
+                } catch (StoringException ex) {
+                    FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа нове сатнице у базу.");
+                }
         }
         activeTaskTimeline.playFromStart();
     }
-    
-    private void checkActiveTask(){
+
+    private void checkActiveTask() {
         Task check = user.getTaskHandler().getActiveTask();
-        if(check == null){
-            if(activeTask != null){
-                FormLoader.showInformationDialog("Обавјештење", "Тренутно немате активни задатак.\n"
-                    + "Поновна провјера се врши за 5 минута.\n"
-                    + "За више информација кликните на дугме \n за активни задатак.\n");
+        if (check == null) {
+            if (activeTask != null) {
+                activeTask = check;
+                clockTimeline.stop();
+                FormLoader.showExtendedInformationDialog("Обавјештење", " ", "Тренутно немате активни задатак.\n"
+                        + "Поновна провјера се врши за " + seconds / 60 + " мин.\n"
+                        + "За више информација кликните на дугме за активни задатак.\n");
             }
-            activeTask = check;
-            clockTimeline.stop();
-        }else {
-            if(activeTask == null){
+        } else {
+            if (activeTask == null) {
                 restartClock();
                 clockTimeline.playFromStart();
-                FormLoader.showInformationDialog("Обавјештење", "Почео је ваш рад на активном задатку.\n"
-                    + "За више информација кликните на дугме \n за активни задатак.\n");
+                FormLoader.showExtendedInformationDialog("Обавјештење", " ", "Почео је ваш рад на активном задатку.\n"
+                        + "За више информација кликните на дугме за активни задатак.\n");
                 try {
                     user.getTaskHandler().createNewTimetableEntry(new Date(), new Date());
                 } catch (StoringException ex) {
                     FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа нове сатнице у базу.");
                 }
-            }else if(!check.getId().equals(activeTask.getId())){
+            } else if (!check.getId().equals(activeTask.getId())) {
                 restartClock();
                 clockTimeline.playFromStart();
-                FormLoader.showInformationDialog("Обавјештење", "Дошло је до промјене вашег \n активног задатка."
-                    + "За више информација кликните на дугме \n за активни задатак.");
+                FormLoader.showExtendedInformationDialog("Обавјештење", " ", "Дошло је до промјене вашег активног задатка.\n"
+                        + "За више информација кликните на дугме за активни задатак.");
                 try {
                     user.getTaskHandler().createNewTimetableEntry(new Date(), new Date());
                 } catch (StoringException ex) {
                     FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа нове сатнице у базу.");
                 }
-            }else {
+            } else {
                 try {
                     user.getTaskHandler().updateActiveTime(new Date());
                 } catch (StoringException ex) {

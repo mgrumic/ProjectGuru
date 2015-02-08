@@ -20,6 +20,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -58,7 +62,6 @@ public class FormLoader {
         fapc.setController(controller);
         fapc.setProject(project);
 
-
         Scene scene = new Scene(root);
         scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddproject.css").toExternalForm());
 
@@ -68,7 +71,6 @@ public class FormLoader {
 
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
-
 
         stage.show();
     }
@@ -93,7 +95,6 @@ public class FormLoader {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
 
-
         stage.show();
     }
 
@@ -112,14 +113,12 @@ public class FormLoader {
 //        stage.setResizable(false);
 //        stage.show();
 //    }
-
     /**
      * Poziva se kada se dodaje podzadatak za neki zadatak
      *
      * @param task
      * @throws IOException
      */
-
     public static void loadFormAddTask(Project project, Task task, LoggedUser user, TeamOfficeController controller, boolean edit) throws IOException {
 
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddTask.fxml"));
@@ -151,7 +150,7 @@ public class FormLoader {
     public static void loadFormDocumentation(Project project, LoggedUser user) throws Exception {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormDocumentation.fxml"));
     //    loader.setController(new FormDocumentationController(allDocuments));
-       
+
         Parent root = loader.load();
         FormDocumentationController fdc = loader.getController();
         fdc.setProject(project);
@@ -179,7 +178,6 @@ public class FormLoader {
         fdc.setUser(user);
         fdc.loadDocum();
 
-
         Scene scene = new Scene(root);
 
         Stage stage = new Stage();
@@ -200,18 +198,18 @@ public class FormLoader {
         FormReportController frc = loader.getController();
         frc.setProject(project);
         frc.setUser(user);
-        
+
         Scene scene = new Scene(root);
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Извјештаји за пројекат: " + project.getName());
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
-        
+
         stage.show();
     }
-    
-    public static void loadFormActivities(LoggedUser user, Task task) throws IOException{
+
+    public static void loadFormActivities(LoggedUser user, Task task) throws IOException {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormActivities.fxml"));
         Parent root = loader.load();
         FormActivitiesController controller = loader.getController();
@@ -226,7 +224,7 @@ public class FormLoader {
         //stage.setResizable(false);
 
         controller.loadActivities();
-        
+
         stage.show();
     }
 
@@ -264,7 +262,7 @@ public class FormLoader {
         stage.initModality(Modality.APPLICATION_MODAL);
 
         stage.show();
-        
+
     }
 
     /**
@@ -313,8 +311,8 @@ public class FormLoader {
 
     }
 
-    public static void loadFormSetActiveTask(Task task, LoggedUser user) throws IOException{
-        
+    public static void loadFormSetActiveTask(Task task, LoggedUser user) throws IOException {
+
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormSetActiveTask.fxml"));
         Parent root = loader.load();
         FormSetActiveTaskController controller = loader.getController();
@@ -329,6 +327,7 @@ public class FormLoader {
 
         stage.show();
     }
+
     public static void showInformationDialog(String title, String message) {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle(title);
@@ -336,7 +335,6 @@ public class FormLoader {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
 
     public static void showErrorDialog(String title, String message) {
         Alert alert = new Alert(AlertType.ERROR);
@@ -367,6 +365,35 @@ public class FormLoader {
 
     }
 
+    public static void showExtendedInformationDialog(String header, String content, String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(" ");
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+
+        Label label = new Label(message);
+        label.setWrapText(true);
+      //  TextArea textArea = new TextArea(message);
+      //  textArea.setEditable(false);
+      //  textArea.setWrapText(true);
+
+        label.setMaxWidth(Double.MAX_VALUE);
+        label.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(label, Priority.ALWAYS);
+        GridPane.setHgrow(label, Priority.ALWAYS);
+
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(label, 0, 0);
+     //   expContent.add(textArea, 0, 1);
+
+        alert.getDialogPane().setExpandableContent(expContent);
+        alert.getDialogPane().setExpanded(true);
+        alert.getDialogPane().setPrefSize(550, 230);
+        
+        alert.show();
+    }
+
     public static Node getAddMembersNode(ObservableList<TeamOfficeController.UserWrapper> allMembers, ObservableList<TeamOfficeController.UserWrapper> selectedMembers) {
         Node view = null;
         FXMLLoader fxmlLoader;
@@ -380,5 +407,4 @@ public class FormLoader {
         return view;
     }
 
-    
 }
