@@ -32,13 +32,16 @@ import javafx.scene.control.Button;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.FormatStringConverter;
 import netscape.security.Privilege;
+import projectguru.controllers.util.SerbianLocalDateProperty;
 import projectguru.controllers.util.SerbianLocalDateStringConverter;
 import projectguru.entities.Activity;
 import projectguru.entities.Task;
@@ -66,7 +69,7 @@ public class FormActivitiesController implements Initializable {
     private TableColumn<ActivityWrapper, String> columnTaskName;
 
     @FXML
-    private TableColumn<ActivityWrapper, String> columnDate;
+    private TableColumn<ActivityWrapper, LocalDate> columnDate;
 
     @FXML
     private TableColumn<ActivityWrapper, String> columnName;
@@ -148,13 +151,18 @@ public class FormActivitiesController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         columnCreatorName.setCellValueFactory( (rowData) -> rowData.getValue().getCreatorName());
-        columnDate.setCellValueFactory((rowData) -> new SimpleObjectProperty(rowData.getValue().getDate()));
+        
+        columnDate.setCellValueFactory((rowData) -> rowData.getValue().getDate());
+        columnDate.setCellFactory(new LocalDateTableColumnCellFactory());
+            
         columnName.setCellValueFactory((rowData) -> rowData.getValue().getName());
         columnRemark.setCellValueFactory((rowData) -> rowData.getValue().getRemark());
         columnTaskName.setCellValueFactory((rowData) -> rowData.getValue().getTaskName());
         
         dpDate.setConverter(new SerbianLocalDateStringConverter());
         
+        btnReject.setVisible(false);
+        btnSaveChanges.setVisible(false);
         
 
     }    
@@ -224,6 +232,7 @@ public class FormActivitiesController implements Initializable {
         }else{
             btnDeleteActivity.setDisable(true);
         }
+        
     }
     
     private void setFormData(ActivityWrapper newValue){
@@ -237,7 +246,7 @@ public class FormActivitiesController implements Initializable {
         txtName.setText(newValue.getName().getValue());
         txtRemark.setText(newValue.getRemark().getValue());
         txtTaskName.setText(newValue.getTaskName().getValue());
-        dpDate.setValue(newValue.getDate());
+        dpDate.setValue(newValue.getDate().getValue());
         
         if(newValue.getActivity().getWorksOnTask().getWorksOnTaskPK()
                 .getUsername().compareTo(
@@ -256,6 +265,13 @@ public class FormActivitiesController implements Initializable {
     }
     
     private void deleteActivity(){
+        
+        if(! FormLoader.showConfirmationDialog("Да ли сте сигурни?", "Да ли сте сигурни да желите обрисати ову активност.")){
+            
+            return;
+            
+        }
+        
          Activity act = tblActivities.getSelectionModel().getSelectedItem().getActivity();
          
         try {
@@ -324,7 +340,9 @@ public class FormActivitiesController implements Initializable {
         }else{
             dpDate.setEditable(false);
         }
-        
+                
+        btnReject.setVisible(true);
+        btnSaveChanges.setVisible(true);
         this.newMode = newMode;
     }
     
@@ -332,12 +350,21 @@ public class FormActivitiesController implements Initializable {
 
         Activity act = new Activity();
         
+        if(txtName.getText().isEmpty()){
+            FormLoader.showInformationDialog("Задатак нема име", "Додајте име за задатак.");
+            return;
+        }else{
+            act.setName(txtName.getText());
+        }
+        
+        
+        
         Date date = Date.from(dpDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
         
         act.setCreationDate(date);
         
         act.setDescription(txtDescription.getText());
-        act.setName(txtName.getText());
+        
         act.setRemark(txtRemark.getText());
 
                 
@@ -393,6 +420,30 @@ public class FormActivitiesController implements Initializable {
         }
         
     }
+
+    private static class LocalDateTableColumnCellFactory implements Callback<TableColumn<ActivityWrapper, LocalDate>, TableCell<ActivityWrapper, LocalDate>> {
+
+        private static SerbianLocalDateStringConverter converter = new SerbianLocalDateStringConverter();
+        
+        public LocalDateTableColumnCellFactory() {
+        }
+
+
+        @Override
+        public TableCell<ActivityWrapper, LocalDate> call(TableColumn<ActivityWrapper, LocalDate> param) {
+            return new TableCell<ActivityWrapper, LocalDate>() {
+                
+                @Override
+                public void updateItem(final LocalDate item, boolean empty){
+                    if( item != null && !empty){
+                        setText(converter.toString(item));
+                    }else{
+                        setText("");
+                    }
+                }
+            };
+        }
+    }
     
 }
 
@@ -401,7 +452,7 @@ class ActivityWrapper {
         private StringProperty name;
         private StringProperty taskName;
         private StringProperty creatorName;
-        private LocalDate date;
+        private SerbianLocalDateProperty date;
         private StringProperty remark;
         private IntegerProperty id;
         private StringProperty description;
@@ -431,11 +482,11 @@ class ActivityWrapper {
         this.creatorName = creatorName;
     }
 
-    public LocalDate getDate() {
+    public SerbianLocalDateProperty getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(SerbianLocalDateProperty date) {
         this.date = date;
     }
 
@@ -480,7 +531,8 @@ class ActivityWrapper {
             User user = activity.getWorksOnTask().getUser();
             creatorName = new SimpleStringProperty(user.getFirstName() + " " + user.getLastName());
             taskName = new SimpleStringProperty(activity.getWorksOnTask().getTask().getName());
-            date = ZonedDateTime.ofInstant(activity.getCreationDate().toInstant(), ZoneId.systemDefault()).toLocalDate();
+            LocalDate localDate = ZonedDateTime.ofInstant(activity.getCreationDate().toInstant(), ZoneId.systemDefault()).toLocalDate();
+            date = new SerbianLocalDateProperty(localDate);
             id = new SimpleIntegerProperty(activity.getId());
             name = new SimpleStringProperty(activity.getName());
             remark = new SimpleStringProperty(activity.getRemark());
