@@ -126,7 +126,7 @@ public class TeamOfficeController {
     private TextField tfSearchProjects;
     @FXML
     private TextField tfSearchMembers;
-
+    
     @FXML
     private Label lblProjectName;
     @FXML
@@ -325,6 +325,8 @@ public class TeamOfficeController {
         }
     }
 
+    
+    
     /**
      * Moje varijable
      */
@@ -753,7 +755,7 @@ public class TeamOfficeController {
             }else if(!check.getId().equals(activeTask.getId())){
                 restartClock();
                 clockTimeline.playFromStart();
-                FormLoader.showInformationDialog("Обавјештење", "Дошло је до промјене вашег \n активног задатка. "
+                FormLoader.showInformationDialog("Обавјештење", "Дошло је до промјене вашег \n активног задатка."
                     + "За више информација кликните на дугме \n за активни задатак.");
                 try {
                     user.getTaskHandler().createNewTimetableEntry(new Date(), new Date());

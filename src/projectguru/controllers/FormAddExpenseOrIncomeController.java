@@ -63,6 +63,17 @@ public class FormAddExpenseOrIncomeController implements Initializable {
     private ComboBox<String> cbCurrency;
 
     @FXML
+    private Button btnNew;
+    
+    @FXML
+    void btnNewPressed(ActionEvent event) {
+        tfAmount.setText("");
+        taDescription.setText("");
+        
+        btnAdd.setVisible(true);
+    }
+    
+    @FXML
     void btnAddPressed(ActionEvent event) {
         if (checkFields()) {
             addFinance();
@@ -72,9 +83,6 @@ public class FormAddExpenseOrIncomeController implements Initializable {
     @FXML
     void btnExitPressed(ActionEvent event) {
         ((Stage) btnExit.getScene().getWindow()).close();
-      ///  if(controller != null){
-    //        controller.loadFinances();
-     //   }
     }
 
     /**
@@ -113,6 +121,8 @@ public class FormAddExpenseOrIncomeController implements Initializable {
                 }
             }
         });
+        
+        btnAdd.setVisible(false);
     }
 
     public void setProjectAndActivity(Project project, Activity activity) {
@@ -150,6 +160,8 @@ public class FormAddExpenseOrIncomeController implements Initializable {
             }
             listFinances.setItems(items);
         }
+        tfAmount.setText("");
+        taDescription.setText("");
     }
 
     private void changeFields(FinanceWrapper item) {
@@ -162,6 +174,7 @@ public class FormAddExpenseOrIncomeController implements Initializable {
             tfAmount.setText(exp.getMoneyAmmount().toString());
             taDescription.setText(exp.getDescription());
         }
+        btnAdd.setVisible(false);
     }
 
     private boolean checkFields() {
