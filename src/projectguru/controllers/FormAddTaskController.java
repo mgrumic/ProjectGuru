@@ -37,6 +37,7 @@ import javafx.stage.Stage;
 import projectguru.controllers.TeamOfficeController.UserWrapper;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
+import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.TaskHandler;
@@ -45,7 +46,6 @@ import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.utils.FormLoader;
 import projectguru.utils.ProjectGuruUtilities;
-
 
 /**
  * FXML Controller class
@@ -101,9 +101,7 @@ public class FormAddTaskController implements Initializable {
             btnBack.setDisable(false);
         }
 
-
     };
-
 
     private final EventHandler<MouseEvent> eventOnClickBack = new EventHandler<MouseEvent>() {
         @Override
@@ -161,6 +159,8 @@ public class FormAddTaskController implements Initializable {
             Task tmpTask = null;
             if (edit) {
                 tmpTask = user.getTaskHandler().getUpdatedTask(task);
+            } else {
+                tmpTask = new Task();
             }
             tmpTask.setName(strName);
             tmpTask.setStartDate(startDate);
@@ -176,31 +176,26 @@ public class FormAddTaskController implements Initializable {
                 if (edit) {
                     result = taskJpa.editSubtask(tmpTask);
                 } else {
-                    if(task == null){
+                    if (task == null) {
                         project.setIDRootTask(tmpTask);
                         user.getProjectHandler().setRootTask(project, tmpTask);
                         result = true;
-                    }else {
+                    } else {
                         result = taskJpa.addSubtask(task, tmpTask);
                     }
                 }
                 if (selectedMembers != null && result == true) {
                     Iterator<UserWrapper> itr = selectedMembers.iterator();
                     while (itr.hasNext()) {
-                        taskJpa.addMember(
-                                tmpTask,
-                                itr.next().getUser()
-                        );
-
+                        User user = itr.next().getUser();
+                        if (!tmpTask.getWorksOnTaskList().contains(user)) {
+                            taskJpa.addMember(tmpTask, user);
+                        }
                     }
-                }else {
-                    project.setIDRootTask(tmpTask);
-                    user.getProjectHandler().setRootTask(project, tmpTask);
                 }
                 controller.addNodeToTree(tmpTask);
-
-                Stage stage = (Stage) btnFinish.getScene().getWindow();
                 controller.loadTaskTree(project);
+                Stage stage = (Stage) btnFinish.getScene().getWindow();
                 stage.close();
 
             } catch (EntityDoesNotExistException ex) {
@@ -219,12 +214,8 @@ public class FormAddTaskController implements Initializable {
     @FXML
     private Button btnBack;
 
-
-
     public void initialize(URL url, ResourceBundle rb
     ) {
-
-
 
         btnNext.setOnMouseClicked(eventOnClickNext);
         btnBack.setOnMouseClicked(eventOnClickBack);
@@ -298,7 +289,5 @@ public class FormAddTaskController implements Initializable {
         }
 
     }
-
-
 
 }
