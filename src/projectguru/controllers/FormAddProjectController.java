@@ -11,6 +11,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import static java.time.temporal.TemporalQueries.localDate;
 import java.util.Date;
 import java.util.Iterator;
@@ -32,11 +33,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import projectguru.controllers.TeamOfficeController.UserWrapper;
+import projectguru.controllers.util.SerbianLocalDateStringConverter;
 import projectguru.entities.Project;
+import projectguru.entities.Task;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
@@ -75,6 +79,13 @@ public class FormAddProjectController implements Initializable {
     private Button btnBack;
     @FXML
     private Label lblFormName;
+    @FXML
+    private TextField txtManHours;
+    @FXML
+    private GridPane paneRootTaskAdditions;
+    @FXML
+    private DatePicker dpDeadline;
+    
     
     private LoggedUser user;
 
@@ -140,6 +151,31 @@ public class FormAddProjectController implements Initializable {
                 FormLoader.showInformationDialog("Напомена", "Поље буџет није коректно попуњено!");
                 return;
             }
+            
+            int manhours = 0;
+            Date rootDeadline = null;
+            
+            if(!edit){
+            
+                try{
+                    manhours = Integer.parseInt(txtManHours.getText().trim());
+                }catch(Exception ex){
+                    FormLoader.showErrorDialog("Грешка", "Упишите одговарајућу вриједност у поље човјек-часови.");
+                    return;
+                }
+                
+                try{
+                    if(dpDeadline.getValue().isBefore(LocalDate.now(ZoneId.systemDefault()))){
+                        FormLoader.showErrorDialog("Грешка", "Вриједност крајњег рока је невалидна.");
+                        return;
+                    }
+                    rootDeadline = Date.from(dpDeadline.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                }catch(Exception ex){
+                    FormLoader.showErrorDialog("Грешка", "Вриједност крајњег рока је невалидна.");
+                    return;
+                }
+          
+            }
 
             Double dou = (new Double(strBudget));
             Integer id = null;
@@ -153,6 +189,7 @@ public class FormAddProjectController implements Initializable {
                 } catch (EntityDoesNotExistException ex) {
                     FormLoader.showInformationDialog("Грешка", "Пројекат не посотји");
                 }
+                
             } else {
                 newProject = new Project();
             }
@@ -183,6 +220,7 @@ public class FormAddProjectController implements Initializable {
                     projectJpa.editProject(newProject);
                 } else {
                     projectJpa.createProject(newProject);
+                    project = newProject;
                 }
                 if (selectedMembers != null) {
                     Iterator<UserWrapper> itr = selectedMembers.iterator();
@@ -194,6 +232,20 @@ public class FormAddProjectController implements Initializable {
                         );
                     }
                 }
+                
+                if(!edit){
+                    
+                    Task root = new Task();
+                    
+                    root.setDescription(strDescr);
+                    root.setName(strName);
+                    root.setAssumedManHours(manhours);
+                    root.setDeadline(rootDeadline);
+                    
+                    user.getProjectHandler().setRootTask(newProject, root);
+                    user.getTaskHandler().setChef(root, user.getUser());
+                }
+                
                 controller.loadProjects();
                 Stage stage = (Stage) btnFinish.getScene().getWindow();
                 stage.close();
@@ -223,7 +275,9 @@ public class FormAddProjectController implements Initializable {
         btnFinish.setOnMouseClicked(eventOnClickFinish);
         btnHelp.setOnMouseClicked(eventOnClickHelp);
         start.setValue(Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
-
+        dpDeadline.setConverter(new SerbianLocalDateStringConverter());
+        ends.setConverter(new SerbianLocalDateStringConverter());
+        start.setConverter(new SerbianLocalDateStringConverter());
     }
 
     public void setUser(LoggedUser user) {
@@ -248,7 +302,11 @@ public class FormAddProjectController implements Initializable {
     public void setProject(Project project) {
         this.project = project;
         if (project != null) {
+            
             edit = true;
+            
+            paneRootTaskAdditions.setVisible(false);
+            
             lblFormName.setText("Промјена ставки пројекта");
             name.setText(project.getName());
             
@@ -281,6 +339,10 @@ public class FormAddProjectController implements Initializable {
             lblFormName.setText("Нови пројекат ");
         }
 
+    }
+    
+    public Project getProject(){
+        return project;
     }
 
 }

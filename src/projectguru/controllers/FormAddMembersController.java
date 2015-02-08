@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import projectguru.controllers.TeamOfficeController.UserWrapper;
@@ -90,6 +91,8 @@ public class FormAddMembersController implements Initializable {
         buttonSelectOne.setOnMouseClicked(eventOnSelectOne);
         buttonUnselectAll.setOnMouseClicked(eventOnUnselectAll);
         buttonUnselectOne.setOnMouseClicked(eventOnUnselectOne);
+        listViewAllMembers.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        listViewSelectedMembers.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     public void setListViewSelectedMembers(ListView<UserWrapper> listViewSelectedMembers) {

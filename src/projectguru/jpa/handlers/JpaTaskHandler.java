@@ -1124,5 +1124,41 @@ public class JpaTaskHandler implements TaskHandler {
         return new ArrayList<User>();
     }
 
+    @Override
+    public List<User> getAddableMembers(Task task) {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            task = em.find(Task.class, task.getId());
+            
+            Task parent = new ArrayList<>(task.getClosureTasksParents()).stream().filter((cp)->cp.getDepth() == 1).findFirst().map((cp)->cp.getParent()).orElse(null);
+
+            Query q = null;
+            
+            if(parent == null){
+                /* root task, trebam naci one koji su u  projektu, a nisu u zadataku*/
+                q = em.createQuery("SELECT wop.user FROM Task t, Project pr, IN(pr.worksOnProjectList) wop WHERE t.id = :idtask AND pr.id = :idproject AND NOT EXISTS ( SELECT wot FROM IN(t.worksOnTaskList) wot WHERE wot.worksOnTaskPK.username = wop.worksOnProjectPK.username )");
+                q.setParameter("idproject", task.getProjectList().get(0).getId());
+            }else{
+                /* trebam naci one koji su u roditelju a nisu u ovom zadatku */
+                q = em.createQuery("SELECT wop.user FROM Task t, Task p, IN(p.worksOnTaskList) wop WHERE t.id = :idtask AND p.id = :idparent AND wop NOT IN ( SELECT wot FROM WorksOnTask wot WHERE wot.worksOnTaskPK.iDTask = :idtask ) ");
+                q.setParameter("idparent", parent.getId());
+            }
+            
+            q.setParameter("idtask", task.getId());
+
+            return q.getResultList();
+
+        } catch (Exception ex) {
+
+        } finally {
+            em.close();
+        }
+        return new ArrayList<User>();
+    }
+
+    
+    
     
 }

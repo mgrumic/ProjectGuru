@@ -231,7 +231,18 @@ public class TeamOfficeController {
     @FXML
     void btnNewProjectPressed(ActionEvent event) {
         try {
-            FormLoader.loadFormAddProject(user, null, this);
+            Project newProject = FormLoader.loadFormAddProject(user, null, this);
+            try {
+                newProject = user.getProjectHandler().getUpdatedProject(newProject);
+                
+            } catch (EntityDoesNotExistException ex) {
+                Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+            
+            
+            
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -659,7 +670,7 @@ public class TeamOfficeController {
                     lblProjectName.setText(project.getName());
                     tAreaDescription.setText(project.getDescription());
                     lblStartDate.setText(formater.format(project.getStartDate()));
-                    lblEndDate.setText(formater.format(project.getEndDate()));
+                    lblEndDate.setText(project.getEndDate() != null ? formater.format(project.getEndDate()) : "");
                     lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
                     lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
                     lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
