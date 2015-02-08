@@ -7,14 +7,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="91.0" prefWidth="298.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormReportController">
+<AnchorPane id="AnchorPane" prefHeight="91.0" prefWidth="438.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormReportController">
     <stylesheets>
         <URL value="@/projectguru/css/formreport.css" />
     </stylesheets>
    <children>
-      <ComboBox fx:id="reportTypeComboBox" layoutX="106.0" layoutY="16.0" prefHeight="25.0" prefWidth="180.0" promptText="Извјештај" />
+      <ComboBox fx:id="reportTypeComboBox" layoutX="244.0" layoutY="15.0" prefHeight="25.0" prefWidth="180.0" promptText="Извјештај" />
       <Label layoutX="14.0" layoutY="20.0" text="Тип извјештаја:" />
-      <Button fx:id="cancelButton" layoutX="69.0" layoutY="57.0" mnemonicParsing="false" onAction="#cancelButtonPressed" text="Откажи" />
-      <Button fx:id="generateButton" layoutX="159.0" layoutY="55.0" mnemonicParsing="false" onAction="#generateButtonPressed" text="Генериши извјештај" />
+      <Button fx:id="cancelButton" layoutX="119.0" layoutY="57.0" mnemonicParsing="false" onAction="#cancelButtonPressed" prefHeight="25.0" prefWidth="114.0" text="Откажи" />
+      <Button fx:id="generateButton" layoutX="244.0" layoutY="57.0" mnemonicParsing="false" onAction="#generateButtonPressed" prefHeight="25.0" prefWidth="180.0" text="Генериши извјештај" />
    </children>
 </AnchorPane>

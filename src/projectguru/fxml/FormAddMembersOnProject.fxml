@@ -13,8 +13,8 @@
          <bottom>
             <AnchorPane prefHeight="54.0" prefWidth="380.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="btnAdd" layoutX="358.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="103.0" text="Додај чланове" AnchorPane.rightAnchor="133.0" />
-                  <Button fx:id="btnHelp" layoutX="498.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Помоћ" AnchorPane.rightAnchor="36.0" />
+                  <Button fx:id="btnAdd" layoutX="358.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="135.0" text="Додај чланове" AnchorPane.rightAnchor="133.0" />
+                  <Button fx:id="btnHelp" layoutX="498.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Помоћ" AnchorPane.rightAnchor="36.0" />
                   <Separator layoutX="31.0" layoutY="11.0" prefHeight="1.0" prefWidth="520.0" AnchorPane.rightAnchor="36.0" />
                </children>
             </AnchorPane>
