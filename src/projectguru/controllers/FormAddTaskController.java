@@ -323,8 +323,13 @@ public class FormAddTaskController implements Initializable {
         if (edit) {
             name.setText(task.getName());
             description.setText(task.getDescription());
-            start.setValue(Instant.ofEpochMilli(task.getStartDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            
+            if(task.getStartDate() != null){
+                start.setValue(Instant.ofEpochMilli(task.getStartDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+            
             dedline.setValue(Instant.ofEpochMilli(task.getDeadline().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            
             if (task.getEndDate() != null) {
                 ends.setValue(task.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
