@@ -141,7 +141,7 @@ public class FormAddTaskController implements Initializable {
                 return;
             }
             if (!ProjectGuruUtilities.tryParseInt(strMenHours)) {
-                FormLoader.showInformationDialog("Напомена", "Поље човјек/часова није коректно попуњено!");
+                FormLoader.showInformationDialog("Напомена", "Поље човјек-часова није коректно попуњено!");
 
                 return;
             }
@@ -193,7 +193,7 @@ public class FormAddTaskController implements Initializable {
                     Iterator<UserWrapper> itr = selectedMembers.iterator();
                     while (itr.hasNext()) {
                         User user = itr.next().getUser();
-                        if(!new ArrayList<>(tmpTask.getWorksOnTaskList())
+                        if(!tmpTask.getWorksOnTasksListNonRemoved()
                                 .stream()
                                 .anyMatch(
                                         (wot) -> wot
@@ -202,7 +202,7 @@ public class FormAddTaskController implements Initializable {
                                                 .equals(user.getUsername()))
                                 ){
                             
-                            
+
                             taskJpa.addMember(tmpTask, user);
                             
                             
@@ -284,6 +284,8 @@ public class FormAddTaskController implements Initializable {
                 .map((u)-> new UserWrapper(u))
                 .collect(Collectors.toList())
             );
+            
+            btnNext.setDisable(true);
             
         }else{
             selectedMembers = FXCollections.observableArrayList(new ArrayList());

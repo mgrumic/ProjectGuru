@@ -77,7 +77,7 @@ public class JpaTaskHandler implements TaskHandler {
 
         Query q = em.createQuery("SELECT case when (count(wot) > 0)  then true else false end "
                 + "FROM Task t, IN(t.closureTasksParents) p, IN(p.parent.worksOnTaskList) wot "
-                + "WHERE t.id = :taskid AND wot.privileges = :privileges "
+                + "WHERE t.id = :taskid AND wot.privileges = :privileges AND wot.removed = false "
                 + "AND wot.worksOnTaskPK.username = :username", Long.class);
 
         q.setParameter("taskid", task.getId());
@@ -98,7 +98,7 @@ public class JpaTaskHandler implements TaskHandler {
     public boolean checkInsightPrivileges(Task task) {
 
         // WorksOnTaskList je generisana i popunice se podacima kad prvi put zatrazio nesto od nje.
-        for (WorksOnTask wot : task.getWorksOnTaskList()) {
+        for (WorksOnTask wot : task.getWorksOnTasksListNonRemoved()) {
             if (wot.getWorksOnTaskPK().getUsername().equals(loggedUser.getUser().getUsername())
                     && wot.getPrivileges() >= Privileges.INSIGHT.ordinal()) {
                 return true;
@@ -323,7 +323,7 @@ public class JpaTaskHandler implements TaskHandler {
             }
             try {
                 em.getTransaction().begin();
-                for (WorksOnTask wot : task.getWorksOnTaskList()) {
+                for (WorksOnTask wot : task.getWorksOnTasksListNonRemoved()) {
                     if (wot.getWorksOnTaskPK().getUsername().equals(user.getUsername())) {
                         
                         wot.setPrivileges(Privileges.CHEF.ordinal());
@@ -370,6 +370,113 @@ public class JpaTaskHandler implements TaskHandler {
         //Meni se to ne svidja. To u GUI-ju moze izgledati kao jedna operacija, ali zapravo da budu dve.
         return false;
     }
+    
+    @Override
+    public boolean removeChef(Task task) throws EntityDoesNotExistException, StoringException {
+                EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+
+        if (!checkTaskChefPrivileges(task)) {
+            return false;
+        }
+
+        boolean previousChefFound = false;
+        
+        EntityManager em = emf.createEntityManager();
+        try {
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
+                throw new EntityDoesNotExistException("Task does not exists in database.");
+            }
+
+            try {
+                em.getTransaction().begin();
+  
+                User user = getChef(task);
+                if(user != null){
+                    
+                        WorksOnTask wot = getWorksOnTask(task, user);
+                        
+                        if(wot != null){
+                            wot.setPrivileges(Privileges.MEMBER.ordinal());
+
+                            em.merge(wot);
+                            
+                            em.getTransaction().commit();
+                            return true;
+                        }
+
+                }
+
+                em.getTransaction().rollback();
+                
+                
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+        } finally {
+                        
+            em.close();
+        }
+        //TODO: razmisliti da li da omogucimo da se za sefa postavi neko ko nije clan
+        //pa da se on ovde onda prvo postavi za clana pa onda za sefa?
+        //Meni se to ne svidja. To u GUI-ju moze izgledati kao jedna operacija, ali zapravo da budu dve.
+        return false;
+    }
+    
+    @Override
+    public boolean removeMember(Task task, User user) throws StoringException, InsuficientPrivilegesException, EntityDoesNotExistException{
+        
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
+                throw new EntityDoesNotExistException("Task does not exists in database.");
+            }
+
+            if (user.getUsername() == null || (user = em.find(User.class, user.getUsername())) == null) {
+                throw new EntityDoesNotExistException("User does not exists in database.");
+            }
+
+            if (!checkTaskChefPrivileges(task)) {
+                throw new InsuficientPrivilegesException();
+            }
+
+
+            try {
+                em.getTransaction().begin();
+                
+                WorksOnTask wot = getWorksOnTask(task, user);
+                
+                wot.setRemoved(true);
+                em.merge(wot);
+                
+                for(ClosureTasks ct : task.getClosureTasksChildren()){
+                    wot = getWorksOnTask(ct.getChild(), user);
+                    if(wot != null){
+                        wot.setRemoved(true);
+                        em.merge(wot);
+                    }
+                }
+                
+                
+                em.getTransaction().commit();
+                em.refresh(task);
+                em.refresh(user);
+                return true;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+        } finally {
+            em.close();
+        }
+        
+    }
 
     //TODO: razmisliti da u ovakvim situacijama bacimo izuzetak
     //npr: InsuficientPrivilegesException, UserNotMemberOfProjectException
@@ -406,7 +513,7 @@ public class JpaTaskHandler implements TaskHandler {
                     )) {
                         nwot = new WorksOnTask(
                                 new WorksOnTaskPK(task.getId(), username, task.getProjectList().get(0).getId()),
-                                Privileges.MEMBER.ordinal(), false);
+                                Privileges.MEMBER.ordinal(), false, false);
                     } else {
                         throw new Exception("User is not member of project.");
                     }
@@ -420,9 +527,17 @@ public class JpaTaskHandler implements TaskHandler {
                             if (isMember(parent, user)) {
 
                                 int projectId = parent.getWorksOnTaskList().get(0).getWorksOnTaskPK().getIDProject();
-                                nwot = new WorksOnTask(
+                                
+                                nwot = getWorksOnTask(task, user);
+                                
+                                if(nwot != null){
+                                    nwot.setRemoved(false);
+                                }else{
+                                        nwot = new WorksOnTask(
                                         new WorksOnTaskPK(task.getId(), user.getUsername(), projectId),
-                                        Privileges.MEMBER.ordinal(), false);
+                                        Privileges.MEMBER.ordinal(), false, false);
+                                }
+                                
                             } else {
                                 throw new Exception("User is not member of parent task.");
                             }
@@ -587,18 +702,24 @@ public class JpaTaskHandler implements TaskHandler {
     @Override
     public User getChef(Task task) {
 
-        assert (task.getWorksOnTaskList() != null);
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+            
+            if(task.getId() == null || (task = em.find(Task.class, task.getId())) == null){
+                return null;
+            }
 
-        for (WorksOnTask wot : task.getWorksOnTaskList()) {
-            if (wot.getPrivileges() == Privileges.CHEF.ordinal()) {
-                EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
-                EntityManager em = emf.createEntityManager();
-                try {
+            for (WorksOnTask wot : task.getWorksOnTaskList()) {
+                if (wot.getPrivileges() == Privileges.CHEF.ordinal()) {
+
                     return em.find(User.class, wot.getWorksOnTaskPK().getUsername());
-                } finally {
-                    em.close();
+
                 }
             }
+              
+        } finally {
+            em.close();
         }
         return null;
     }
@@ -606,7 +727,7 @@ public class JpaTaskHandler implements TaskHandler {
     @Override
     public boolean isMember(Task task, User user) {
 
-        for (WorksOnTask wot : task.getWorksOnTaskList()) {
+        for (WorksOnTask wot : task.getWorksOnTasksListNonRemoved()) {
             if (wot.getWorksOnTaskPK().getUsername().equals(user.getUsername())
                     && wot.getPrivileges() >= Privileges.MEMBER.ordinal()) {
                 return true;
@@ -794,7 +915,7 @@ public class JpaTaskHandler implements TaskHandler {
             try {
                 em.getTransaction().begin();
 
-                for (WorksOnTask wot : task.getWorksOnTaskList()) {
+                for (WorksOnTask wot : task.getWorksOnTasksListNonRemoved()) {
                     Task active = getActiveTask(wot.getWorksOnTaskPK().getUsername());
                     
                     //ako nema aktivnog
@@ -927,7 +1048,7 @@ public class JpaTaskHandler implements TaskHandler {
 
                     Task prnt = prnt1;
 
-                    new ArrayList<>(task.getWorksOnTaskList())
+                    new ArrayList<>(task.getWorksOnTasksListNonRemoved())
                             .stream()
                             .filter((wot) -> wot.getWorking())
                             .forEach((wot) -> {
@@ -1057,7 +1178,7 @@ public class JpaTaskHandler implements TaskHandler {
                     em.merge(wota);
                 }
                 WorksOnTask wot = getWorksOnTask(task, user);
-                if(wot == null){
+                if(wot == null || wot.getRemoved()){
                     throw new UserNotTaskMemberException();
                 }
                 wot.setWorking(true);
@@ -1071,6 +1192,60 @@ public class JpaTaskHandler implements TaskHandler {
                     active = em.getReference(Task.class, active.getId());
                     em.refresh(active);
                 }
+            } catch (InsuficientPrivilegesException ipe) {
+                throw   ipe;
+            }catch(UserNotTaskMemberException uex){
+                throw uex;
+            } catch (Exception ex) {
+                if (em.getTransaction().isActive()) {
+                    em.getTransaction().rollback();
+                }
+                ex.printStackTrace();
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+
+        } finally {
+            em.close();
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean deactivateUserFromTask(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException, UserNotTaskMemberException {
+              EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
+                throw new EntityDoesNotExistException("Parent task does not exist.");
+            }
+
+            if (user.getUsername() == null || (user = em.find(User.class, user.getUsername())) == null) {
+                throw new EntityDoesNotExistException("User does not exists in database.");
+            }
+
+            if (task.getStartDate() == null || task.getEndDate() != null) {
+                return false;
+            }
+
+            try {
+                em.getTransaction().begin();
+
+                if (!checkTaskChefPrivileges(task)) {
+                    throw new InsuficientPrivilegesException("User does not have sufficient privileges over task :" + task.getName() + ".");
+                }
+
+                WorksOnTask wot = getWorksOnTask(task, user);
+                if(wot == null){
+                    throw new UserNotTaskMemberException();
+                }
+                wot.setWorking(false);
+
+                em.merge(wot);
+
+                em.getTransaction().commit();
+                em.refresh(task);
+                em.refresh(user);
+
             } catch (InsuficientPrivilegesException ipe) {
                 throw   ipe;
             }catch(UserNotTaskMemberException uex){
@@ -1110,7 +1285,7 @@ public class JpaTaskHandler implements TaskHandler {
 
         try {
 
-            TypedQuery<User> query = em.createQuery("SELECT wot.user FROM Task t, IN(t.worksOnTaskList) wot WHERE t.id = :id", User.class);
+            TypedQuery<User> query = em.createQuery("SELECT wot.user FROM Task t, IN(t.worksOnTaskList) wot WHERE t.id = :id AND wot.removed = false", User.class);
             
             query.setParameter("id", task.getId());
 
@@ -1142,14 +1317,14 @@ public class JpaTaskHandler implements TaskHandler {
                 q.setParameter("idproject", task.getProjectList().get(0).getId());
             }else{
                 /* trebam naci one koji su u roditelju a nisu u ovom zadatku */
-                q = em.createQuery("SELECT wop.user FROM Task p, IN(p.worksOnTaskList) wop WHERE p.id = :idparent ");
+                q = em.createQuery("SELECT wop.user FROM Task p, IN(p.worksOnTaskList) wop WHERE p.id = :idparent wop.removed = false");
                 q.setParameter("idparent", parent.getId());
             }
             
 
             List<User> allAbove = q.getResultList();
             
-            q = em.createQuery("SELECT wot.user FROM Task t, IN(t.worksOnTaskList) wot WHERE t.id = :idtask");
+            q = em.createQuery("SELECT wot.user FROM Task t, IN(t.worksOnTaskList) wot WHERE t.id = :idtask AND wot.removed = false");
             
             q.setParameter("idtask", task.getId());
             
@@ -1170,7 +1345,6 @@ public class JpaTaskHandler implements TaskHandler {
         return new ArrayList<User>();
     }
 
-    
     
     
 }

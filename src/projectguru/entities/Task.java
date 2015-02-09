@@ -10,6 +10,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -156,6 +157,13 @@ public class Task implements Serializable {
 
     public List<WorksOnTask> getWorksOnTaskList() {
         return worksOnTaskList;
+    }
+    
+        public List<WorksOnTask> getWorksOnTasksListNonRemoved() {
+        return new ArrayList<>(worksOnTaskList)
+                        .stream()
+                        .filter((wot) -> !wot.getRemoved())
+                        .collect(Collectors.toList());
     }
 
     public void setWorksOnTaskList(List<WorksOnTask> worksOnTaskList) {

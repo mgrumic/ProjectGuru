@@ -6,7 +6,9 @@
 package projectguru.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -58,6 +60,23 @@ public class User implements Serializable {
     private boolean activated;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     private List<WorksOnProject> worksOnProjectList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
+    private List<WorksOnTask> worksOnTaskList;
+
+    public List<WorksOnTask> getWorksOnTaskListNonRemoved() {
+        return new ArrayList<>(worksOnTaskList)
+                        .stream()
+                        .filter((wot) -> !wot.getRemoved())
+                        .collect(Collectors.toList());
+    }
+    
+    public List<WorksOnTask> getWorksOnTaskList(){
+        return worksOnTaskList;
+    }
+
+    public void setWorksOnTaskList(List<WorksOnTask> worksOnTaskList) {
+        this.worksOnTaskList = worksOnTaskList;
+    }
 
     public User() {
     }

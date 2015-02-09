@@ -6,7 +6,6 @@
 package projectguru.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -20,12 +19,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
  *
- * @author ZM
+ * @author marko
  */
 @Entity
 @Table(name = "works_on_task")
@@ -35,62 +33,52 @@ import javax.persistence.Table;
     @NamedQuery(name = "WorksOnTask.findByPrivileges", query = "SELECT w FROM WorksOnTask w WHERE w.privileges = :privileges"),
     @NamedQuery(name = "WorksOnTask.findByUsername", query = "SELECT w FROM WorksOnTask w WHERE w.worksOnTaskPK.username = :username"),
     @NamedQuery(name = "WorksOnTask.findByIDProject", query = "SELECT w FROM WorksOnTask w WHERE w.worksOnTaskPK.iDProject = :iDProject"),
-    @NamedQuery(name = "WorksOnTask.findByWorking", query = "SELECT w FROM WorksOnTask w WHERE w.working = :working")})
+    @NamedQuery(name = "WorksOnTask.findByWorking", query = "SELECT w FROM WorksOnTask w WHERE w.working = :working"),
+    @NamedQuery(name = "WorksOnTask.findByRemoved", query = "SELECT w FROM WorksOnTask w WHERE w.removed = :removed")})
 public class WorksOnTask implements Serializable {
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "worksOnTask", fetch = FetchType.LAZY)
-    private List<Timetable> timetableList;
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected WorksOnTaskPK worksOnTaskPK;
     @Basic(optional = false)
-    @Column(name = "Privileges")
+    @Column(nullable = false)
     private int privileges;
     @Basic(optional = false)
-    @Column(name = "Working")
+    @Column(nullable = false)
     private boolean working;
+    @Basic(optional = false)
+    @Column(nullable = false)
+    private boolean removed;
     @OneToMany(mappedBy = "worksOnTask", fetch = FetchType.LAZY)
     private List<Activity> activityList;
-    @JoinColumn(name = "IDTask", referencedColumnName = "ID", insertable = false, updatable = false)
+    @JoinColumn(name = "IDTask", referencedColumnName = "ID", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Task task;
-    
-     @JoinColumn(name = "Username", referencedColumnName = "Username", insertable = false, updatable = false)
+    @JoinColumn(name = "Username", referencedColumnName = "Username", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private User user;
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-    
     @JoinColumns({
-        @JoinColumn(name = "Username", referencedColumnName = "Username", insertable = false, updatable = false),
-        @JoinColumn(name = "IDProject", referencedColumnName = "IDProject", insertable = false, updatable = false)})
+        @JoinColumn(name = "Username", referencedColumnName = "Username", nullable = false, insertable = false, updatable = false),
+        @JoinColumn(name = "IDProject", referencedColumnName = "IDProject", nullable = false, insertable = false, updatable = false)})
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private WorksOnProject worksOnProject;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "worksOnTask", fetch = FetchType.LAZY)
+    private List<Timetable> timetableList;
 
     public WorksOnTask() {
-        //activityList = new ArrayList<>();
-        //timetableList = new ArrayList<>();
     }
 
     public WorksOnTask(WorksOnTaskPK worksOnTaskPK) {
-        this();
         this.worksOnTaskPK = worksOnTaskPK;
     }
 
-    public WorksOnTask(WorksOnTaskPK worksOnTaskPK, int privileges, boolean working) {
-        this();
+    public WorksOnTask(WorksOnTaskPK worksOnTaskPK, int privileges, boolean working, boolean removed) {
         this.worksOnTaskPK = worksOnTaskPK;
         this.privileges = privileges;
         this.working = working;
+        this.removed = removed;
     }
 
     public WorksOnTask(int iDTask, String username, int iDProject) {
-        this();
         this.worksOnTaskPK = new WorksOnTaskPK(iDTask, username, iDProject);
     }
 
@@ -102,6 +90,14 @@ public class WorksOnTask implements Serializable {
         this.worksOnTaskPK = worksOnTaskPK;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
     public int getPrivileges() {
         return privileges;
     }
@@ -118,8 +114,16 @@ public class WorksOnTask implements Serializable {
         this.working = working;
     }
 
+    public boolean getRemoved() {
+        return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+        this.removed = removed;
+    }
+
     public List<Activity> getActivityList() {
-        return (activityList);
+        return activityList;
     }
 
     public void setActivityList(List<Activity> activityList) {
@@ -142,6 +146,13 @@ public class WorksOnTask implements Serializable {
         this.worksOnProject = worksOnProject;
     }
 
+    public List<Timetable> getTimetableList() {
+        return timetableList;
+    }
+
+    public void setTimetableList(List<Timetable> timetableList) {
+        this.timetableList = timetableList;
+    }
 
     @Override
     public int hashCode() {
@@ -166,14 +177,6 @@ public class WorksOnTask implements Serializable {
     @Override
     public String toString() {
         return "projectguru.entities.WorksOnTask[ worksOnTaskPK=" + worksOnTaskPK + " ]";
-    }
-
-    public List<Timetable> getTimetableList() {
-        return (timetableList);
-    }
-
-    public void setTimetableList(List<Timetable> timetableList) {
-        this.timetableList = timetableList;
     }
     
 }

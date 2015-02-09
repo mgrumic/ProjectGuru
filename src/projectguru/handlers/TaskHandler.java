@@ -51,7 +51,21 @@ public interface TaskHandler {
     public boolean deleteSubtask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
     
     public boolean setChef(Task task, User user) throws EntityDoesNotExistException, StoringException;
+    public boolean removeChef(Task task) throws EntityDoesNotExistException, StoringException;
     public User getChef(Task task);
+    
+    /**
+     * Removes user from task, by setting removed = true to corresponding WorksOnTask.
+     * It does so to all sub tasks of this task.
+     * @param task
+     * @param user
+     * @return mostly true
+     * @throws StoringException
+     * @throws InsuficientPrivilegesException
+     * @throws EntityDoesNotExistException 
+     */
+    public boolean removeMember(Task task, User user) throws StoringException, InsuficientPrivilegesException, EntityDoesNotExistException;
+    
     public boolean addMember(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException;
     
     public boolean addActivity(Task task, Activity activity) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException;
@@ -122,6 +136,9 @@ public interface TaskHandler {
     
     public boolean setActiveTask(Task task) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException, UserNotTaskMemberException;
     public boolean setActiveTask(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException, UserNotTaskMemberException;
+    
+    public boolean deactivateUserFromTask(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException, UserNotTaskMemberException;
+    
     
     /**
      * Starts new working session (creates new start working time - end working time pair),
