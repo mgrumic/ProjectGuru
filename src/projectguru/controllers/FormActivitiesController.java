@@ -37,6 +37,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.FormatStringConverter;
@@ -212,12 +213,11 @@ public class FormActivitiesController implements Initializable {
             
         
         } catch (InsuficientPrivilegesException ex) {
-            Logger.getLogger(FormActivitiesController.class.getName()).log(Level.SEVERE, null, ex);
-            FormLoader.showErrorDialog("Грешка", "Чини се да овај задатак више не постоји у бази.");
+            FormLoader.showErrorDialog("Грешка", "Немате довољно привилегија или нисте члан задатка");
+            ((Stage)btnNewActivity.getScene().getWindow()).close();
         } catch (StoringException ex) {
-            Logger.getLogger(FormActivitiesController.class.getName()).log(Level.SEVERE, null, ex);
             FormLoader.showErrorDialog("Грешка", "Десила се грешка приликом приступа бази. За више информација погледајте лог датотеку.");
-        
+            ((Stage)btnNewActivity.getScene().getWindow()).close();
         }
         
         

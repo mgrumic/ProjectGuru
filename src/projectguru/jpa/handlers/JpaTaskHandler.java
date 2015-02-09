@@ -100,7 +100,7 @@ public class JpaTaskHandler implements TaskHandler {
         // WorksOnTaskList je generisana i popunice se podacima kad prvi put zatrazio nesto od nje.
         for (WorksOnTask wot : task.getWorksOnTaskList()) {
             if (wot.getWorksOnTaskPK().getUsername().equals(loggedUser.getUser().getUsername())
-                    && wot.getPrivileges() >= Privileges.MEMBER.ordinal()) {
+                    && wot.getPrivileges() >= Privileges.INSIGHT.ordinal()) {
                 return true;
             }
         }

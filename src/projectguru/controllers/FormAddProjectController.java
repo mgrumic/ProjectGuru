@@ -91,7 +91,6 @@ public class FormAddProjectController implements Initializable {
 
     private ObservableList<UserWrapper> allMembers = null;
     private ObservableList<UserWrapper> selectedMembers = null;
-    private TeamOfficeController controller;
     private Project project;
 
     private boolean edit = false;
@@ -124,7 +123,7 @@ public class FormAddProjectController implements Initializable {
     private final EventHandler<MouseEvent> eventOnClickHelp = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent t) {
-            FormLoader.showInformationDialog("Напомена", "Како бисе успјешно "
+            FormLoader.showInformationDialog("Напомена", "Како би се успјешно "
                     + "креирао пројекат морате унијети сва поља. "
                     + "Додавање чланова је опционо.");
         }
@@ -245,8 +244,6 @@ public class FormAddProjectController implements Initializable {
                     user.getProjectHandler().setRootTask(newProject, root);
                     user.getTaskHandler().setChef(root, user.getUser());
                 }
-                
-                controller.loadProjects();
                 Stage stage = (Stage) btnFinish.getScene().getWindow();
                 stage.close();
             } catch (InsuficientPrivilegesException ex) {
@@ -293,10 +290,6 @@ public class FormAddProjectController implements Initializable {
         if (selectedMembers == null) {
             selectedMembers = FXCollections.observableArrayList();
         }
-    }
-
-    public void setController(TeamOfficeController controller) {
-        this.controller = controller;
     }
 
     public void setProject(Project project) {

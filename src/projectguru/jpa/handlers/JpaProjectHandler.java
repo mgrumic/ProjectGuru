@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import projectguru.AccessManager;
@@ -91,7 +92,7 @@ public class JpaProjectHandler implements ProjectHandler {
         try {
 
             TypedQuery<User> query = em.createQuery("SELECT wop.user FROM Project p, IN(p.worksOnProjectList) wop WHERE p.id = :id", User.class);
-            
+
             query.setParameter("id", project.getId());
 
             return query.getResultList();
@@ -103,7 +104,7 @@ public class JpaProjectHandler implements ProjectHandler {
         }
         return new ArrayList<User>();
     }
-    
+
     @Override
     public List<User> getAllChefs(Project project) {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
@@ -113,12 +114,11 @@ public class JpaProjectHandler implements ProjectHandler {
 
             TypedQuery<User> query = em.createQuery("SELECT wop.user FROM Project p, IN(p.worksOnProjectList) wop WHERE p.id = :id "
                     + "and wop.privileges = :privileges", User.class);
-            
+
             query.setParameter("id", project.getId());
             query.setParameter("privileges", Privileges.CHEF.ordinal());
-            
+
            // System.out.println(Privileges.CHEF.ordinal());
-            
             return query.getResultList();
 
         } catch (Exception ex) {
@@ -128,7 +128,6 @@ public class JpaProjectHandler implements ProjectHandler {
         }
         return new ArrayList<User>();
     }
-    
 
     @Override
     public boolean createProject(Project project) throws InsuficientPrivilegesException, StoringException {
@@ -245,11 +244,10 @@ public class JpaProjectHandler implements ProjectHandler {
                 em.persist(task);
                 em.flush();
                 project.setIDRootTask(task);
-                
+
                 //treba dodati clanove projekta u root zadatak
-                
-                for(WorksOnProject wop : project.getWorksOnProjectList()){
-                    
+                for (WorksOnProject wop : project.getWorksOnProjectList()) {
+
                     WorksOnTask wot = new WorksOnTask();
                     wot.setWorksOnTaskPK(new WorksOnTaskPK());
                     wot.getWorksOnTaskPK().setIDTask(task.getId());
@@ -257,7 +255,7 @@ public class JpaProjectHandler implements ProjectHandler {
                     wot.getWorksOnTaskPK().setIDProject(project.getId());
                     wot.setPrivileges(wop.getPrivileges());
                     wot.setWorking(false);
-                    
+
                     task.getWorksOnTaskList().add(wot);
                 }
             } else {
@@ -285,15 +283,15 @@ public class JpaProjectHandler implements ProjectHandler {
         EntityManager em = emf.createEntityManager();
 
         try {
-            
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-            
-            if(user.getUsername()== null || (user = em.find(user.getClass(), user.getUsername())) == null){
+
+            if (user.getUsername() == null || (user = em.find(user.getClass(), user.getUsername())) == null) {
                 throw new EntityDoesNotExistException("User does not exist.");
             }
-            
+
             em.getTransaction().begin();
 
             TypedQuery<WorksOnProject> query = em.createQuery("SELECT wop FROM WorksOnProject wop WHERE "
@@ -339,11 +337,11 @@ public class JpaProjectHandler implements ProjectHandler {
         EntityManager em = emf.createEntityManager();
 
         try {
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-            
-            if(user.getUsername()== null || (user = em.find(user.getClass(), user.getUsername())) == null){
+
+            if (user.getUsername() == null || (user = em.find(user.getClass(), user.getUsername())) == null) {
                 throw new EntityDoesNotExistException("User does not exist.");
             }
 
@@ -404,10 +402,10 @@ public class JpaProjectHandler implements ProjectHandler {
 
             em.getTransaction().begin();
 
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-       
+
             document.setIDProject(project);
 
             em.persist(document);
@@ -434,10 +432,9 @@ public class JpaProjectHandler implements ProjectHandler {
         EntityManager em = emf.createEntityManager();
 
         try {
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-
 
             return project.getDocumentList();
             //Moze i ovako (za slucaj da ovo gore ne radi kako treba):
@@ -459,7 +456,7 @@ public class JpaProjectHandler implements ProjectHandler {
 
         try {
 
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
 
@@ -486,10 +483,10 @@ public class JpaProjectHandler implements ProjectHandler {
 
         try {
 
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-            
+
             inc.setIDProject(project);
 
             em.getTransaction().begin();
@@ -515,11 +512,11 @@ public class JpaProjectHandler implements ProjectHandler {
         EntityManager em = emf.createEntityManager();
         try {
 
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-            
-            if(user.getUsername()== null || (user = em.find(user.getClass(), user.getUsername())) == null){
+
+            if (user.getUsername() == null || (user = em.find(user.getClass(), user.getUsername())) == null) {
                 throw new EntityDoesNotExistException("User does not exist.");
             }
 
@@ -531,7 +528,7 @@ public class JpaProjectHandler implements ProjectHandler {
             }
         } catch (EntityDoesNotExistException ex) {
             Logger.getLogger(JpaProjectHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }finally{
+        } finally {
             em.close();
         }
         return false;
@@ -544,12 +541,12 @@ public class JpaProjectHandler implements ProjectHandler {
         EntityManager em = emf.createEntityManager();
 
         try {
-            
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-            
-            if(user.getUsername()== null || (user = em.find(user.getClass(), user.getUsername())) == null){
+
+            if (user.getUsername() == null || (user = em.find(user.getClass(), user.getUsername())) == null) {
                 throw new EntityDoesNotExistException("User does not exist.");
             }
 
@@ -578,17 +575,17 @@ public class JpaProjectHandler implements ProjectHandler {
 
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
-        
+
         try {
-            
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-            
-            if(user.getUsername()== null || (user = em.find(user.getClass(), user.getUsername())) == null){
+
+            if (user.getUsername() == null || (user = em.find(user.getClass(), user.getUsername())) == null) {
                 throw new EntityDoesNotExistException("User does not exist.");
             }
-            
+
             for (WorksOnProject wop : project.getWorksOnProjectList()) {
                 if (wop.getWorksOnProjectPK().getUsername().equals(user.getUsername())
                         && wop.getPrivileges() >= Privileges.MEMBER.ordinal()) {
@@ -598,7 +595,7 @@ public class JpaProjectHandler implements ProjectHandler {
             return false;
         } catch (EntityDoesNotExistException ex) {
             Logger.getLogger(JpaProjectHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }finally{
+        } finally {
             em.close();
         }
         return false;
@@ -607,16 +604,16 @@ public class JpaProjectHandler implements ProjectHandler {
     public boolean isInsight(Project project, User user) {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
-        
+
         try {
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-            
-            if(user.getUsername()== null || (user = em.find(user.getClass(), user.getUsername())) == null){
+
+            if (user.getUsername() == null || (user = em.find(user.getClass(), user.getUsername())) == null) {
                 throw new EntityDoesNotExistException("User does not exist.");
             }
-            
+
             for (WorksOnProject wop : project.getWorksOnProjectList()) {
                 if (wop.getWorksOnProjectPK().getUsername().equals(user.getUsername())
                         && wop.getPrivileges() >= Privileges.INSIGHT.ordinal()) {
@@ -638,8 +635,12 @@ public class JpaProjectHandler implements ProjectHandler {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
 
-        if (project.getId() == null || (project = em.find(Project.class, project.getId())) == null) {
-            throw new EntityDoesNotExistException("Failed to load user !");
+        if (project.getId() == null) {
+            throw new EntityDoesNotExistException("Failed to load project !");
+        }
+        project = em.find(Project.class, project.getId());
+        if(project == null){
+            throw new EntityDoesNotExistException("Failed to load project !");
         }
         em.close();
         return project;
@@ -649,14 +650,12 @@ public class JpaProjectHandler implements ProjectHandler {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
 
-        if (user.getUsername() == null || (user = em.find(User.class, user.getUsername())) == null) {
+        if(user.getUsername() == null){
             throw new EntityDoesNotExistException("Failed to load user !");
         }
-
-        em.close();
-        return user;
+        TypedQuery<User> query = em.createNamedQuery("User.findByUsername", User.class);
+        return query.setParameter("username", user.getUsername()).getSingleResult();
+        
     }
-    
-    
 
 }

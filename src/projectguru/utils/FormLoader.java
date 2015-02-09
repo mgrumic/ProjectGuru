@@ -52,14 +52,13 @@ import projectguru.handlers.exceptions.EntityDoesNotExistException;
  */
 public class FormLoader {
 
-    public static Project loadFormAddProject(LoggedUser user, Project project, TeamOfficeController controller) throws IOException {
+    public static Project loadFormAddProject(LoggedUser user, Project project) throws IOException {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddProject.fxml"));
 
         Parent root = loader.load();
 
         FormAddProjectController fapc = loader.getController();
         fapc.setUser(user);
-        fapc.setController(controller);
         fapc.setProject(project);
 
         Scene scene = new Scene(root);
@@ -228,8 +227,6 @@ public class FormLoader {
         stage.setScene(scene);
         stage.setTitle("Активности за задатак " + task.getName());
         //stage.setResizable(false);
-
-        controller.loadActivities();
 
         stage.show();
     }

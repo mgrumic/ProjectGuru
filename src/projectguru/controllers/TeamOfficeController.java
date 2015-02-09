@@ -228,18 +228,8 @@ public class TeamOfficeController {
     @FXML
     void btnNewProjectPressed(ActionEvent event) {
         try {
-            Project newProject = FormLoader.loadFormAddProject(user, null, this);
-            try {
-                newProject = user.getProjectHandler().getUpdatedProject(newProject);
-                
-            } catch (EntityDoesNotExistException ex) {
-                Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-            
-            
-            
-            
+            FormLoader.loadFormAddProject(user, null);
+            loadProjects();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -251,7 +241,8 @@ public class TeamOfficeController {
         if (projectWrapper != null) {
             Project project = projectWrapper.getProject();
             try {
-                FormLoader.loadFormAddProject(user, project, this);
+                FormLoader.loadFormAddProject(user, project);
+                loadProjects();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -360,7 +351,6 @@ public class TeamOfficeController {
             System.exit(0);
         }
         setGUIForUser();
-        System.out.println("User aktivan: " + user.getUser().getActivated());
     }
 
     @FXML
@@ -703,6 +693,7 @@ public class TeamOfficeController {
                     lblEndDate.setText(end.toString());
                     lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
                     lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
+                    lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
                     try {
                         lblNumActivities.setText((root != null) ? (user.getActivityHandler().findActivitiesForTask(root.getValue().getTask(), true, false)).size() + "" : "0");
                     } catch (InsuficientPrivilegesException ex) {
