@@ -149,9 +149,24 @@ public interface TaskHandler {
      */
     public Task getUpdatedTask(Task task);
     
+    /**
+     * 
+     * @param task
+     * @return Members of task
+     */
+    public List<User> getAllMembers(Task task);
+    
+    /**
+     * Searches for users which can be added as members to task.
+     * User can be added to task if it's not already member of task and is member of parent task,
+     * or project if it's root task.
+     * @param task Task to which you want to add members
+     * @return list of user addable as members to this task
+     */
+    public List<User> getAddableMembers(Task task);
     
     public enum OnBusyWorkers {
         THROW_EXCEPTION, TRANSFER_FROM_PARENT_TASK, SIMPLE
     }
-    public List<User> getAllMembers(Task task);
+    
 }

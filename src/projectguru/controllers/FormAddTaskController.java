@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -35,6 +36,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import projectguru.controllers.TeamOfficeController.UserWrapper;
+import projectguru.controllers.util.SerbianLocalDateStringConverter;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
 import projectguru.entities.User;
@@ -176,20 +178,34 @@ public class FormAddTaskController implements Initializable {
                 if (edit) {
                     result = taskJpa.editSubtask(tmpTask);
                 } else {
-                    if (task == null) {
+                    /* ovo ne bi trebalo biti jer bi dodavanje projekta trebalo odmah dodati i root task */
+                    if (parentTask == null) {
                         project.setIDRootTask(tmpTask);
                         user.getProjectHandler().setRootTask(project, tmpTask);
+                        user.getTaskHandler().setChef(tmpTask, user.getUser());
                         result = true;
                     } else {
-                        result = taskJpa.addSubtask(task, tmpTask);
+                        result = taskJpa.addSubtask(parentTask, tmpTask);
                     }
                 }
-                if (selectedMembers != null && result == true) {
+                /* u slucaju da dodajemo, ne daj boze, root task, ovo ne smije proci */
+                if (selectedMembers != null && result == true && (parentTask != null || edit)){
                     Iterator<UserWrapper> itr = selectedMembers.iterator();
                     while (itr.hasNext()) {
                         User user = itr.next().getUser();
-                        if (!tmpTask.getWorksOnTaskList().contains(user)) {
+                        if(!new ArrayList<>(tmpTask.getWorksOnTaskList())
+                                .stream()
+                                .anyMatch(
+                                        (wot) -> wot
+                                                .getWorksOnTaskPK()
+                                                .getUsername()
+                                                .equals(user.getUsername()))
+                                ){
+                            
+                            
                             taskJpa.addMember(tmpTask, user);
+                            
+                            
                         }
                     }
                 }
@@ -213,6 +229,17 @@ public class FormAddTaskController implements Initializable {
     private Button btnHelp;
     @FXML
     private Button btnBack;
+    
+    
+    private Task parentTask;
+
+    public Task getParentTask() {
+        return parentTask;
+    }
+
+    public void setParentTask(Task parentTask) {
+        this.parentTask = parentTask;
+    }
 
     public void initialize(URL url, ResourceBundle rb
     ) {
@@ -223,14 +250,14 @@ public class FormAddTaskController implements Initializable {
         btnHelp.setOnMouseClicked(eventOnClickHelp);
 
         start.setValue(Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+        start.setConverter(new SerbianLocalDateStringConverter());
+        ends.setConverter(new SerbianLocalDateStringConverter());
+        
 
     }
 
     public void setUser(LoggedUser user) {
         this.user = user;
-        if (task != null || user != null) {
-            defineObservableList();
-        }
     }
 
     public void setProject(Project project) {
@@ -239,18 +266,47 @@ public class FormAddTaskController implements Initializable {
 
     public void setTask(Task task) {
         this.task = task;
-        if (task != null || user != null) {
-            defineObservableList();
-        }
     }
 
     private void defineObservableList() {
-        allMembers = FXCollections.observableArrayList(
-                user.getTaskHandler().getAllMembers(task)
+
+        if(edit){
+            selectedMembers = FXCollections.observableArrayList(
+                    user.getTaskHandler().getAllMembers(task)
+                    .stream()
+                    .map((u)-> new UserWrapper(u))
+                    .collect(Collectors.toList())
+            );
+            
+            allMembers = FXCollections.observableArrayList(
+                user.getTaskHandler().getAddableMembers(task)
                 .stream()
-                .map((member) -> new UserWrapper(member))
-                .collect(Collectors.toList()));
-        selectedMembers = FXCollections.observableArrayList();
+                .map((u)-> new UserWrapper(u))
+                .collect(Collectors.toList())
+            );
+            
+        }else{
+            selectedMembers = FXCollections.observableArrayList(new ArrayList());
+            
+            if(parentTask == null){
+                /* root zadatak */
+                allMembers = FXCollections.observableArrayList(
+                        user.getProjectHandler().getAllMembers(project)
+                        .stream()
+                        .map((u)-> new UserWrapper(u))
+                        .collect(Collectors.toList())
+                );
+            }else{
+                /* novi zadatak, kao podzadatak parentTaska */
+                allMembers = FXCollections.observableArrayList(
+                        new ArrayList<>(user.getTaskHandler().getAllMembers(parentTask))
+                        .stream()
+                        .map((u)-> new UserWrapper(u))
+                        .collect(Collectors.toList())
+                );
+            }
+        }
+
     }
 
     public void setController(TeamOfficeController controller) {
@@ -260,34 +316,27 @@ public class FormAddTaskController implements Initializable {
 
     public void setEdit(boolean edit) {
         this.edit = edit;
+    }
+
+    public void load(){
+
         if (edit) {
             name.setText(task.getName());
             description.setText(task.getDescription());
-            start.setValue(Instant.ofEpochMilli(task.getStartDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            
+            if(task.getStartDate() != null){
+                start.setValue(Instant.ofEpochMilli(task.getStartDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+            
             dedline.setValue(Instant.ofEpochMilli(task.getDeadline().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+            
             if (task.getEndDate() != null) {
-                ends.setValue(Instant.ofEpochMilli(task.getEndDate().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
+                ends.setValue(task.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
 
-            menHours.setText(Integer.toString(task.getAssumedManHours()));
-//            allMembers = FXCollections.observableArrayList(
-//                    user.getTaskHandler().getAllMembers(task.getClosureTasksParents().get(0).getParent())
-//                    .stream()
-//                    .map((member) -> new TeamOfficeController.UserWrapper(member))
-//                    .collect(Collectors.toList())
-//            );
-//            user.getTaskHandler().getAllMembers(task.getClosureTasksParents().get(0).getParent());
-//
-//            allMembers.removeAll(FXCollections.observableArrayList(
-//                    user.getTaskHandler().getAllMembers(task)
-//                    .stream()
-//                    .map((member) -> new TeamOfficeController.UserWrapper(member))
-//                    .collect(Collectors.toList()))
-//            );
-
-//            selectedMembers = FXCollections.observableArrayList();
+            menHours.setText(Integer.toString(task.getAssumedManHours()));;
         }
-
+        
+        defineObservableList();
     }
-
 }

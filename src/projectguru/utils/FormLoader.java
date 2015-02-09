@@ -52,7 +52,7 @@ import projectguru.handlers.exceptions.EntityDoesNotExistException;
  */
 public class FormLoader {
 
-    public static void loadFormAddProject(LoggedUser user, Project project, TeamOfficeController controller) throws IOException {
+    public static Project loadFormAddProject(LoggedUser user, Project project, TeamOfficeController controller) throws IOException {
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddProject.fxml"));
 
         Parent root = loader.load();
@@ -72,7 +72,9 @@ public class FormLoader {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
 
-        stage.show();
+        stage.showAndWait();
+        
+        return fapc.getProject();
     }
 
     public static void loadFormAddMembersOnProjects(LoggedUser user, Project project, TeamOfficeController controller) throws IOException {
@@ -120,7 +122,6 @@ public class FormLoader {
      * @throws IOException
      */
     public static void loadFormAddTask(Project project, Task task, LoggedUser user, TeamOfficeController controller, boolean edit) throws IOException {
-
         FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddTask.fxml"));
 
         Parent root = loader.load();
@@ -128,12 +129,17 @@ public class FormLoader {
         FormAddTaskController fatc = loader.getController();
         fatc.setUser(user);
         fatc.setProject(project);
-        if (task == null) {
-            task = project.getIDRootTask();
-        }
-        fatc.setTask(task);
+        
         fatc.setController(controller);
         fatc.setEdit(edit);
+        
+        if(edit){
+            fatc.setTask(task);
+        }else{
+            fatc.setParentTask(task);
+        }
+        
+        fatc.load();
 
         Scene scene = new Scene(root);
         //scene.getStylesheets().add(FormLoader.class.getResource("/projectguru/css/formaddtask.css").toExternalForm());
