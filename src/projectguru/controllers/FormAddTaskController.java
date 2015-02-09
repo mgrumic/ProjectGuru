@@ -189,11 +189,11 @@ public class FormAddTaskController implements Initializable {
                     }
                 }
                 /* u slucaju da dodajemo, ne daj boze, root task, ovo ne smije proci */
-                if (selectedMembers != null && result == true && task != null) {
+                if (selectedMembers != null && result == true && (parentTask != null || edit)){
                     Iterator<UserWrapper> itr = selectedMembers.iterator();
                     while (itr.hasNext()) {
                         User user = itr.next().getUser();
-                        if(!tmpTask.getWorksOnTaskList()
+                        if(!new ArrayList<>(tmpTask.getWorksOnTaskList())
                                 .stream()
                                 .anyMatch(
                                         (wot) -> wot
@@ -299,7 +299,7 @@ public class FormAddTaskController implements Initializable {
             }else{
                 /* novi zadatak, kao podzadatak parentTaska */
                 allMembers = FXCollections.observableArrayList(
-                        user.getTaskHandler().getAllMembers(parentTask)
+                        new ArrayList<>(user.getTaskHandler().getAllMembers(parentTask))
                         .stream()
                         .map((u)-> new UserWrapper(u))
                         .collect(Collectors.toList())

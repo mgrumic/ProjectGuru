@@ -1138,17 +1138,29 @@ public class JpaTaskHandler implements TaskHandler {
             
             if(parent == null){
                 /* root task, trebam naci one koji su u  projektu, a nisu u zadataku*/
-                q = em.createQuery("SELECT wop.user FROM Task t, Project pr, IN(pr.worksOnProjectList) wop WHERE t.id = :idtask AND pr.id = :idproject AND NOT EXISTS ( SELECT wot FROM IN(t.worksOnTaskList) wot WHERE wot.worksOnTaskPK.username = wop.worksOnProjectPK.username )");
+                q = em.createQuery("SELECT wop.user FROM Project pr, IN(pr.worksOnProjectList) wop WHERE pr.id = :idproject ");
                 q.setParameter("idproject", task.getProjectList().get(0).getId());
             }else{
                 /* trebam naci one koji su u roditelju a nisu u ovom zadatku */
-                q = em.createQuery("SELECT wop.user FROM Task t, Task p, IN(p.worksOnTaskList) wop WHERE t.id = :idtask AND p.id = :idparent AND wop NOT IN ( SELECT wot FROM WorksOnTask wot WHERE wot.worksOnTaskPK.iDTask = :idtask ) ");
+                q = em.createQuery("SELECT wop.user FROM Task p, IN(p.worksOnTaskList) wop WHERE p.id = :idparent ");
                 q.setParameter("idparent", parent.getId());
             }
             
-            q.setParameter("idtask", task.getId());
 
-            return q.getResultList();
+            List<User> allAbove = q.getResultList();
+            
+            q = em.createQuery("SELECT wot.user FROM Task t, IN(t.worksOnTaskList) wot WHERE t.id = :idtask");
+            
+            q.setParameter("idtask", task.getId());
+            
+            List<User> members = q.getResultList();
+            
+            List<User> resultList = allAbove
+                    .stream()
+                    .filter((ua) -> !members.stream().anyMatch((um) -> um.equals(ua)))
+                    .collect(Collectors.toList());
+            
+            return resultList;        
 
         } catch (Exception ex) {
 
