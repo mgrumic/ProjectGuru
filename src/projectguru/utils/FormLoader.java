@@ -252,7 +252,7 @@ public class FormLoader {
         Parent root = loader.load();
         FormFinancesOverviewController controller = loader.getController();
         controller.setProjectAndUser(project, user);
-
+        controller.load();
         Scene scene = new Scene(root);
         Stage stage = new Stage();
         stage.setScene(scene);

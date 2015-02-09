@@ -8,6 +8,9 @@ package projectguru.controllers;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -156,19 +159,24 @@ public class TeamOfficeController {
         if (projectItem != null) {
             TreeItem<TaskNode> taskNode = null;
             if (treeTasks.getRoot() == null) {
-                try {
-                    FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this, false);
-
-                } catch (IOException ex) {
-                    Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                if (user.getProjectHandler().checkProjectChefPrivileges(projectItem.getProject())) {
+                    try {
+                        FormLoader.loadFormAddTask(projectItem.getProject(), null, user, this, false);
+                    } catch (IOException ex) {
+                        Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    FormLoader.showInformationDialog("Обавјештење", "Немате довољно привилегија");
                 }
             } else if ((taskNode = treeTasks.getSelectionModel().getSelectedItem()) != null) {
-                try {
-
-                    FormLoader.loadFormAddTask(projectItem.getProject(), taskNode.getValue().getTask(), user, this, false);
-
-                } catch (IOException ex) {
-                    Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                if (user.getTaskHandler().checkTaskChefPrivileges(taskNode.getValue().getTask())) {
+                    try {
+                        FormLoader.loadFormAddTask(projectItem.getProject(), taskNode.getValue().getTask(), user, this, false);
+                    } catch (IOException ex) {
+                        Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    FormLoader.showInformationDialog("Обавјештење", "Немате довољно привилегија");
                 }
             } else {
 
@@ -334,8 +342,14 @@ public class TeamOfficeController {
     private static final ImageView rootImage = new ImageView(new Image(TeamOfficeController.class
             .getResourceAsStream("/projectguru/images/root.png")));
 
-    public static void updateLoggedUser() throws EntityDoesNotExistException {
+    public void updateLoggedUser() throws EntityDoesNotExistException {
         user.setUser(user.getProjectHandler().getUpdatedUser(user.getUser()));
+        if (user.getUser().getActivated() == false) {
+            FormLoader.showExtendedInformationDialog("Обавјештење", null, "Ваш налог је деактивиран.\nКонтактирајте администратора за више информација.");
+            System.exit(0);
+        }
+        setGUIForUser();
+        System.out.println("User aktivan: " + user.getUser().getActivated());
     }
 
     @FXML
@@ -531,16 +545,35 @@ public class TeamOfficeController {
                         }));
     }
 
-    public void setUser(LoggedUser user) {
+    public void setGUIForUser() {
+        int privileges = user.getUser().getAppPrivileges();
+        if (privileges >= Privileges.CHEF.ordinal()) {
+            btnNewProject.setPrefSize(104, 24);
+            btnAddMember.setPrefSize(104, 24);
+            btnNewProject.setVisible(true);
+            btnAddMember.setVisible(true);
+        } else {
+            btnNewProject.setPrefSize(0, 24);
+            btnAddMember.setPrefSize(0, 24);
+            btnNewProject.setVisible(false);
+            btnAddMember.setVisible(false);
 
-        this.user = user;
-
-        if (user.getUser().getAppPrivileges() != Privileges.ADMIN.ordinal()) {
-            mItemKorisnickiNalozi.setVisible(false);
         }
+        if (privileges != Privileges.ADMIN.ordinal()) {
+            mItemKorisnickiNalozi.setVisible(false);
+        } else {
+            mItemKorisnickiNalozi.setVisible(true);
+        }
+    }
+
+    public void setUser(LoggedUser user) {
+        this.user = user;
+    }
+
+    public void load() {
+        setGUIForUser();
         loadProjects();
         listProjects.getSelectionModel().select(0);
-
     }
 
     public void loadProjects() {
@@ -634,8 +667,8 @@ public class TeamOfficeController {
                     PieChart.Data worked;
                     PieChart.Data left;
                     if (root != null) {
-                        lblProjectCompleted.setText(String.format("%.2f ", (root.getValue().getPartDone() * 100)) + "%");
-                        chartPie.setTitle(String.format("Укупно одрађено: %.2f ", (root.getValue().getPartDone() * 100)) + "%");
+                        lblProjectCompleted.setText(String.format("%5.2f ", (root.getValue().getPartDone() * 100)) + "%");
+                        chartPie.setTitle(String.format("Укупно одрађено: %5.2f ", (root.getValue().getPartDone() * 100)) + "%");
                         worked = new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100);
                         left = new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100));
                     } else {
@@ -648,21 +681,24 @@ public class TeamOfficeController {
                     pieChartData.add(left);
                     chartPie.setData(pieChartData);
 
-                    SimpleDateFormat formater = new SimpleDateFormat("YYYY-MM-DD");
+                    SimpleDateFormat formater = new SimpleDateFormat("dd.mm.yyyy");
                     Project project = projectWrapper.getProject();
+                    lblStatusLabel.setText("Тренутно изабрани пројекат: " + project.getName());
                     lblProjectName.setText(project.getName());
                     tAreaDescription.setText(project.getDescription());
-                    lblStartDate.setText(formater.format(project.getStartDate()));
-                    lblEndDate.setText(formater.format(project.getEndDate()));
+                    LocalDate start = project.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    lblStartDate.setText(start.toString());
+                    LocalDate end = project.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    lblEndDate.setText(end.toString());
                     lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
                     lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
                     lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
                     try {
                         lblNumActivities.setText((root != null) ? (user.getActivityHandler().findActivitiesForTask(root.getValue().getTask(), true, false)).size() + "" : "0");
                     } catch (InsuficientPrivilegesException ex) {
-                        FormLoader.showInformationDialog("Обавјештење", "Немате довољно привилегија да бисте видјели број активности.");
+                        lblNumActivities.setText("- ");
                     } catch (StoringException ex) {
-                        FormLoader.showErrorDialog("Грешка", "Грешка приликом добављања активности иѕ баѕе");
+                        lblNumActivities.setText("- ");
                     }
                     ObservableList<UserWrapper> userList = FXCollections.observableArrayList(
                             user.getProjectHandler().getAllChefs(project)
@@ -670,6 +706,11 @@ public class TeamOfficeController {
                             .map((member) -> new UserWrapper(member))
                             .collect(Collectors.toList()));
                     listChefs.setItems(userList);
+                    if (user.getProjectHandler().checkProjectChefPrivileges(project)) {
+                        btnEditProject.setVisible(true);
+                    } else {
+                        btnEditProject.setVisible(false);
+                    }
                 }
             }
         });
@@ -719,7 +760,7 @@ public class TeamOfficeController {
     public void startActiveTask() {
         activeTask = user.getTaskHandler().getActiveTask();
         if (activeTask == null) {
-            FormLoader.showExtendedInformationDialog("Обавјештење", " ","Тренутно немате активни задатак.\n"
+            FormLoader.showExtendedInformationDialog("Обавјештење", " ", "Тренутно немате активни задатак.\n"
                     + "Поновна провјера се врши за " + seconds / 60 + " мин.\n"
                     + "Уколико добијете задатак почеће вам се рачунати вријеме.\n"
                     + "За више информација кликните на дугме за активни задатак.\n");
@@ -728,15 +769,20 @@ public class TeamOfficeController {
             FormLoader.showExtendedInformationDialog("Обавјештење", " ", "Почео је ваш рад на активном задатку.\n"
                     + "За више информација кликните на дугме за активни задатак.\n");
             try {
-                    user.getTaskHandler().createNewTimetableEntry(new Date(), new Date());
-                } catch (StoringException ex) {
-                    FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа нове сатнице у базу.");
-                }
+                user.getTaskHandler().createNewTimetableEntry(new Date(), new Date());
+            } catch (StoringException ex) {
+                FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа нове сатнице у базу.");
+            }
         }
         activeTaskTimeline.playFromStart();
     }
 
     private void checkActiveTask() {
+        try {
+            updateLoggedUser();
+        } catch (EntityDoesNotExistException ex) {
+
+        }
         Task check = user.getTaskHandler().getActiveTask();
         if (check == null) {
             if (activeTask != null) {

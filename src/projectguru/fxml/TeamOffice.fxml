@@ -41,7 +41,7 @@
                                                    <top>
                                                       <HBox alignment="CENTER" prefHeight="35.0" prefWidth="227.0" spacing="5.0" BorderPane.alignment="CENTER">
                                                          <children>
-                                                            <TextField fx:id="tfSearchMembers" promptText="Претрага" HBox.hgrow="ALWAYS" />
+                                                            <TextField fx:id="tfSearchMembers" maxWidth="1.7976931348623157E308" minWidth="-Infinity" promptText="Претрага" HBox.hgrow="ALWAYS" />
                                                             <Button fx:id="btnAddMember" mnemonicParsing="false" onAction="#btnAddMemberPressed" prefHeight="25.0" prefWidth="104.0" text="Додај" HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
@@ -66,8 +66,8 @@
                                                    <top>
                                                       <HBox alignment="CENTER" prefHeight="34.0" prefWidth="227.0" spacing="5.0" BorderPane.alignment="CENTER">
                                                          <children>
-                                                            <TextField fx:id="tfSearchProjects" promptText="Претрага" HBox.hgrow="ALWAYS" />
-                                                            <Button fx:id="btnNewProject" mnemonicParsing="false" onAction="#btnNewProjectPressed" prefHeight="25.0" prefWidth="78.0" text="Нови " HBox.hgrow="ALWAYS" />
+                                                            <TextField fx:id="tfSearchProjects" maxWidth="1.7976931348623157E308" minWidth="-Infinity" promptText="Претрага" HBox.hgrow="ALWAYS" />
+                                                            <Button fx:id="btnNewProject" mnemonicParsing="false" onAction="#btnNewProjectPressed" prefHeight="25.0" prefWidth="104.0" text="Нови " HBox.hgrow="ALWAYS" />
                                                          </children>
                                                       </HBox>
                                                    </top>
@@ -255,7 +255,7 @@
          <bottom>
             <FlowPane prefHeight="25.0" prefWidth="805.0" BorderPane.alignment="CENTER">
                <children>
-                  <Label fx:id="lblStatusLabel" text="Status Label">
+                  <Label fx:id="lblStatusLabel">
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </padding>

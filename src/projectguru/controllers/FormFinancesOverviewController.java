@@ -88,9 +88,19 @@ public class FormFinancesOverviewController implements Initializable {
     public void setProjectAndUser(Project project, LoggedUser user) {
         this.project = project;
         this.user = user;
-        loadFinances();
     }
-    
+    public void load(){
+        if(user != null && project != null){
+            loadFinances();
+            if(user.getProjectHandler().checkProjectChefPrivileges(project)){
+                btnIncomes.setVisible(true);
+                btnExpenses.setVisible(true);
+            }else{
+                btnIncomes.setVisible(false);
+                btnExpenses.setVisible(false);
+            }
+        }
+    }
     public void loadFinances(){
 
         try {
