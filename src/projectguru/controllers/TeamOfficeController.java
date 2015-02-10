@@ -340,7 +340,7 @@ public class TeamOfficeController {
     private ObservableList<ProjectWrapper> projects;
     private ObservableList<UserWrapper> members;
     private ContextMenu rootContextMenu;
-
+    private ContextMenu projectListMenu;
     private long time = System.currentTimeMillis();
     private Timeline clockTimeline;
     private Timeline activeTaskTimeline;
@@ -384,6 +384,18 @@ public class TeamOfficeController {
         btnCurrentTask.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/active_task.png"))));
 
+        projectListMenu = new ContextMenu();
+        final MenuItem refreshProjectList = new MenuItem("Учитај све пројекте");
+        
+        refreshProjectList.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                loadProjects();
+            }
+        });
+        projectListMenu.getItems().add(refreshProjectList);
+        listProjects.setContextMenu(projectListMenu);
+        
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
@@ -585,8 +597,8 @@ public class TeamOfficeController {
                 .collect(Collectors.toList())
         );
         listProjects.setItems(projects);
-        if (projects.size() == 1) {
-            listProjects.getSelectionModel().select(0);
+        if(projects.size() > 0){
+            listProjects.getSelectionModel().select(null);
         }
     }
 
