@@ -15,6 +15,7 @@ import projectguru.handlers.exceptions.BusyWorkersException;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
+import projectguru.handlers.exceptions.UnfinishedSubtaskException;
 import projectguru.handlers.exceptions.UserNotTaskMemberException;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
@@ -130,7 +131,7 @@ public interface TaskHandler {
      */
     public boolean startTask(Task task, OnBusyWorkers onBusyWorkers) throws EntityDoesNotExistException, BusyWorkersException, StoringException;
     
-    public boolean endTask(Task task, boolean endSubtasks) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
+    public boolean endTask(Task task, boolean endSubtasks) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException, UnfinishedSubtaskException;
     public boolean endTask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
     
     public boolean setActiveTask(Task task) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException, UserNotTaskMemberException;

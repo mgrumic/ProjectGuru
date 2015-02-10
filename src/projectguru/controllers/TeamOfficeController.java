@@ -937,7 +937,9 @@ public class TeamOfficeController {
                     FormLoader.showErrorDialog("Грешка", "Немате довољно привилегија");
                 } catch (StoringException ex) {
                     FormLoader.showErrorDialog("Грешка", "Грешка са базом");
+
                 }
+
             }
         }
     }
