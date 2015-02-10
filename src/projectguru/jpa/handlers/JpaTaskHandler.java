@@ -1218,7 +1218,7 @@ public class JpaTaskHandler implements TaskHandler {
     
     @Override
     public boolean deactivateUserFromTask(Task task, User user) throws EntityDoesNotExistException, StoringException, InsuficientPrivilegesException, UserNotTaskMemberException {
-              EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
         try {
             if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
@@ -1351,6 +1351,39 @@ public class JpaTaskHandler implements TaskHandler {
         return new ArrayList<User>();
     }
 
+    @Override
+    public List<Timetable> getTimetables(Task task, User user) throws EntityDoesNotExistException, StoringException {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        try {
+            if (task.getId() == null || (task = em.find(Task.class, task.getId())) == null) {
+                throw new EntityDoesNotExistException("Parent task does not exist.");
+            }
+
+            if (user.getUsername() == null || (user = em.find(User.class, user.getUsername())) == null) {
+                throw new EntityDoesNotExistException("User does not exists in database.");
+            }
+
+            try {
+                
+                Query q = em.createQuery("SELECT tt FROM Timetable tt WHERE tt.timetablePK.iDTask = :idtask AND tt.timetablePK.username = :username");
+                q.setParameter("idtask", task.getId());
+                q.setParameter("username", user.getUsername());
+                
+                return q.getResultList();
+                
+            }catch(Exception ex){
+                throw new StoringException(ex.getLocalizedMessage());
+            }
+
+
+        } finally {
+            em.close();
+        }
+
+    }
+
+    
     
     
 }

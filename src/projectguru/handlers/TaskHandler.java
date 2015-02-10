@@ -172,6 +172,8 @@ public interface TaskHandler {
      */
     public List<User> getAllMembers(Task task);
     
+    public List<Timetable> getTimetables(Task task, User user) throws EntityDoesNotExistException, StoringException;
+    
     /**
      * Searches for users which can be added as members to task.
      * User can be added to task if it's not already member of task and is member of parent task,

@@ -130,10 +130,8 @@ public class FormUsersOnTasksController implements Initializable {
     }    
     
     public void load(){
-        
-        User chef = loggedUser.getTaskHandler().getChef(task);
-        
-        ischef = chef != null && chef.getUsername().equals(loggedUser.getUser().getUsername());
+                
+        ischef = loggedUser.getTaskHandler().checkTaskChefPrivileges(task);
         
         if(task.getStartDate() == null){
             status = Status.INIT;
