@@ -184,8 +184,9 @@
                                              <top>
                                                 <FlowPane alignment="CENTER_LEFT" columnHalignment="CENTER" hgap="20.0" prefHeight="47.0" prefWidth="539.0" vgap="20.0" BorderPane.alignment="CENTER">
                                                    <children>
-                                                      <Button fx:id="btnAddSubtask" mnemonicParsing="false" onAction="#btnAddSubtaskPressed" text="Додај задатак" />
-                                                      <Button fx:id="btnAddActivity" mnemonicParsing="false" onAction="#btnAddActivityPressed" text="Преглед активности" />
+                                                      <Button fx:id="btnAddSubtask" mnemonicParsing="false" onAction="#btnAddSubtaskPressed" prefHeight="25.0" prefWidth="200.0" text="Додај задатак" />
+                                                      <Button fx:id="btnAddActivity" mnemonicParsing="false" onAction="#btnAddActivityPressed" prefHeight="25.0" prefWidth="200.0" text="Преглед активности" />
+                                                      <Button fx:id="btnUsersOnTask" mnemonicParsing="false" onAction="#btnUsersOnTaskPressed" prefHeight="25.0" prefWidth="200.0" text="Чланови задатка" />
                                                    </children>
                                                    <opaqueInsets>
                                                       <Insets />

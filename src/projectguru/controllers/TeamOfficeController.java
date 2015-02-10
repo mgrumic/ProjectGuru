@@ -153,7 +153,9 @@ public class TeamOfficeController {
     private Button btnFinances;
     @FXML
     private Button btnCurrentTask;
-
+    @FXML
+    private Button btnUsersOnTask;
+    
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
 
@@ -289,10 +291,10 @@ public class TeamOfficeController {
         }
 
     }
-    
+
     @FXML
-    void mItemClosePressed(ActionEvent event){
-        ((Stage)btnAddActivity.getScene().getWindow()).close();
+    void mItemClosePressed(ActionEvent event) {
+        ((Stage) btnAddActivity.getScene().getWindow()).close();
     }
 
     @FXML
@@ -333,6 +335,17 @@ public class TeamOfficeController {
         }
     }
 
+    @FXML
+    void btnUsersOnTaskPressed(ActionEvent event) {
+        TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
+        if (taskNode != null) {
+            try {
+                FormLoader.loadFormUsersOnTask(user, taskNode.getValue().getTask());
+            } catch (IOException ex) {
+                Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
     /**
      * Moje varijable
      */
@@ -383,10 +396,12 @@ public class TeamOfficeController {
                 .getResourceAsStream("/projectguru/images/finances.png"))));
         btnCurrentTask.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/active_task.png"))));
-
+        btnUsersOnTask.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/members.png"))));
+        
         projectListMenu = new ContextMenu();
         final MenuItem refreshProjectList = new MenuItem("Учитај све пројекте");
-        
+
         refreshProjectList.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -395,7 +410,7 @@ public class TeamOfficeController {
         });
         projectListMenu.getItems().add(refreshProjectList);
         listProjects.setContextMenu(projectListMenu);
-        
+
         listProjects.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ProjectWrapper>() {
             @Override
             public void changed(ObservableValue<? extends ProjectWrapper> observable, ProjectWrapper oldValue, ProjectWrapper newValue) {
@@ -418,6 +433,7 @@ public class TeamOfficeController {
         final MenuItem addActivity = new MenuItem("Додај активност");
         final MenuItem editSubtask = new MenuItem("Прикажи задатак");
         final MenuItem activateTask = new MenuItem("Aктивирај задатак");
+        final MenuItem manageMembers = new MenuItem("Чланови задатка");
 
         addSubtask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -451,7 +467,13 @@ public class TeamOfficeController {
                 }
             }
         });
-        rootContextMenu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask);
+        manageMembers.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                btnUsersOnTaskPressed(event);
+            }
+        });
+        rootContextMenu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask, manageMembers);
 
         treeColumnTasks.setCellFactory(new Callback<TreeTableColumn<TaskNode, String>, TreeTableCell<TaskNode, String>>() {
             @Override
@@ -567,13 +589,13 @@ public class TeamOfficeController {
 
     public void setGUIForUser() {
         int privileges = user.getUser().getAppPrivileges();
-        if(privileges == Privileges.NO_PRIVILEGES.ordinal()){
+        if (privileges == Privileges.NO_PRIVILEGES.ordinal()) {
             btnNewProject.setDisable(true);
             mItemKorisnickiNalozi.setVisible(false);
-        }else if(privileges == Privileges.CHEF.ordinal()){
+        } else if (privileges == Privileges.CHEF.ordinal()) {
             btnNewProject.setDisable(false);
             mItemKorisnickiNalozi.setVisible(false);
-        }else if(privileges == Privileges.ADMIN.ordinal()){
+        } else if (privileges == Privileges.ADMIN.ordinal()) {
             btnNewProject.setDisable(false);
             mItemKorisnickiNalozi.setVisible(true);
         }
@@ -597,7 +619,7 @@ public class TeamOfficeController {
                 .collect(Collectors.toList())
         );
         listProjects.setItems(projects);
-        if(projects.size() > 0){
+        if (projects.size() > 0) {
             listProjects.getSelectionModel().select(null);
         }
     }
@@ -718,7 +740,7 @@ public class TeamOfficeController {
                             .collect(Collectors.toList()));
                     listChefs.setItems(userList);
                     ProjectHandler ph = user.getProjectHandler();
-                    if(ph.checkProjectChefPrivileges(project)){
+                    if (ph.checkProjectChefPrivileges(project)) {
                         btnAddMember.setDisable(false);
                         btnAddSubtask.setVisible(true);
                         btnAddActivity.setVisible(true);
@@ -726,8 +748,9 @@ public class TeamOfficeController {
                         btnFinances.setVisible(true);
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
+                        btnUsersOnTask.setVisible(true);
                         lblProjectCompleted.setText("Шеф пројекта");
-                    }else if(ph.checkMemberPrivileges(project)){
+                    } else if (ph.checkMemberPrivileges(project)) {
                         btnAddMember.setDisable(true);
                         btnAddSubtask.setVisible(true);
                         btnAddActivity.setVisible(true);
@@ -735,8 +758,9 @@ public class TeamOfficeController {
                         btnFinances.setVisible(true);
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
+                        btnUsersOnTask.setVisible(false);
                         lblProjectCompleted.setText("Члан пројекта");
-                    }else if(ph.checkInsightPrivileges(project)){
+                    } else if (ph.checkInsightPrivileges(project)) {
                         btnAddMember.setDisable(true);
                         btnAddSubtask.setVisible(false);
                         btnAddActivity.setVisible(false);
@@ -744,8 +768,9 @@ public class TeamOfficeController {
                         btnFinances.setVisible(true);
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
+                        btnUsersOnTask.setVisible(false);
                         lblProjectCompleted.setText("Надзор");
-                    }else if(ph.checkExternPrivileges(project)){
+                    } else if (ph.checkExternPrivileges(project)) {
                         btnAddMember.setDisable(true);
                         btnAddSubtask.setVisible(false);
                         btnAddActivity.setVisible(false);
@@ -753,8 +778,9 @@ public class TeamOfficeController {
                         btnFinances.setVisible(false);
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
+                        btnUsersOnTask.setVisible(false);
                         lblProjectCompleted.setText("Екстерни члан");
-                    }else {
+                    } else {
                         btnAddMember.setDisable(true);
                         btnAddSubtask.setVisible(false);
                         btnAddActivity.setVisible(false);
@@ -762,6 +788,7 @@ public class TeamOfficeController {
                         btnFinances.setVisible(false);
                         btnGetReport.setVisible(false);
                         btnDocuments.setVisible(false);
+                        btnUsersOnTask.setVisible(false);
                         lblProjectCompleted.setText("Немате привилегија");
                     }
                 }
