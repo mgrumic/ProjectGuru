@@ -9,6 +9,7 @@ import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import projectguru.controllers.TeamOfficeController;
@@ -35,6 +36,7 @@ public class ProjectGuru {
         scene.getStylesheets().add(this.getClass().getResource("/projectguru/css/projectguru.css").toExternalForm());
         
         primaryStage.setTitle("Пројекат Гуру");
+        primaryStage.getIcons().add(new Image(Login.class.getResourceAsStream("/projectguru/images/icon.png")));
         primaryStage.setScene(scene);
         primaryStage.initStyle(StageStyle.DECORATED);
         

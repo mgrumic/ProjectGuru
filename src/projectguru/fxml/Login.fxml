@@ -31,6 +31,6 @@
             <Label fx:id="lblWarning" layoutX="29.0" layoutY="2.0" prefHeight="40.0" prefWidth="267.0" text="Погрешно корисничко име или шифра" textFill="#3d50c6" wrapText="true" />
          </children>
       </Pane>
-      <ImageView fx:id="imgViewLogo" fitHeight="70.0" fitWidth="145.0" layoutX="277.0" layoutY="36.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="imgViewLogo" fitHeight="70.0" fitWidth="139.0" layoutX="288.0" layoutY="36.0" pickOnBounds="true" preserveRatio="true" />
    </children>
 </AnchorPane>

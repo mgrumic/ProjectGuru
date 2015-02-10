@@ -107,8 +107,8 @@
                                                             <Font name="System Bold" size="18.0" />
                                                          </font>
                                                       </Label>
-                                                      <Label layoutX="322.0" layoutY="19.0" prefHeight="17.0" prefWidth="142.0" text="Укупно одрађено:" AnchorPane.rightAnchor="137.0" />
-                                                      <Label fx:id="lblProjectCompleted" layoutX="441.0" layoutY="15.0" prefHeight="25.0" prefWidth="102.0" text="0 %" AnchorPane.rightAnchor="34.0">
+                                                      <Label layoutX="322.0" layoutY="19.0" prefHeight="17.0" prefWidth="196.0" text="Ваша улога на пројекту:" AnchorPane.rightAnchor="220.0" />
+                                                      <Label fx:id="lblProjectCompleted" layoutX="441.0" layoutY="15.0" prefHeight="25.0" prefWidth="197.0" AnchorPane.rightAnchor="34.0">
                                                          <font>
                                                             <Font name="System Bold" size="16.0" />
                                                          </font>
@@ -217,12 +217,7 @@
                       <Menu mnemonicParsing="false" text="Апликација">
                         <items>
                               <MenuItem fx:id="mItemKorisnickiNalozi" mnemonicParsing="false" onAction="#mItemKorisnickNaloziPressed" text="Кориснички налози" />
-                          <MenuItem mnemonicParsing="false" text="Close" />
-                        </items>
-                      </Menu>
-                      <Menu mnemonicParsing="false" text="Опције">
-                        <items>
-                          <MenuItem mnemonicParsing="false" text="Delete" />
+                          <MenuItem mnemonicParsing="false" onAction="#mItemClosePressed" text="Close" />
                         </items>
                       </Menu>
                       <Menu mnemonicParsing="false" text="Помоћ">

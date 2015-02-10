@@ -50,8 +50,10 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import projectguru.controllers.util.SerbianLocalDateStringConverter;
 import projectguru.entities.Document;
 import projectguru.entities.DocumentRevision;
 import projectguru.entities.Privileges;
@@ -286,6 +288,11 @@ public class TeamOfficeController {
             Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+    
+    @FXML
+    void mItemClosePressed(ActionEvent event){
+        ((Stage)btnAddActivity.getScene().getWindow()).close();
     }
 
     @FXML
@@ -548,21 +555,14 @@ public class TeamOfficeController {
 
     public void setGUIForUser() {
         int privileges = user.getUser().getAppPrivileges();
-        if (privileges >= Privileges.CHEF.ordinal()) {
-            btnNewProject.setPrefSize(104, 24);
-            btnAddMember.setPrefSize(104, 24);
-            btnNewProject.setVisible(true);
-            btnAddMember.setVisible(true);
-        } else {
-            btnNewProject.setPrefSize(0, 24);
-            btnAddMember.setPrefSize(0, 24);
-            btnNewProject.setVisible(false);
-            btnAddMember.setVisible(false);
-
-        }
-        if (privileges != Privileges.ADMIN.ordinal()) {
+        if(privileges == Privileges.NO_PRIVILEGES.ordinal()){
+            btnNewProject.setDisable(true);
             mItemKorisnickiNalozi.setVisible(false);
-        } else {
+        }else if(privileges == Privileges.CHEF.ordinal()){
+            btnNewProject.setDisable(false);
+            mItemKorisnickiNalozi.setVisible(false);
+        }else if(privileges == Privileges.ADMIN.ordinal()){
+            btnNewProject.setDisable(false);
             mItemKorisnickiNalozi.setVisible(true);
         }
     }
@@ -668,12 +668,10 @@ public class TeamOfficeController {
                     PieChart.Data worked;
                     PieChart.Data left;
                     if (root != null) {
-                        lblProjectCompleted.setText(String.format("%5.2f ", (root.getValue().getPartDone() * 100)) + "%");
                         chartPie.setTitle(String.format("Укупно одрађено: %5.2f ", (root.getValue().getPartDone() * 100)) + "%");
                         worked = new PieChart.Data("Одрађено", root.getValue().getPartDone() * 100);
                         left = new PieChart.Data("Преостало", 100 - (root.getValue().getPartDone() * 100));
                     } else {
-                        lblProjectCompleted.setText("0%");
                         chartPie.setTitle("Укупно одрађено: 0%");
                         worked = new PieChart.Data("Одрађено", 0);
                         left = new PieChart.Data("Преостало", 100);
@@ -682,15 +680,15 @@ public class TeamOfficeController {
                     pieChartData.add(left);
                     chartPie.setData(pieChartData);
 
-                    SimpleDateFormat formater = new SimpleDateFormat("dd.mm.yyyy");
                     Project project = projectWrapper.getProject();
                     lblStatusLabel.setText("Тренутно изабрани пројекат: " + project.getName());
                     lblProjectName.setText(project.getName());
                     tAreaDescription.setText(project.getDescription());
                     LocalDate start = project.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    lblStartDate.setText(start.toString());
+                    SerbianLocalDateStringConverter cnv = new SerbianLocalDateStringConverter();
+                    lblStartDate.setText(cnv.toString(start));
                     LocalDate end = project.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    lblEndDate.setText(end.toString());
+                    lblEndDate.setText(cnv.toString(end));
                     lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
                     lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
                     lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
@@ -707,10 +705,52 @@ public class TeamOfficeController {
                             .map((member) -> new UserWrapper(member))
                             .collect(Collectors.toList()));
                     listChefs.setItems(userList);
-                    if (user.getProjectHandler().checkProjectChefPrivileges(project)) {
+                    ProjectHandler ph = user.getProjectHandler();
+                    if(ph.checkProjectChefPrivileges(project)){
+                        btnAddMember.setDisable(false);
+                        btnAddSubtask.setVisible(true);
+                        btnAddActivity.setVisible(true);
                         btnEditProject.setVisible(true);
-                    } else {
+                        btnFinances.setVisible(true);
+                        btnDocuments.setVisible(true);
+                        btnGetReport.setVisible(true);
+                        lblProjectCompleted.setText("Шеф пројекта");
+                    }else if(ph.checkMemberPrivileges(project)){
+                        btnAddMember.setDisable(true);
+                        btnAddSubtask.setVisible(true);
+                        btnAddActivity.setVisible(true);
                         btnEditProject.setVisible(false);
+                        btnFinances.setVisible(true);
+                        btnDocuments.setVisible(true);
+                        btnGetReport.setVisible(true);
+                        lblProjectCompleted.setText("Члан пројекта");
+                    }else if(ph.checkInsightPrivileges(project)){
+                        btnAddMember.setDisable(true);
+                        btnAddSubtask.setVisible(false);
+                        btnAddActivity.setVisible(false);
+                        btnEditProject.setVisible(false);
+                        btnFinances.setVisible(true);
+                        btnDocuments.setVisible(true);
+                        btnGetReport.setVisible(true);
+                        lblProjectCompleted.setText("Надзор");
+                    }else if(ph.checkExternPrivileges(project)){
+                        btnAddMember.setDisable(true);
+                        btnAddSubtask.setVisible(false);
+                        btnAddActivity.setVisible(false);
+                        btnEditProject.setVisible(false);
+                        btnFinances.setVisible(false);
+                        btnDocuments.setVisible(true);
+                        btnGetReport.setVisible(true);
+                        lblProjectCompleted.setText("Екстерни члан");
+                    }else {
+                        btnAddMember.setDisable(true);
+                        btnAddSubtask.setVisible(false);
+                        btnAddActivity.setVisible(false);
+                        btnEditProject.setVisible(false);
+                        btnFinances.setVisible(false);
+                        btnGetReport.setVisible(false);
+                        btnDocuments.setVisible(false);
+                        lblProjectCompleted.setText("Немате привилегија");
                     }
                 }
             }

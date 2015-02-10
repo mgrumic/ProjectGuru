@@ -39,8 +39,10 @@ import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import projectguru.controllers.TeamOfficeController.UserWrapper;
 import projectguru.controllers.util.SerbianLocalDateStringConverter;
+import projectguru.entities.Privileges;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
+import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
@@ -224,11 +226,8 @@ public class FormAddProjectController implements Initializable {
                 if (selectedMembers != null) {
                     Iterator<UserWrapper> itr = selectedMembers.iterator();
                     while (itr.hasNext()) {
-
-                        projectJpa.addMember(
-                                newProject,
-                                itr.next().getUser()
-                        );
+                        User member = itr.next().getUser();
+                        projectJpa.addMember(newProject, member);
                     }
                 }
                 
@@ -241,6 +240,7 @@ public class FormAddProjectController implements Initializable {
                     root.setAssumedManHours(manhours);
                     root.setDeadline(rootDeadline);
                     
+                    user.getProjectHandler().setPrivileges(project, user.getUser(), Privileges.CHEF);
                     user.getProjectHandler().setRootTask(newProject, root);
                     user.getTaskHandler().setChef(root, user.getUser());
                 }

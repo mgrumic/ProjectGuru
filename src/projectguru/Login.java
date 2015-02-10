@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -60,8 +61,9 @@ public class Login extends Application {
         scene.getStylesheets().add(this.getClass().getResource("/projectguru/css/login.css").toExternalForm());
         
         primaryStage.setTitle("Пријава на систем");
+        primaryStage.getIcons().add(new Image(Login.class.getResourceAsStream("/projectguru/images/icon.png")));
         primaryStage.setScene(scene);
-        primaryStage.initStyle(StageStyle.UTILITY);
+        primaryStage.initStyle(StageStyle.DECORATED);
         primaryStage.setResizable(false);
         
         primaryStage.show();

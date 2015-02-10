@@ -183,9 +183,10 @@ public class FormUserAccountsController implements Initializable {
         });
 
         privileges = FXCollections.observableArrayList();
-        privileges.add(new ApplicationPrivileges("Без привилегија", Privileges.NO_PRIVILEGES.ordinal()));
-        privileges.add(new ApplicationPrivileges("Надзор", Privileges.INSIGHT.ordinal()));
-        privileges.add(new ApplicationPrivileges("Члан", Privileges.MEMBER.ordinal()));
+        privileges.add(new ApplicationPrivileges("Обичан корисник", Privileges.NO_PRIVILEGES.ordinal()));
+        //privileges.add(new ApplicationPrivileges("Екстерни корисник", Privileges.EXTERN.ordinal()));
+        // privileges.add(new ApplicationPrivileges("Надзор", Privileges.INSIGHT.ordinal()));
+        //privileges.add(new ApplicationPrivileges("Члан", Privileges.MEMBER.ordinal()));
         privileges.add(new ApplicationPrivileges("Шеф пројекта", Privileges.CHEF.ordinal()));
         privileges.add(new ApplicationPrivileges("Администратор", Privileges.ADMIN.ordinal()));
 

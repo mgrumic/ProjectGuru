@@ -24,12 +24,13 @@ import projectguru.handlers.exceptions.StoringException;
 public interface ProjectHandler {
 
     public boolean checkProjectChefPrivileges(Project project);
-
+    
     public boolean checkMemberPrivileges(Project project);
-
+    
     public boolean checkInsightPrivileges(Project project);
 
-//    public boolean isProjectExists(Project project);
+    public boolean checkExternPrivileges(Project project);
+    
     public List<Project> getAllProjects();
 
     public List<User> getAllMembers(Project project);
@@ -56,6 +57,8 @@ public interface ProjectHandler {
 
     public boolean isInsight(Project project, User user);
 
+    public boolean isExtern(Project project, User user);
+    
     public boolean addDocument(Project project, Document document) throws InsuficientPrivilegesException, StoringException;
 
     public List<Document> getAllDocuments(Project project) throws EntityDoesNotExistException;

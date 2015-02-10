@@ -11,5 +11,5 @@ package projectguru.entities;
  * @author marko
  */
 public enum Privileges {
-    NO_PRIVILEGES, INSIGHT, MEMBER, CHEF, ADMIN
+    NO_PRIVILEGES, EXTERN, INSIGHT, MEMBER, CHEF, ADMIN
 }

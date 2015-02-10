@@ -60,6 +60,11 @@ public class JpaProjectHandler implements ProjectHandler {
     public boolean checkInsightPrivileges(Project project) {
         return isInsight(project, loggedUser.getUser());
     }
+    
+    @Override
+    public boolean checkExternPrivileges(Project project) {
+        return isExtern(project, loggedUser.getUser());
+    }
 
     @Override
     public List<Project> getAllProjects() {
@@ -234,6 +239,9 @@ public class JpaProjectHandler implements ProjectHandler {
         if (project.getId() == null || (project = em.find(Project.class, project.getId())) == null) {
             throw new EntityDoesNotExistException("Project does not exist.");
         }
+        if (!checkProjectChefPrivileges(project)) {
+            throw new InsuficientPrivilegesException();
+        }
         try {
             em.getTransaction().begin();
 
@@ -360,7 +368,7 @@ public class JpaProjectHandler implements ProjectHandler {
             if (wop.isEmpty()) {
 
                 WorksOnProject newWop = new WorksOnProject(new WorksOnProjectPK(user.getUsername(), project.getId()));
-                newWop.setPrivileges(Privileges.NO_PRIVILEGES.ordinal());
+                newWop.setPrivileges(Privileges.MEMBER.ordinal());
                 em.persist(newWop);
                 em.getTransaction().commit();
                 em.refresh(project);
@@ -626,6 +634,30 @@ public class JpaProjectHandler implements ProjectHandler {
         return false;
     }
 
+    public boolean isExtern(Project project, User user){
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+
+        try {
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
+                throw new EntityDoesNotExistException("Project does not exist.");
+            }
+
+            if (user.getUsername() == null || (user = em.find(user.getClass(), user.getUsername())) == null) {
+                throw new EntityDoesNotExistException("User does not exist.");
+            }
+
+            for (WorksOnProject wop : project.getWorksOnProjectList()) {
+                if (wop.getWorksOnProjectPK().getUsername().equals(user.getUsername())
+                        && wop.getPrivileges() >= Privileges.EXTERN.ordinal()) {
+                    return true;
+                }
+            }
+        } catch (EntityDoesNotExistException ex) {
+            Logger.getLogger(JpaProjectHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
     /*
      *  Metode koje mi uvijek daju azurirane objekte iz baze
      *
