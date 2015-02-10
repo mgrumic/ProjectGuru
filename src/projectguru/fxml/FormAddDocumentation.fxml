@@ -25,9 +25,9 @@
       <TextField fx:id="textBoxDocPath" layoutX="141.0" layoutY="192.0" prefHeight="25.0" prefWidth="266.0" />
       <Button fx:id="btnChooseDoc" layoutX="414.0" layoutY="192.0" mnemonicParsing="false" onAction="#btnChooseDocPressed" text="Изабери" />
       <Label layoutX="35.0" layoutY="234.0" text="Опис:" />
-      <TextArea fx:id="textBoxDesc" layoutX="141.0" layoutY="230.0" prefHeight="117.0" prefWidth="337.0" />
+      <TextArea fx:id="textBoxDesc" layoutX="141.0" layoutY="230.0" prefHeight="117.0" prefWidth="337.0" wrapText="true" />
       <Button fx:id="btnSave" layoutX="355.0" layoutY="376.0" mnemonicParsing="false" onAction="#btnSavePressed" text="Сачувај" />
-      <Button fx:id="btnCancel" layoutX="426.0" layoutY="376.0" mnemonicParsing="false" text="Изађи" />
+      <Button fx:id="btnCancel" layoutX="426.0" layoutY="376.0" mnemonicParsing="false" onAction="#btnCancelPressed" text="Изађи" />
       <CheckBox fx:id="checkBoxRev" layoutX="141.0" layoutY="69.0" mnemonicParsing="false" onAction="#checkBoxRevPressed" text="Додајем ревизију" />
    </children>
 </AnchorPane>

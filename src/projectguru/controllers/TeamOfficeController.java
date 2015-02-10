@@ -7,6 +7,7 @@ package projectguru.controllers;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -1056,7 +1057,9 @@ public class TeamOfficeController {
 
         @Override
         public String toString() {
-            return document.getDatePosted().toString();
+            DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+            String sdt = df.format(document.getDatePosted());
+            return sdt;
         }
     }
 

@@ -32,6 +32,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.eclipse.persistence.jpa.jpql.parser.DateTime;
 import projectguru.controllers.TeamOfficeController.DocumentWrapper;
 import projectguru.entities.Document;
 import projectguru.entities.DocumentRevision;
@@ -43,6 +44,7 @@ import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
+import projectguru.utils.FormLoader;
 
 /**
  * FXML Controller class
@@ -122,34 +124,44 @@ public class FormAddDocumentationController implements Initializable {
     private void btnSavePressed(ActionEvent event) {
         try {
             if (!checkBoxRev.isSelected()) {
+                if (textBoxDesc.getText() != "" && textBoxName.getText() != "" && file != null) {
+                    byte[] fajl = Files.readAllBytes(Paths.get(file.getPath()));
+                    String desc = this.textBoxDesc.getText();
+                    String name = this.textBoxName.getText();
+                    Calendar cal = Calendar.getInstance();
+                    Date date = cal.getTime();
 
-                byte[] fajl = Files.readAllBytes(Paths.get(file.getPath()));
-                String desc = this.textBoxDesc.getText();
-                String name = this.textBoxName.getText();
-                Date date = new Date();
+                    Document d = new Document(null, name, date, desc);
+                    DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, desc);
+                    //ProjectHandler prJpa = user.getProjectHandler(); 
+                    //prJpa.addDocument(project, d);
+                    //treba mi metoda koja vraca zadnji dokument
+                    DocumentHandler docJpa = user.getDocumentHandler();
 
-                Document d = new Document(null, name, date, desc);
-                DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, desc);
-                //ProjectHandler prJpa = user.getProjectHandler(); 
-                //prJpa.addDocument(project, d);
-                //treba mi metoda koja vraca zadnji dokument
-                DocumentHandler docJpa = user.getDocumentHandler();
-
-                docJpa.addDocument(project, d);
-                docJpa.addRevision(d, drev);
+                    docJpa.addDocument(project, d);
+                    docJpa.addRevision(d, drev);
+                    Stage stage = (Stage) btnSave.getScene().getWindow();
+                    stage.close();
+                } else {
+                    FormLoader.showInformationDialog("Напомена", "Морате попунити сва поља!");
+                }
 
             } else {
+                if (file != null) {
+                    TeamOfficeController.DocumentWrapper dw = chooseBoxRevisionOn.getItems().get(chooseBoxRevisionOn.getSelectionModel().getSelectedIndex());
 
-                TeamOfficeController.DocumentWrapper dw = chooseBoxRevisionOn.getItems().get(chooseBoxRevisionOn.getSelectionModel().getSelectedIndex());
-
-                byte[] fajl = Files.readAllBytes(Paths.get(file.getPath()));
-                String desc = this.textBoxDesc.getText();
-                Date date = new Date();
-                Document doc = dw.getDocument();
-                DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, desc);
-                DocumentHandler docJpa = user.getDocumentHandler();
-                docJpa.addRevision(doc, drev);
-
+                    byte[] fajl = Files.readAllBytes(Paths.get(file.getPath()));
+                    //String desc = this.textBoxDesc.getText();
+                    Date date = new Date();
+                    Document doc = dw.getDocument();
+                    DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, "");
+                    DocumentHandler docJpa = user.getDocumentHandler();
+                    docJpa.addRevision(doc, drev);
+                    Stage stage = (Stage) btnSave.getScene().getWindow();
+                    stage.close();
+                } else {
+                    FormLoader.showInformationDialog("Напомена", "Морате попунити сва поља!");
+                }
             }
 
         } catch (IOException e) {
@@ -161,8 +173,6 @@ public class FormAddDocumentationController implements Initializable {
         } catch (StoringException s) {
             s.printStackTrace();
         }
-        Stage stage = (Stage) btnSave.getScene().getWindow();
-        stage.close();
 
     }
 
@@ -177,6 +187,14 @@ public class FormAddDocumentationController implements Initializable {
             textBoxDesc.setDisable(false);
             textBoxName.setDisable(false);
             chooseBoxRevisionOn.setDisable(true);
+        }
+    }
+
+    @FXML
+    private void btnCancelPressed(ActionEvent event) {
+        if (FormLoader.showConfirmationDialog("Да ли сте сигурни?", "Да ли сте сигурни да желите изаћи?")) {
+            Stage stage = (Stage) btnCancel.getScene().getWindow();
+            stage.close();
         }
     }
 }

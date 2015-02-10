@@ -73,7 +73,6 @@ public class FormDocumentationController implements Initializable {
     private Button ButtonAdd;
     @FXML
     private ChoiceBox<DocumentWrapper> choiceBoxDocum;
-    @FXML
     private Label labelDate;
     @FXML
     private Label labesDescription;
@@ -110,6 +109,7 @@ public class FormDocumentationController implements Initializable {
                 loadRevision(choiceBoxDocum.getItems().get((Integer) t1).getDocument());
             }
         });
+         
     }
 
     public void loadRevision(Document doc) {
@@ -124,18 +124,16 @@ public class FormDocumentationController implements Initializable {
         listViewRevision.setItems(docw);
         listViewRevision.getSelectionModel().selectFirst();
         if (listAll.size() > 0) {
-            this.labelDate.setText(listAll.get(0).getDatePosted().toString());
             this.labesDescription.setText(doc.getDescription());
         }
+       
     }
 
     @FXML
     void buttonAddDocPressed(ActionEvent event) {
         if (user.getUser().getAppPrivileges() != 4) {
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.WINDOW_MODAL);
-            dialogStage.setScene(new Scene(VBoxBuilder.create().children(new Text("Немате привилегију за додавање документа!")).alignment(Pos.CENTER).padding(new Insets(35)).build()));
-            dialogStage.show();
+            FormLoader.showInformationDialog("Напомена", "Немате привилегију за додавање документа!");
+           
         } else {
             try {
                 FormLoader.loadFormAddDocumentation(project, user);
@@ -192,7 +190,7 @@ public class FormDocumentationController implements Initializable {
 	    fileOuputStream.write(bFile);
 	    fileOuputStream.close();
  
-	    System.out.println("Done");
+	 //   System.out.println("Done");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
