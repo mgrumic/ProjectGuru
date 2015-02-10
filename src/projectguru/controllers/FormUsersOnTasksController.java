@@ -123,17 +123,15 @@ public class FormUsersOnTasksController implements Initializable {
         btnSave.setVisible(false);
         columnUsername.setCellValueFactory((r) -> new SimpleObjectProperty<>(r.getValue().getUsername()));
         columnNameLastName.setCellValueFactory((r) -> new SimpleObjectProperty<>(r.getValue().getNameLastName()));
-        columnActive.setCellValueFactory((r) -> new SimpleObjectProperty<>(r.getValue().isWorking() ? "Да" : "Ne"));
+        columnActive.setCellValueFactory((r) -> new SimpleObjectProperty<>(r.getValue().isWorking() ? "Да" : "Не"));
         columnChef.setCellValueFactory((r)-> new SimpleObjectProperty<>(r.getValue().isChef() ? "Шеф" : ""));
         
         
     }    
     
     public void load(){
-        
-        User chef = loggedUser.getTaskHandler().getChef(task);
-        
-        ischef = chef != null && chef.getUsername().equals(loggedUser.getUser().getUsername());
+                
+        ischef = loggedUser.getTaskHandler().checkTaskChefPrivileges(task);
         
         if(task.getStartDate() == null){
             status = Status.INIT;
@@ -255,7 +253,9 @@ public class FormUsersOnTasksController implements Initializable {
             
             User newUser = FormLoader.loadFormAddableMembers(loggedUser, task);
             
-            loggedUser.getTaskHandler().addMember(task, newUser);
+            if(newUser != null){
+                loggedUser.getTaskHandler().addMember(task, newUser);
+            }
             
             
         } catch (IOException ex) {
