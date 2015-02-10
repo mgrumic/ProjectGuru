@@ -1000,7 +1000,7 @@ public class JpaTaskHandler implements TaskHandler {
     }
 
         @Override
-    public boolean endTask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException, UnfinishedSubtaskException {
+    public boolean endTask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException{
         return endTask(task, true);
     }
     
