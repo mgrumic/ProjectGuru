@@ -34,15 +34,18 @@ import projectguru.controllers.FormAddMembersController;
 import projectguru.controllers.FormAddMembersOnProjectController;
 import projectguru.controllers.FormAddProjectController;
 import projectguru.controllers.FormAddTaskController;
+import projectguru.controllers.FormAddableMembersController;
 import projectguru.controllers.FormDocumentationController;
 import projectguru.controllers.FormFinancesOverviewController;
 import projectguru.controllers.FormReportController;
 import projectguru.controllers.FormSetActiveTaskController;
 import projectguru.controllers.FormUserAccountsController;
+import projectguru.controllers.FormUsersOnTasksController;
 import projectguru.controllers.TeamOfficeController;
 import projectguru.entities.Activity;
 import projectguru.entities.Project;
 import projectguru.entities.Task;
+import projectguru.entities.User;
 import projectguru.handlers.LoggedUser;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 
@@ -410,4 +413,44 @@ public class FormLoader {
         return view;
     }
 
+    public static void loadFormUsersOnTask(LoggedUser loggedUser, Task task) throws IOException{
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormUsersOnTasks.fxml"));
+        Parent root = loader.load();
+        
+        FormUsersOnTasksController controller = loader.getController();
+        controller.setLoggedUser(loggedUser);
+        controller.setTask(task);
+        
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Корисници на задатку " + task.getName());
+        stage.setResizable(true);
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.show();
+    }
+    
+    public static User loadFormAddableMembers(LoggedUser loggedUser, Task task) throws IOException{
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormSAddableMembers.fxml"));
+        Parent root = loader.load();
+        
+        FormAddableMembersController controller = loader.getController();
+        controller.setLoggedUser(loggedUser);
+        controller.setTask(task);
+        
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Корисници на задатку " + task.getName());
+        stage.setResizable(true);
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.showAndWait();
+        
+        return controller.getUser();
+    }
+    
 }

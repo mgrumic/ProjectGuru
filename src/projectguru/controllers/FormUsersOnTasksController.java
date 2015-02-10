@@ -6,6 +6,7 @@
 package projectguru.controllers;
 
 import com.sun.javafx.sg.prism.NGCanvas;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -226,6 +227,24 @@ public class FormUsersOnTasksController implements Initializable {
     
     private void add(){
         
+        try {
+            User newUser = FormLoader.loadFormAddableMembers(loggedUser, task);
+            
+            loggedUser.getTaskHandler().addMember(task, newUser);
+            
+            
+        } catch (IOException ex) {
+            Logger.getLogger(FormUsersOnTasksController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (EntityDoesNotExistException ex) {
+            Logger.getLogger(FormUsersOnTasksController.class.getName()).log(Level.SEVERE, null, ex);
+            FormLoader.showErrorDialog("Грешка", "Чини се да, или задатак или овај корисник више не постоје у бази.");
+        } catch (StoringException ex) {
+            Logger.getLogger(FormUsersOnTasksController.class.getName()).log(Level.SEVERE, null, ex);
+            FormLoader.showErrorDialog("Грешка", "Десила се грешка приликом уписа у базу.");
+        } catch (InsuficientPrivilegesException ex) {
+            Logger.getLogger(FormUsersOnTasksController.class.getName()).log(Level.SEVERE, null, ex);
+            FormLoader.showInformationDialog("Недовољне привилегије", "Грешка се десила највјероватније усљед тога што више немате привилегије да додате учесника на задатак.");
+        }
         
         loadUsers();
     }
