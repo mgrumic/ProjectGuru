@@ -10,35 +10,60 @@ package projectguru.utils;
  * @author medlan
  */
 public enum ReportType {
-    REPORT1,
-    REPORT2,
-    REPORT3,
+    STANJE_PROJEKTA_REPORT,
+    FINANSIJSKI_PREGLED_PRIHODA_REPORT,
+    FINANSIJSKI_PREGLED_RASHODA_REPORT,
+    PREGLED_AKTIVNOSTI_REPORT,
     NONE;
-    private static final String t1 = "Извјештај 1";
-    private static final String t2 = "Извјештај 2";
-    private static final String t3 = "Извјештај 3";
+    private static final String t1 = "Стање пројекта";
+    private static final String t2 = "Финансијски преглед расхода";
+    private static final String t3 = "Финансијски преглед прихода";
+    private static final String t4 = "Преглед активности";
+    
+    private static final String q1 = "";
+    private static final String q2 = "select * from rashodi";
+    private static final String q3 = "select * from prihodi";
+    private static final String q4 = "";
     
     public static ReportType getType(String str){
         if(null != str)
             switch (str) {
             case t1:
-                return REPORT1;
+                return STANJE_PROJEKTA_REPORT;
             case t2:
-                return REPORT2;
+                return FINANSIJSKI_PREGLED_RASHODA_REPORT;
             case t3:
-                return REPORT3;
+                return FINANSIJSKI_PREGLED_PRIHODA_REPORT;
+            case t4:
+                return PREGLED_AKTIVNOSTI_REPORT;
         }
         return NONE;
     }
     
     public String getText(){
         switch(this){
-            case REPORT1:
+            case STANJE_PROJEKTA_REPORT:
                 return t1;
-            case REPORT2:
+            case FINANSIJSKI_PREGLED_RASHODA_REPORT:
                 return t2;
-            case REPORT3:
+            case FINANSIJSKI_PREGLED_PRIHODA_REPORT:
                 return t3;
+            case PREGLED_AKTIVNOSTI_REPORT:
+                return t4;
+        }
+        return null;
+    }
+    
+    public String getQuerry(){
+        switch(this){
+            case STANJE_PROJEKTA_REPORT:
+                return q1;
+            case FINANSIJSKI_PREGLED_RASHODA_REPORT:
+                return q2;
+            case FINANSIJSKI_PREGLED_PRIHODA_REPORT:
+                return q3;
+            case PREGLED_AKTIVNOSTI_REPORT:
+                return q4;
         }
         return null;
     }
