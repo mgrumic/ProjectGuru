@@ -5,11 +5,9 @@
  */
 package projectguru.controllers;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -17,7 +15,6 @@ import javafx.scene.control.ComboBox;
 import javafx.stage.Stage;
 import projectguru.entities.Project;
 import projectguru.handlers.LoggedUser;
-import projectguru.handlers.ReportHandler;
 import projectguru.jpa.handlers.JpaReportHandler;
 import projectguru.utils.FormLoader;
 import projectguru.utils.ReportType;
@@ -62,9 +59,10 @@ public class FormReportController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        reportTypeComboBox.getItems().add(ReportType.REPORT1.getText());
-        reportTypeComboBox.getItems().add(ReportType.REPORT2.getText());
-        reportTypeComboBox.getItems().add(ReportType.REPORT3.getText());
+        reportTypeComboBox.getItems().add(ReportType.STANJE_PROJEKTA_REPORT.getText());
+        reportTypeComboBox.getItems().add(ReportType.FINANSIJSKI_PREGLED_PRIHODA_REPORT.getText());
+        reportTypeComboBox.getItems().add(ReportType.FINANSIJSKI_PREGLED_RASHODA_REPORT.getText());
+        reportTypeComboBox.getItems().add(ReportType.PREGLED_AKTIVNOSTI_REPORT.getText());
     }
     
     @FXML
@@ -77,7 +75,7 @@ public class FormReportController implements Initializable {
         JpaReportHandler report = new JpaReportHandler(user);
         ReportType type = ReportType.getType(reportTypeComboBox.getValue());
         if(type == ReportType.NONE){
-            //TODO: MessageBox.Show
+            FormLoader.showErrorDialog("Извјештаји", "Одаберите извјештај који требате генерисати.");
         }else{
             report.setProject(project);
             report.generateReport(type);
