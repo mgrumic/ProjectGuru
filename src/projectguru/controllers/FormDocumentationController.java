@@ -91,6 +91,7 @@ public class FormDocumentationController implements Initializable {
     }
 
     public void loadDocum() {
+        buttonOpen.setDisable(false);
         List<Document> listAll = project.getDocumentList();
         List<DocumentWrapper> dwList = new ArrayList<DocumentWrapper>();
         for (int i = 0; i < listAll.size(); i++) {
@@ -109,7 +110,10 @@ public class FormDocumentationController implements Initializable {
                 loadRevision(choiceBoxDocum.getItems().get((Integer) t1).getDocument());
             }
         });
-         
+         if(listAll.size()==0){
+             FormLoader.showInformationDialog("Напомена", "Немате ни један додан документ !");
+             buttonOpen.setDisable(true);
+         }
     }
 
     public void loadRevision(Document doc) {

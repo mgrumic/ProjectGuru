@@ -92,12 +92,15 @@ public class FormAddDocumentationController implements Initializable {
     }
 
     public void loadDocum() {
+        checkBoxRev.setDisable(false);
         List<Document> listAll = project.getDocumentList();
         List<TeamOfficeController.DocumentWrapper> dwList = new ArrayList<TeamOfficeController.DocumentWrapper>();
         for (int i = 0; i < listAll.size(); i++) {
             dwList.add(new TeamOfficeController.DocumentWrapper(listAll.get(i)));
         }
-
+        if(listAll.size()==0){
+            checkBoxRev.setDisable(true);
+        }
         ObservableList<TeamOfficeController.DocumentWrapper> docw = FXCollections.observableArrayList(dwList);
         chooseBoxRevisionOn.setItems(docw);
         chooseBoxRevisionOn.getSelectionModel().selectFirst();
@@ -168,10 +171,12 @@ public class FormAddDocumentationController implements Initializable {
             e.printStackTrace();
         } catch (EntityDoesNotExistException e) {
             e.printStackTrace();
-        } catch (InsuficientPrivilegesException i) {
+        } catch (InsuficientPrivilegesException i) {   
             i.printStackTrace();
+            FormLoader.showInformationDialog("Напомена", "Немате довољно привилегија !");
         } catch (StoringException s) {
             s.printStackTrace();
+            FormLoader.showInformationDialog("Напомена", "Грешка са базом !");
         }
 
     }
