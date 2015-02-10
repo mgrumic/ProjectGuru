@@ -13,14 +13,20 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Query;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import projectguru.AccessManager;
+import projectguru.jpa.JpaAccessManager;
 
 /**
  *
@@ -63,12 +69,6 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     private List<WorksOnTask> worksOnTaskList;
 
-    public List<WorksOnTask> getWorksOnTaskListNonRemoved() {
-        return new ArrayList<>(worksOnTaskList)
-                        .stream()
-                        .filter((wot) -> !wot.getRemoved())
-                        .collect(Collectors.toList());
-    }
     
     public List<WorksOnTask> getWorksOnTaskList(){
         return worksOnTaskList;
@@ -175,5 +175,23 @@ public class User implements Serializable {
     public String toString() {
         return "projectguru.entities.User[ username=" + username + " ]";
     }
+
+
+    public List<WorksOnTask> getWorksOnTaskListNonRemoved() {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        
+        try{
+            
+            Query q = em.createQuery("SELECT wot FROM WorksOnTask wot WHERE wot.worksOnTaskPK.username = :username AND wot.removed = false ", WorksOnTask.class);
+            q.setParameter("username", this.username);
+            return q.getResultList();
+
+        }finally{
+            em.close();
+        }
+
+    }
+  
     
 }

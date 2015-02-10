@@ -98,7 +98,7 @@ public class JpaTaskHandler implements TaskHandler {
     public boolean checkInsightPrivileges(Task task) {
 
         // WorksOnTaskList je generisana i popunice se podacima kad prvi put zatrazio nesto od nje.
-        for (WorksOnTask wot : task.getWorksOnTasksListNonRemoved()) {
+        for (WorksOnTask wot : task.getWorksOnTaskListNonRemoved()) {
             if (wot.getWorksOnTaskPK().getUsername().equals(loggedUser.getUser().getUsername())
                     && wot.getPrivileges() >= Privileges.INSIGHT.ordinal()) {
                 return true;
@@ -323,7 +323,7 @@ public class JpaTaskHandler implements TaskHandler {
             }
             try {
                 em.getTransaction().begin();
-                for (WorksOnTask wot : task.getWorksOnTasksListNonRemoved()) {
+                for (WorksOnTask wot : task.getWorksOnTaskListNonRemoved()) {
                     if (wot.getWorksOnTaskPK().getUsername().equals(user.getUsername())) {
                         
                         wot.setPrivileges(Privileges.CHEF.ordinal());
@@ -727,7 +727,7 @@ public class JpaTaskHandler implements TaskHandler {
     @Override
     public boolean isMember(Task task, User user) {
 
-        for (WorksOnTask wot : task.getWorksOnTasksListNonRemoved()) {
+        for (WorksOnTask wot : task.getWorksOnTaskListNonRemoved()) {
             if (wot.getWorksOnTaskPK().getUsername().equals(user.getUsername())
                     && wot.getPrivileges() >= Privileges.MEMBER.ordinal()) {
                 return true;
@@ -915,7 +915,7 @@ public class JpaTaskHandler implements TaskHandler {
             try {
                 em.getTransaction().begin();
 
-                for (WorksOnTask wot : task.getWorksOnTasksListNonRemoved()) {
+                for (WorksOnTask wot : task.getWorksOnTaskListNonRemoved()) {
                     Task active = getActiveTask(wot.getWorksOnTaskPK().getUsername());
                     
                     //ako nema aktivnog
@@ -1048,7 +1048,7 @@ public class JpaTaskHandler implements TaskHandler {
 
                     Task prnt = prnt1;
 
-                    new ArrayList<>(task.getWorksOnTasksListNonRemoved())
+                    new ArrayList<>(task.getWorksOnTaskListNonRemoved())
                             .stream()
                             .filter((wot) -> wot.getWorking())
                             .forEach((wot) -> {

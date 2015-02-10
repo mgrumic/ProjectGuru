@@ -15,6 +15,8 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,9 +24,12 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import projectguru.AccessManager;
+import projectguru.jpa.JpaAccessManager;
 
 /**
  *
@@ -159,11 +164,20 @@ public class Task implements Serializable {
         return worksOnTaskList;
     }
     
-        public List<WorksOnTask> getWorksOnTasksListNonRemoved() {
-        return new ArrayList<>(worksOnTaskList)
-                        .stream()
-                        .filter((wot) -> !wot.getRemoved())
-                        .collect(Collectors.toList());
+    public List<WorksOnTask> getWorksOnTaskListNonRemoved() {
+        EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
+        EntityManager em = emf.createEntityManager();
+        
+        try{
+            
+            Query q = em.createQuery("SELECT wot FROM WorksOnTask wot WHERE wot.worksOnTaskPK.iDTask = :idtask AND wot.removed = false ", WorksOnTask.class);
+            q.setParameter("idtask", this.id);
+            return q.getResultList();
+
+        }finally{
+            em.close();
+        }
+
     }
 
     public void setWorksOnTaskList(List<WorksOnTask> worksOnTaskList) {

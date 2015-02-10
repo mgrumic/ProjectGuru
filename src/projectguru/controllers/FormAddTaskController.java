@@ -193,7 +193,7 @@ public class FormAddTaskController implements Initializable {
                     Iterator<UserWrapper> itr = selectedMembers.iterator();
                     while (itr.hasNext()) {
                         User user = itr.next().getUser();
-                        if(!tmpTask.getWorksOnTasksListNonRemoved()
+                        if(!tmpTask.getWorksOnTaskListNonRemoved()
                                 .stream()
                                 .anyMatch(
                                         (wot) -> wot
