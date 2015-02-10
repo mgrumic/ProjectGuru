@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import projectguru.entities.Task;
 import projectguru.entities.User;
@@ -40,11 +41,15 @@ public class FormAddableMembersController implements Initializable {
     @FXML
     void btnConfirm_OnAction(ActionEvent event) {
         user = lstAddableUsers.getSelectionModel().getSelectedItem();
+        
+        Stage stage = (Stage)btnCancel.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
     void btnCancel_OnAction(ActionEvent event) {
-        
+        Stage stage = (Stage)btnCancel.getScene().getWindow();
+        stage.close();
     }
     
     /**

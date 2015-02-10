@@ -435,12 +435,13 @@ public class FormLoader {
     }
     
     public static User loadFormAddableMembers(LoggedUser loggedUser, Task task) throws IOException{
-        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormSAddableMembers.fxml"));
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormAddableMembers.fxml"));
         Parent root = loader.load();
         
         FormAddableMembersController controller = loader.getController();
         controller.setLoggedUser(loggedUser);
         controller.setTask(task);
+        controller.load();
         
         Scene scene = new Scene(root);
         Stage stage = new Stage();

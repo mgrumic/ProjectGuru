@@ -1323,7 +1323,7 @@ public class JpaTaskHandler implements TaskHandler {
                 q.setParameter("idproject", task.getProjectList().get(0).getId());
             }else{
                 /* trebam naci one koji su u roditelju a nisu u ovom zadatku */
-                q = em.createQuery("SELECT wop.user FROM Task p, IN(p.worksOnTaskList) wop WHERE p.id = :idparent wop.removed = false");
+                q = em.createQuery("SELECT wop.user FROM Task p, IN(p.worksOnTaskList) wop WHERE p.id = :idparent AND wop.removed = false");
                 q.setParameter("idparent", parent.getId());
             }
             

@@ -51,7 +51,7 @@
                         <DatePicker fx:id="start" prefHeight="25.0" prefWidth="266.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                         <DatePicker fx:id="ends" prefHeight="25.0" prefWidth="267.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                         <TextArea fx:id="description" prefHeight="105.0" prefWidth="283.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                        <GridPane fx:id="paneRootTaskAdditions" prefHeight="90.0" prefWidth="520.0" style="-fx-border-color: black; -fx-background-color: 0xffffffff;" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4">
+                        <GridPane fx:id="paneRootTaskAdditions" prefHeight="90.0" prefWidth="520.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4">
                           <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="252.0" minWidth="10.0" prefWidth="239.0" />
                             <ColumnConstraints hgrow="SOMETIMES" maxWidth="279.0" minWidth="10.0" prefWidth="277.0" />
