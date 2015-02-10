@@ -65,6 +65,7 @@ import projectguru.handlers.ProjectHandler;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.InsuficientPrivilegesException;
 import projectguru.handlers.exceptions.StoringException;
+import projectguru.handlers.exceptions.UnfinishedSubtaskException;
 import projectguru.tasktree.TaskNode;
 import projectguru.tasktree.TaskTree;
 import projectguru.utils.FormLoader;
@@ -155,7 +156,7 @@ public class TeamOfficeController {
     private Button btnCurrentTask;
     @FXML
     private Button btnUsersOnTask;
-    
+
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
 
@@ -398,7 +399,7 @@ public class TeamOfficeController {
                 .getResourceAsStream("/projectguru/images/active_task.png"))));
         btnUsersOnTask.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/members.png"))));
-        
+
         projectListMenu = new ContextMenu();
         final MenuItem refreshProjectList = new MenuItem("Учитај све пројекте");
 
@@ -457,16 +458,10 @@ public class TeamOfficeController {
         activateTask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
-                if (taskNode != null) {
-                    try {
-                        FormLoader.loadFormSetActiveTask(taskNode.getValue().getTask(), user);
-                    } catch (IOException ex) {
-                        Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
+                activateOrFinishTask();
             }
         });
+
         manageMembers.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -487,10 +482,18 @@ public class TeamOfficeController {
                             setContextMenu(null);
                         } else if (t != null) {
                             setText(t);
-                            TaskNode node = this.getTreeTableRow().getItem();
+                            TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
+                            if (taskNode != null) {
+                            TaskNode node = taskNode.getValue();
                             if (node != null && user.getTaskHandler().checkTaskChefPrivileges(node.getTask())) {
+                                if (node.getTask().getStartDate() != null) {
+                                    activateTask.setText("Заврши задатак");
+                                } else {
+                                    activateTask.setText("Активирај задатак");
+                                }
                                 setContextMenu(rootContextMenu);
                             }
+                        }
                         }
 
                     }
@@ -902,6 +905,42 @@ public class TeamOfficeController {
             }
         }
         activeTask = check;
+    }
+
+    private void activateOrFinishTask() {
+        TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
+        if (taskNode != null) {
+            Task task = taskNode.getValue().getTask();
+            if (task.getStartDate() == null) {
+                boolean result = FormLoader.showConfirmationDialog("Активирање задатка",
+                        "Да ли сте сигурни да желите активирати задатак ?");
+                if (result == true) {
+                    try {
+                        user.getTaskHandler().startTask(task);
+                    } catch (EntityDoesNotExistException ex) {
+                        FormLoader.showErrorDialog("Грешка", "Објекат не постоји у бази");
+                    } catch (StoringException ex) {
+                        FormLoader.showErrorDialog("Грешка", "Грешка са базом");
+                    }
+                }
+            } else {
+                boolean result;
+                try {
+                    result = user.getTaskHandler().endTask(task);
+                    if (result != true) {
+                        FormLoader.showInformationDialog("Oбавјештење", "Неуспјех приликом завршетка задатка! ");
+                    }
+                } catch (EntityDoesNotExistException ex) {
+                    FormLoader.showErrorDialog("Грешка", "Објекат не постоји у бази");
+                } catch (InsuficientPrivilegesException ex) {
+                    FormLoader.showErrorDialog("Грешка", "Немате довољно привилегија");
+                } catch (StoringException ex) {
+                    FormLoader.showErrorDialog("Грешка", "Грешка са базом");
+                } catch (UnfinishedSubtaskException ex) {
+                    FormLoader.showErrorDialog("Грешка", "Задатак има недовршених подзадатака");
+                }
+            }
+        }
     }
 
     /**
