@@ -25,6 +25,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import netscape.security.Privilege;
@@ -76,6 +77,10 @@ public class FormUsersOnTasksController implements Initializable {
     
     @FXML
     private Button btnViewTimetable;
+    
+    
+    @FXML
+    private Label lblStatus;
     
     @FXML
     private TableColumn<UserOnTaskWrapper, String> columnChef;
@@ -130,12 +135,31 @@ public class FormUsersOnTasksController implements Initializable {
         
         ischef = chef != null && chef.getUsername().equals(loggedUser.getUser().getUsername());
         
+        if(task.getStartDate() == null){
+            status = Status.INIT;
+            lblStatus.setText("Задатак још није започет.");
+        }else if(task.getStartDate() != null && task.getEndDate() == null) {
+            status = Status.STARTED;
+            lblStatus.setText("Задатак је у току.");
+        }else{
+            status = Status.ENDED;
+            lblStatus.setText("Задатак је завршен.");
+        }
+        
+        
         btnAddMember.setDisable(!ischef);
         btnDeleteMember.setDisable(!ischef);
         btnReject.setDisable(!ischef);
         btnSave.setDisable(!ischef);
-        chbActive.setDisable(!ischef);
+        chbActive.setDisable(!ischef || status != Status.STARTED);
         chbChef.setDisable(!ischef);
+        
+        btnAddMember.setVisible(ischef);
+        btnDeleteMember.setVisible(ischef);
+        btnReject.setVisible(ischef);
+        btnSave.setVisible(ischef);
+
+
         
         loadUsers();
   
@@ -228,6 +252,7 @@ public class FormUsersOnTasksController implements Initializable {
     private void add(){
         
         try {
+            
             User newUser = FormLoader.loadFormAddableMembers(loggedUser, task);
             
             loggedUser.getTaskHandler().addMember(task, newUser);
@@ -290,7 +315,7 @@ public class FormUsersOnTasksController implements Initializable {
             if(ischef){
                 btnReject.setDisable(false);
                 btnSave.setDisable(false);
-                chbActive.setDisable(false);
+                chbActive.setDisable(status != Status.STARTED);
                 chbChef.setDisable(false);
                 
             }
@@ -311,6 +336,7 @@ public class FormUsersOnTasksController implements Initializable {
     private ObservableList<UserOnTaskWrapper> usersOnTask;
     
     private boolean ischef;
+    private Status status;
     
     private LoggedUser loggedUser;
     
@@ -332,6 +358,9 @@ public class FormUsersOnTasksController implements Initializable {
         this.loggedUser = loggedUser;
     }
     
+    private static enum Status{
+         INIT, STARTED, ENDED
+    }
     
     private static class UserOnTaskWrapper {
         private User user;

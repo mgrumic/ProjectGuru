@@ -340,7 +340,7 @@ public class JpaTaskHandler implements TaskHandler {
                     }else if(wot.getPrivileges() == Privileges.CHEF.ordinal()){
                         
                         wot.setPrivileges(Privileges.MEMBER.ordinal());
-                        
+                        em.merge(wot);
                         previousChefFound = true;
                         
                         if(chefSet){
@@ -450,6 +450,12 @@ public class JpaTaskHandler implements TaskHandler {
                 WorksOnTask wot = getWorksOnTask(task, user);
                 
                 wot.setRemoved(true);
+                wot.setWorking(false);
+                
+                if(wot.getPrivileges() >= Privileges.CHEF.ordinal()){
+                    wot.setPrivileges(Privileges.MEMBER.ordinal());
+                }
+                
                 em.merge(wot);
                 
                 for(ClosureTasks ct : task.getClosureTasksChildren()){
@@ -995,11 +1001,11 @@ public class JpaTaskHandler implements TaskHandler {
 
         @Override
     public boolean endTask(Task task) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException, UnfinishedSubtaskException {
-        return endTask(task, false);
+        return endTask(task, true);
     }
     
     @Override
-    public boolean endTask(Task task, boolean endSubtasks) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException,UnfinishedSubtaskException {
+    public boolean endTask(Task task, boolean endSubtasks) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException {
 
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
@@ -1020,14 +1026,14 @@ public class JpaTaskHandler implements TaskHandler {
                         new ArrayList<>(task.getClosureTasksChildren()).stream().forEach((ct) -> {
                             if(ct.getChild().getEndDate() == null){
                                 try{
-                                    endTask(ct.getChild(), true);
+                                    endTask(ct.getChild(), false);
                                 }catch(Exception ex){
                                     
                                 }
                             }
                         });
                     } else {
-                        throw new UnfinishedSubtaskException("There are unfinished subtasks");
+                        //throw new UnfinishedSubtaskException("There are unfinished subtasks");
                     }
                 }
                 
@@ -1039,7 +1045,7 @@ public class JpaTaskHandler implements TaskHandler {
                     }
                 }
                 if (prnt1 == null) {
-                    //uraditi nesto kad je root task zavrsen
+                    //TODO: uraditi nesto kad je root task zavrsen
                     for (WorksOnTask wot : task.getWorksOnTaskList()) {
                         wot.setWorking(false);
                         em.merge(wot);

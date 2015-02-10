@@ -429,6 +429,8 @@ public class FormLoader {
 
         stage.initModality(Modality.APPLICATION_MODAL);
 
+        controller.load();
+        
         stage.show();
     }
     

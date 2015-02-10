@@ -724,11 +724,11 @@ public class TeamOfficeController {
                     LocalDate start = project.getStartDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     SerbianLocalDateStringConverter cnv = new SerbianLocalDateStringConverter();
                     lblStartDate.setText(cnv.toString(start));
-                    LocalDate end = project.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                    lblEndDate.setText(cnv.toString(end));
                     lblBudget.setText(String.format("%02d", project.getBudget().intValue()));
                     lblNumTasks.setText((root != null) ? (root.getValue().getTask().getClosureTasksChildren().size() + 1) + "" : "0");
                     lblNumMembers.setText(project.getWorksOnProjectList().size() + "");
+                    LocalDate end = project.getEndDate() != null ? project.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() : null;
+                    lblEndDate.setText(cnv.toString(end));
                     try {
                         lblNumActivities.setText((root != null) ? (user.getActivityHandler().findActivitiesForTask(root.getValue().getTask(), true, false)).size() + "" : "0");
                     } catch (InsuficientPrivilegesException ex) {
