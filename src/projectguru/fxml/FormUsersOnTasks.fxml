@@ -49,8 +49,8 @@
                <children>
                   <CheckBox fx:id="chbActive" mnemonicParsing="false" text="Активан" />
                   <CheckBox fx:id="chbChef" mnemonicParsing="false" text="Шеф задатка" GridPane.rowIndex="1" />
-                  <Button fx:id="btnSave" mnemonicParsing="false" onAction="#btnSave_OnActive" text="Сачувај" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
-                  <Button fx:id="btnReject" mnemonicParsing="false" onAction="#btnReject_OnAction" text="Поништи" GridPane.rowIndex="3" />
+                  <Button fx:id="btnSave" defaultButton="true" mnemonicParsing="false" onAction="#btnSave_OnActive" text="Сачувај" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+                  <Button fx:id="btnReject" cancelButton="true" mnemonicParsing="false" onAction="#btnReject_OnAction" text="Поништи" GridPane.rowIndex="3" />
                </children>
                <GridPane.margin>
                   <Insets />

@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="472.0" prefWidth="613.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="projectguru.controllers.FormUsersOnProjectController">
+<AnchorPane id="AnchorPane" prefHeight="472.0" prefWidth="613.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormUsersOnProjectController">
     <stylesheets>
         <URL value="@/projectguru/css/formusersonproject.css" />
     </stylesheets>
@@ -20,8 +20,8 @@
       <ComboBox layoutX="326.0" layoutY="288.0" prefHeight="25.0" prefWidth="218.0" />
       <Label layoutX="326.0" layoutY="119.0" prefHeight="17.0" prefWidth="233.0" text="Презиме:" />
       <TextField editable="false" layoutX="326.0" layoutY="237.0" prefHeight="25.0" prefWidth="233.0" />
-      <Button layoutX="327.0" layoutY="408.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="Промјени" />
-      <Button layoutX="459.0" layoutY="408.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="Излаз" />
+      <Button defaultButton="true" layoutX="327.0" layoutY="408.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="Промјени" />
+      <Button cancelButton="true" layoutX="459.0" layoutY="408.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="Излаз" />
       <Label layoutX="326.0" layoutY="212.0" prefHeight="17.0" prefWidth="233.0" text="Корисничко име:" />
       <Label layoutX="326.0" layoutY="271.0" prefHeight="17.0" prefWidth="233.0" text="Привилегије:" />
       <TextField editable="false" layoutX="326.0" layoutY="142.0" prefHeight="25.0" prefWidth="233.0" />

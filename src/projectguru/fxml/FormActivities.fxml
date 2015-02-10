@@ -56,8 +56,8 @@
                   <TextArea fx:id="txtDescription" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <Label text="Напомена:" GridPane.rowIndex="5" />
                   <TextField fx:id="txtRemark" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <Button fx:id="btnSaveChanges" mnemonicParsing="false" onAction="#btnSaveChanges_OnAction" text="Сачувај измјене" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
-                  <Button fx:id="btnReject" mnemonicParsing="false" onAction="#btnReject_OnAction" text="Поништи" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
+                  <Button fx:id="btnSaveChanges" defaultButton="true" mnemonicParsing="false" onAction="#btnSaveChanges_OnAction" text="Сачувај измјене" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+                  <Button fx:id="btnReject" cancelButton="true" mnemonicParsing="false" onAction="#btnReject_OnAction" text="Поништи" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
                </children>
                <padding>
                   <Insets left="5.0" right="5.0" />

@@ -61,7 +61,7 @@
          <bottom>
             <AnchorPane prefHeight="54.0" prefWidth="380.0" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="btnFinish" layoutX="373.0" layoutY="15.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="83.0" text="Сачувај" AnchorPane.rightAnchor="144.0" />
+                  <Button fx:id="btnFinish" defaultButton="true" layoutX="373.0" layoutY="15.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="83.0" text="Сачувај" AnchorPane.rightAnchor="144.0" />
                   <Button fx:id="btnNext" layoutX="277.0" layoutY="15.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="79.0" text="Даље&gt;" AnchorPane.rightAnchor="238.0" />
                   <Button fx:id="btnHelp" layoutX="476.0" layoutY="15.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Помоћ" AnchorPane.rightAnchor="40.0" />
                   <Button fx:id="btnBack" disable="true" layoutX="196.0" layoutY="15.0" mnemonicParsing="false" text="&lt;Назад" AnchorPane.rightAnchor="327.0" />
