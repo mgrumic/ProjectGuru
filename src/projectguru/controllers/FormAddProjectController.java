@@ -331,6 +331,19 @@ public class FormAddProjectController implements Initializable {
             );
 
             selectedMembers = FXCollections.observableArrayList();
+            
+            boolean ischef = user.getProjectHandler().checkProjectChefPrivileges(project);
+            if(!ischef){
+                ends.setEditable(false);
+                start.setEditable(false);
+                description.setEditable(false);
+                name.setEditable(false);
+                txtManHours.setEditable(false);
+                dpDeadline.setEditable(false);
+                budget.setEditable(false);
+                btnFinish.setVisible(false);
+            }
+            
         }else {
             lblFormName.setText("Нови пројекат ");
         }

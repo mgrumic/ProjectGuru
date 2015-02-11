@@ -249,7 +249,6 @@ public class FormAddTaskController implements Initializable {
         btnFinish.setOnMouseClicked(eventOnClickFinish);
         btnHelp.setOnMouseClicked(eventOnClickHelp);
 
-        start.setValue(Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
         start.setConverter(new SerbianLocalDateStringConverter());
         ends.setConverter(new SerbianLocalDateStringConverter());
         
@@ -284,9 +283,6 @@ public class FormAddTaskController implements Initializable {
                 .map((u)-> new UserWrapper(u))
                 .collect(Collectors.toList())
             );
-            
-            btnNext.setVisible(false);
-            btnBack.setVisible(false);
             
         }else{
             selectedMembers = FXCollections.observableArrayList(new ArrayList());
@@ -337,7 +333,24 @@ public class FormAddTaskController implements Initializable {
                 ends.setValue(task.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
 
-            menHours.setText(Integer.toString(task.getAssumedManHours()));;
+            menHours.setText(Integer.toString(task.getAssumedManHours()));
+            
+            btnNext.setVisible(false);
+            btnBack.setVisible(false);
+            
+            boolean ischef = user.getTaskHandler().checkTaskChefPrivileges(task);
+            
+            if(!ischef){
+                btnFinish.setVisible(false);
+                dedline.setEditable(false);
+                description.setEditable(false);
+                name.setEditable(false);
+                start.setEditable(false);
+                ends.setEditable(false);
+                menHours.setEditable(false);
+            }
+        }else{
+            start.setValue(Instant.ofEpochMilli(new Date().getTime()).atZone(ZoneId.systemDefault()).toLocalDate());
         }
         
         defineObservableList();
