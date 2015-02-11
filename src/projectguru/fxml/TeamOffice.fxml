@@ -173,10 +173,10 @@
                                              <center>
                                                 <TreeTableView fx:id="treeTasks" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                                   <columns>
-                                                    <TreeTableColumn fx:id="treeColumnTasks" minWidth="327.0" prefWidth="327.68804931640625" />
-                                                      <TreeTableColumn fx:id="treeColumnCompleted" maxWidth="2200.0" minWidth="0.0" prefWidth="100.0" text="Завршено" />
-                                                      <TreeTableColumn prefWidth="100.0" text="Одрађено чч" />
-                                                      <TreeTableColumn prefWidth="100.0" text="Предвиђено чч" />
+                                                    <TreeTableColumn fx:id="treeColumnTasks" minWidth="327.0" prefWidth="366.0" />
+                                                      <TreeTableColumn fx:id="treeColumnCompleted" maxWidth="2200.0" minWidth="120.0" prefWidth="120.0" text="Завршено" />
+                                                      <TreeTableColumn fx:id="treeColumnWorkedMH" prefWidth="100.0" text="Одрађено чч" />
+                                                      <TreeTableColumn fx:id="treeColumnAssumedMH" prefWidth="100.0" text="Предвиђено чч" />
                                                     <TreeTableColumn fx:id="treeColumnDescription" minWidth="203.0" prefWidth="203.0" text="Опис" />
                                                   </columns>
                                                    <columnResizePolicy>

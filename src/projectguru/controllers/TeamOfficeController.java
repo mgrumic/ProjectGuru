@@ -51,6 +51,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -105,6 +107,10 @@ public class TeamOfficeController {
     private TreeTableColumn<TaskNode, String> treeColumnDescription;
     @FXML
     private TreeTableColumn<TaskNode, Double> treeColumnCompleted;
+    @FXML
+    private TreeTableColumn<TaskNode, Double> treeColumnAssumedMH;
+    @FXML
+    private TreeTableColumn<TaskNode, Double> treeColumnWorkedMH;
     @FXML
     private Label lblTime;
     @FXML
@@ -470,9 +476,14 @@ public class TeamOfficeController {
                         super.updateItem(t, bln);
                         if (bln) {
                             setText(null);
+                            setGraphic(null);
                             setContextMenu(null);
                         } else if (t != null) {
-                            setText(t.getTask().getName());
+                            Text text = new Text(t.getTask().getName());
+                            if(t.getWorkedManHours() > t.getTask().getAssumedManHours()){
+                                text.setFill(Color.RED);
+                            }
+                            setGraphic(text);
                             setContextMenu(getContextMenuForTask(t.getTask()));
                         }
 
@@ -505,6 +516,47 @@ public class TeamOfficeController {
                 return cell;
             }
         });
+        treeColumnWorkedMH.setCellFactory(new Callback<TreeTableColumn<TaskNode, Double>, TreeTableCell<TaskNode, Double>>() {
+            @Override
+            public TreeTableCell<TaskNode, Double> call(TreeTableColumn<TaskNode, Double> param) {
+                TreeTableCell<TaskNode, Double> cell = new TreeTableCell<TaskNode, Double>() {
+                    @Override
+                    protected void updateItem(Double t, boolean bln) {
+                        super.updateItem(t, bln);
+                        if (bln) {
+                            setText(null);
+                        } else if (t != null) {
+                            setAlignment(Pos.CENTER);
+                            setText(Math.floor(t) + " h");
+                        }
+
+                    }
+
+                };
+                return cell;
+            }
+        });
+        treeColumnAssumedMH.setCellFactory(new Callback<TreeTableColumn<TaskNode, Double>, TreeTableCell<TaskNode, Double>>() {
+            @Override
+            public TreeTableCell<TaskNode, Double> call(TreeTableColumn<TaskNode, Double> param) {
+                TreeTableCell<TaskNode, Double> cell = new TreeTableCell<TaskNode, Double>() {
+                    @Override
+                    protected void updateItem(Double t, boolean bln) {
+                        super.updateItem(t, bln);
+                        if (bln) {
+                            setText(null);
+                        } else if (t != null) {
+                            setAlignment(Pos.CENTER);
+                            setText(Math.floor(t) + " h");
+                        }
+
+                    }
+
+                };
+                return cell;
+            }
+        });
+        
         treeColumnTasks.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<TaskNode, TaskNode> param)
                 -> new ReadOnlyObjectWrapper<TaskNode>(param.getValue().getValue())
@@ -516,6 +568,13 @@ public class TeamOfficeController {
         treeColumnCompleted.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<TaskNode, Double> param)
                 -> new ReadOnlyObjectWrapper<Double>(param.getValue().getValue().getPartDone()));
+        treeColumnWorkedMH.setCellValueFactory(
+                (TreeTableColumn.CellDataFeatures<TaskNode, Double> param)
+                -> new ReadOnlyObjectWrapper<Double>(param.getValue().getValue().getWorkedManHours()));
+        treeColumnAssumedMH.setCellValueFactory(
+                (TreeTableColumn.CellDataFeatures<TaskNode, Double> param)
+                -> new ReadOnlyObjectWrapper<Double>(param.getValue().getValue().getTask().getAssumedManHours()*1.0));
+        
 
         accProjects.setExpandedPane(accProjects.getPanes().get(0));
         accMembers.setExpandedPane(accMembers.getPanes().get(0));
