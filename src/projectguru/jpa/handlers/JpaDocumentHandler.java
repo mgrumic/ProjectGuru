@@ -107,7 +107,6 @@ public class JpaDocumentHandler implements DocumentHandler {
         revision.setIDDocument(original);
         original.getDocumentRevisionList().add(revision);
 
-        em.getTransaction().commit();
         em.refresh(original);
         em.refresh(revision);
         return true;
@@ -130,13 +129,19 @@ public class JpaDocumentHandler implements DocumentHandler {
             }
 
             document.setIDProject(project);
-
             em.persist(document);
+            em.flush();
+            
+            addRevisionPrivate(document, revision, em);
+            em.flush();
+            
             em.getTransaction().commit();
+            em.persist(revision);
             em.refresh(document);
             em.refresh(project);
+            
             // System.out.println(document);
-            return addRevisionPrivate(document, revision, em);
+
 
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
@@ -148,6 +153,8 @@ public class JpaDocumentHandler implements DocumentHandler {
         } finally {
             em.close();
         }
+        
+        return true;
     }
 
     @Override

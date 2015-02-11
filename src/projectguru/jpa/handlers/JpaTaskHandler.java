@@ -876,6 +876,11 @@ public class JpaTaskHandler implements TaskHandler {
         }
 
         root.setPartDone(partDone);
+        try {
+            root.setWorkedManHours(getWorkedManHoursOfTaskSubtree(root.getTask()));
+        } catch (EntityDoesNotExistException ex) {
+            Logger.getLogger(JpaTaskHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 

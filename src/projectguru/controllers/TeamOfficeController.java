@@ -284,6 +284,7 @@ public class TeamOfficeController {
         } catch (IOException ex) {
             Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

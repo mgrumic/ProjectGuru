@@ -16,6 +16,16 @@ import projectguru.entities.Task;
 public class TaskNode {
     protected Task task;
     protected double partDone;
+    protected double workedManHours;
+
+    public double getWorkedManHours() {
+        return workedManHours;
+    }
+
+    public void setWorkedManHours(double workedManHours) {
+        this.workedManHours = workedManHours;
+    }
+    
 
     public double getPartDone() {
         return partDone;

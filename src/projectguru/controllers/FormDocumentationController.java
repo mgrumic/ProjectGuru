@@ -114,7 +114,12 @@ public class FormDocumentationController implements Initializable {
         choiceBoxDocum.setItems(docw);
         choiceBoxDocum.getSelectionModel().selectFirst();
         loadRevision(choiceBoxDocum.getSelectionModel().getSelectedItem());
-        this.labesDescription.setText(choiceBoxDocum.getSelectionModel().getSelectedItem().getDocument().getDescription());
+        DocumentWrapper item = choiceBoxDocum.getSelectionModel().getSelectedItem();
+        if (item != null) {
+            this.labesDescription.setText(item.getDocument().getDescription());
+        } else {
+            this.labesDescription.setText("");
+        }
         choiceBoxDocum.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DocumentWrapper>() {
 
             @Override
@@ -145,12 +150,10 @@ public class FormDocumentationController implements Initializable {
             return;
         }
 
-        
         Document doc = docwr.getDocument();
-        
+
         labesDescription.setText(doc.getDescription());
 
-        
         List<DocumentRevision> listAll = doc.getDocumentRevisionList();
         List<DocumentRevisionWrapper> dwList = new ArrayList<DocumentRevisionWrapper>();
         for (int i = 0; i < listAll.size(); i++) {
@@ -167,9 +170,9 @@ public class FormDocumentationController implements Initializable {
 
             @Override
             public void changed(ObservableValue<? extends DocumentRevisionWrapper> observable, DocumentRevisionWrapper oldValue, DocumentRevisionWrapper newValue) {
-                if(newValue != null){
+                if (newValue != null) {
                     labelDescRevision.setText(newValue.getDocument().getDescription());
-                }else{
+                } else {
                     labelDescRevision.setText("");
                 }
             }
