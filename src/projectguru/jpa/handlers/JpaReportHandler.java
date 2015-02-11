@@ -10,6 +10,9 @@ import java.sql.Connection;
 
 import java.awt.Color;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import javafx.scene.control.TreeItem;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
@@ -25,10 +28,15 @@ import net.sf.dynamicreports.report.builder.datatype.DataTypes;
 import net.sf.dynamicreports.report.constant.HorizontalAlignment;
 import net.sf.dynamicreports.report.constant.VerticalAlignment;
 import net.sf.dynamicreports.report.builder.component.ComponentBuilders;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import projectguru.AccessManager;
 import projectguru.entities.Project;
+import projectguru.entities.Task;
 import projectguru.handlers.LoggedUser;
 import projectguru.jpa.JpaAccessManager;
+import projectguru.tasktree.TaskNode;
+import projectguru.tasktree.TaskTree;
+import projectguru.utils.ProjectReportBean;
 import projectguru.utils.ReportType;
 /**
  *
@@ -74,7 +82,7 @@ public class JpaReportHandler implements ReportHandler{
            System.out.println(ex.getMessage());
         }
        
-        report = DynamicReports.report().floatColumnFooter();
+        report = DynamicReports.report();
         fillColumns(type);
         StyleBuilder boldStyle = DynamicReports.stl.style().bold();
         StyleBuilder boldCenteredStyle = DynamicReports.stl.style(boldStyle)
@@ -107,14 +115,23 @@ public class JpaReportHandler implements ReportHandler{
         if(type == ReportType.FINANSIJSKI_PREGLED_PRIHODA_REPORT || type == ReportType.FINANSIJSKI_PREGLED_RASHODA_REPORT){
             query = query + " where ProjectID = " + project.getId();
             report.setDataSource(query, connection);
-        }else{
+        }else if(type == ReportType.PREGLED_AKTIVNOSTI_REPORT){
             query = query + " where IDProject = " + project.getId();
             report.setDataSource(query, connection);
+        }else if(type == ReportType.STANJE_PROJEKTA_REPORT){
+            ArrayList<ProjectReportBean> list = new ArrayList<ProjectReportBean>();
+            fillList(list);
+            JRBeanCollectionDataSource bean = new JRBeanCollectionDataSource(list);
+            report.setDataSource(bean);
         }
     }
     
     private void fillColumns(ReportType type){
         StyleBuilder boldStyle = DynamicReports.stl.style().bold();
+        StyleBuilder boldStyleRed = DynamicReports.stl.style().bold().setForegroundColor(Color.RED);
+        StyleBuilder boldStyleGreen = DynamicReports.stl.style().bold().setForegroundColor(Color.GREEN);
+        StyleBuilder boldStyleOrange = DynamicReports.stl.style().bold().setForegroundColor(Color.ORANGE);
+        
         if(type == ReportType.FINANSIJSKI_PREGLED_PRIHODA_REPORT || type == ReportType.FINANSIJSKI_PREGLED_RASHODA_REPORT){
             
                 TextColumnBuilder<BigDecimal> ammountColumn = 
@@ -191,6 +208,73 @@ public class JpaReportHandler implements ReportHandler{
                      usernameColumn,
                      taskNameColumn
             );
+        }else if(type == ReportType.STANJE_PROJEKTA_REPORT){
+            TextColumnBuilder<Integer> percentageColumn = 
+                        Columns.column("Проценат [%]", "percentage", DataTypes.integerType());
+            
+            TextColumnBuilder<String> taskNameColumn = 
+                        Columns.column("Назив задатка", "taskName", DataTypes.stringType());
+            
+            TextColumnBuilder<Integer> manHoursColumn = 
+                        Columns.column("Предвиђено човјек часова", "assumedManHours", DataTypes.integerType());
+            
+            TextColumnBuilder<Double> manHoursDoneColumn = 
+                        Columns.column("Потрошено човјек часова", "doneManHours", DataTypes.doubleType());
+            
+            TextColumnBuilder<String> startDateColumn = 
+                        Columns.column("Датум почетка", "startDate", DataTypes.stringType());
+            
+            TextColumnBuilder<String> endDateColumn = 
+                        Columns.column("Датум завршетка", "endDate", DataTypes.stringType());
+            
+            TextColumnBuilder<String> deadlineDateColumn = 
+                        Columns.column("Крајњи рок", "deаdlineDate", DataTypes.stringType());
+            
+            TextColumnBuilder<Integer> rowNumberColumn = 
+                        DynamicReports.col.reportRowNumberColumn("Бр.")
+                        .setFixedColumns(3)
+                        .setHorizontalAlignment(HorizontalAlignment.RIGHT);
+            
+            Bar3DChartBuilder awesomeChart = DynamicReports.cht.bar3DChart()
+                .setTitle("Однос урађених/предвиђених човјек сати")
+                .setCategory(taskNameColumn)
+                .addSerie(DynamicReports.cht.serie(manHoursColumn), DynamicReports.cht.serie(manHoursDoneColumn));
+            
+            report.columns(rowNumberColumn,
+                           percentageColumn, 
+                           taskNameColumn.setHorizontalAlignment(HorizontalAlignment.RIGHT), 
+                           manHoursColumn, 
+                           manHoursDoneColumn,
+                           startDateColumn.setHorizontalAlignment(HorizontalAlignment.RIGHT)
+                                          .setStyle(boldStyleGreen), 
+                           endDateColumn.setHorizontalAlignment(HorizontalAlignment.RIGHT)
+                                        .setStyle(boldStyleOrange), 
+                           deadlineDateColumn.setHorizontalAlignment(HorizontalAlignment.RIGHT)
+                                             .setStyle(boldStyleRed)
+            ).summary(awesomeChart);
         }
+    }
+    private void fillList(ArrayList<ProjectReportBean> list) {
+        Task rootTask = project.getIDRootTask();
+                if (rootTask != null) {
+                    
+                    TaskTree tree = user.getTaskHandler().getTaskTree(rootTask);
+                    list.add(generateBeanFromTaskNode(tree.getRoot()));
+                    recursiveTaskTreeLoad(tree.getRoot(), list);
+                }
+    }
+
+    private void recursiveTaskTreeLoad(TaskNode task, ArrayList<ProjectReportBean> list) {
+        List<TaskNode> children = task.getChildren();
+        children.stream().forEach((child) -> {
+            list.add(generateBeanFromTaskNode(child));
+            recursiveTaskTreeLoad(child, list);
+        });
+    }
+    
+    private ProjectReportBean generateBeanFromTaskNode(TaskNode node){
+        Task task = node.getTask();
+        return new ProjectReportBean(task.getName(), (int)(100*node.getPartDone()), task.getAssumedManHours(),
+                                     task.getStartDate(), task.getEndDate(), task.getDeadline(), node.getWorkedManHours());
     }
 }
