@@ -42,14 +42,13 @@ public class JpaDocumentHandler implements DocumentHandler {
 //TODO
     @Override
     public boolean checkPrivileges(Document document) {
-        for (WorksOnProject wop : document.getIDProject().getWorksOnProjectList()) {
-            if (wop.getPrivileges() == 4) {
-                if (wop.getUser().equals(user.getUser())) {
-                    return true;
-                }
-            }
+
+        if(document.getIDProject() == null){
+            throw new Error("NAJBEM SE MAME");
         }
-        return false;
+        
+        return user.getProjectHandler().checkMemberPrivileges(document.getIDProject());
+       
     }
 
     @Override
@@ -60,7 +59,7 @@ public class JpaDocumentHandler implements DocumentHandler {
             if (original.getId() == null || (original = em.find(Document.class, original.getId())) == null) {
                 throw new EntityDoesNotExistException("Original document does not exist.");
             }
-            if (checkPrivileges(original)) {
+            if (!checkPrivileges(original)) {
                 throw new InsuficientPrivilegesException();
             }
             try {
@@ -111,6 +110,7 @@ public class JpaDocumentHandler implements DocumentHandler {
             em.persist(document);
             em.getTransaction().commit();
             em.refresh(document);
+            em.refresh(project);
            // System.out.println(document);
             return true;
 

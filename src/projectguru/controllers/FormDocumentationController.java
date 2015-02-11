@@ -83,6 +83,8 @@ public class FormDocumentationController implements Initializable {
 //        this.user = user;
 //    }
     ObservableList<DocumentRevisionWrapper> docw;
+    @FXML
+    private Label labelDescRevision;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -92,7 +94,17 @@ public class FormDocumentationController implements Initializable {
 
     public void loadDocum() {
         buttonOpen.setDisable(false);
-        List<Document> listAll = project.getDocumentList();
+//        try {
+//            project = user.getProjectHandler().getUpdatedProject(project);
+//        } catch (EntityDoesNotExistException ex) {
+//            Logger.getLogger(FormDocumentationController.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+        List<Document> listAll = new ArrayList<>();
+        try {
+            listAll = user.getProjectHandler().getAllDocuments(project);
+        } catch (EntityDoesNotExistException ex) {
+            Logger.getLogger(FormDocumentationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         List<DocumentWrapper> dwList = new ArrayList<DocumentWrapper>();
         for (int i = 0; i < listAll.size(); i++) {
             dwList.add(new DocumentWrapper(listAll.get(i)));
@@ -101,24 +113,45 @@ public class FormDocumentationController implements Initializable {
         ObservableList<DocumentWrapper> docw = FXCollections.observableArrayList(dwList);
         choiceBoxDocum.setItems(docw);
         choiceBoxDocum.getSelectionModel().selectFirst();
-        if (listAll.size() > 0) {
-            loadRevision(listAll.get(0));
-        }
-        choiceBoxDocum.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+        loadRevision(choiceBoxDocum.getSelectionModel().getSelectedItem());
+        this.labesDescription.setText(choiceBoxDocum.getSelectionModel().getSelectedItem().getDocument().getDescription());
+        choiceBoxDocum.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DocumentWrapper>() {
+
             @Override
-            public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-                loadRevision(choiceBoxDocum.getItems().get((Integer) t1).getDocument());
+            public void changed(ObservableValue<? extends DocumentWrapper> observable, DocumentWrapper oldValue, DocumentWrapper newValue) {
+                loadRevision(newValue);
             }
         });
-         if(listAll.size()==0){
-             FormLoader.showInformationDialog("Напомена", "Немате ни један додан документ !");
-             buttonOpen.setDisable(true);
-         }
+        if (listAll.size() == 0) {
+            FormLoader.showInformationDialog("Напомена", "Немате ни један додан документ !");
+            buttonOpen.setDisable(true);
+
+        }
     }
 
-    public void loadRevision(Document doc) {
+    public void loadRevision(DocumentWrapper docwr) {
 
-        List<DocumentRevision> listAll = doc.getDocumentRevisionList();;
+        if (docwr == null) {
+            listViewRevision.setItems(FXCollections.observableArrayList());
+            return;
+        }
+
+        if (docwr.getDocument() == null) {
+            try {
+                throw new Error();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return;
+        }
+
+        
+        Document doc = docwr.getDocument();
+        
+        labesDescription.setText(doc.getDescription());
+
+        
+        List<DocumentRevision> listAll = doc.getDocumentRevisionList();
         List<DocumentRevisionWrapper> dwList = new ArrayList<DocumentRevisionWrapper>();
         for (int i = 0; i < listAll.size(); i++) {
             dwList.add(new DocumentRevisionWrapper(listAll.get(i)));
@@ -128,19 +161,31 @@ public class FormDocumentationController implements Initializable {
         listViewRevision.setItems(docw);
         listViewRevision.getSelectionModel().selectFirst();
         if (listAll.size() > 0) {
-            this.labesDescription.setText(doc.getDescription());
+            this.labelDescRevision.setText(listViewRevision.getSelectionModel().getSelectedItem().getDocument().getDescription());
         }
-       
+        listViewRevision.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<DocumentRevisionWrapper>() {
+
+            @Override
+            public void changed(ObservableValue<? extends DocumentRevisionWrapper> observable, DocumentRevisionWrapper oldValue, DocumentRevisionWrapper newValue) {
+                if(newValue != null){
+                    labelDescRevision.setText(newValue.getDocument().getDescription());
+                }else{
+                    labelDescRevision.setText("");
+                }
+            }
+        });
+
     }
 
     @FXML
     void buttonAddDocPressed(ActionEvent event) {
-        if (user.getUser().getAppPrivileges() != 4) {
+        if (!user.getProjectHandler().checkMemberPrivileges(project)) {
             FormLoader.showInformationDialog("Напомена", "Немате привилегију за додавање документа!");
-           
+
         } else {
             try {
                 FormLoader.loadFormAddDocumentation(project, user);
+                loadDocum();
             } catch (IOException ex) {
                 Logger.getLogger(TeamOfficeController.class.getName()).log(Level.SEVERE, null, ex);
             } catch (Exception e) {
@@ -160,44 +205,47 @@ public class FormDocumentationController implements Initializable {
 
     @FXML
     private void openFile(ActionEvent event) {
-        DocumentRevisionWrapper drw = docw.get(listViewRevision.getSelectionModel().getSelectedIndex());
+        DocumentRevisionWrapper drw = listViewRevision.getSelectionModel().getSelectedItem();
+
+        if (drw == null) {
+            return;
+        }
 
         byte[] file = drw.getDocument().getBinData();
         FileChooser fileChooser = new FileChooser();
 
         //Set extension filter
-        
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
-        FileChooser.ExtensionFilter extFilter2 = new FileChooser.ExtensionFilter("Microsoft Word Documents", ".docx");
-        FileChooser.ExtensionFilter extFilter3 = new FileChooser.ExtensionFilter("PDF Documents", ".pdf");
-        FileChooser.ExtensionFilter extFilter4 = new FileChooser.ExtensionFilter("Microsoft Excel Documents", ".xlsx");
-
-
-        fileChooser.getExtensionFilters().add(extFilter);
-        fileChooser.getExtensionFilters().add(extFilter2);
-        fileChooser.getExtensionFilters().add(extFilter3);
-        fileChooser.getExtensionFilters().add(extFilter4);
+//        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("TXT files (*.txt)", "*.txt");
+//        FileChooser.ExtensionFilter extFilter2 = new FileChooser.ExtensionFilter("Microsoft Word Documents", ".docx");
+//        FileChooser.ExtensionFilter extFilter3 = new FileChooser.ExtensionFilter("PDF Documents", ".pdf");
+//        FileChooser.ExtensionFilter extFilter4 = new FileChooser.ExtensionFilter("Microsoft Excel Documents", ".xlsx");
+//
+//        fileChooser.getExtensionFilters().add(extFilter);
+//        fileChooser.getExtensionFilters().add(extFilter2);
+//        fileChooser.getExtensionFilters().add(extFilter3);
+//        fileChooser.getExtensionFilters().add(extFilter4);
         //Show save file dialog
+        fileChooser.setInitialFileName(drw.getDocument().getFileName());
         File fileSave = fileChooser.showSaveDialog(null);
 
         if (fileSave != null) {
-            SaveFile(fileSave.getPath(),file);
+            SaveFile(fileSave.getPath(), file);
         }
     }
-     private void SaveFile(String content, byte[] bFile){
+
+    private void SaveFile(String content, byte[] bFile) {
         try {
-  
- 
-	    //convert array of bytes into file
-	    FileOutputStream fileOuputStream = 
-                  new FileOutputStream(content); 
-	    fileOuputStream.write(bFile);
-	    fileOuputStream.close();
- 
-	 //   System.out.println("Done");
+
+            //convert array of bytes into file
+            FileOutputStream fileOuputStream
+                    = new FileOutputStream(content);
+            fileOuputStream.write(bFile);
+            fileOuputStream.close();
+
+            //   System.out.println("Done");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-         
+
     }
-    }
+}

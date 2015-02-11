@@ -58,6 +58,8 @@ public class DocumentRevision implements Serializable {
     @JoinColumn(name = "IDDocument", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Document iDDocument;
+    @Column(name = "FileName")
+    private String fileName;
 
     public DocumentRevision() {
     }
@@ -140,6 +142,21 @@ public class DocumentRevision implements Serializable {
             return false;
         }
         return true;
+    }
+        public Document getiDDocument() {
+        return iDDocument;
+    }
+
+    public void setiDDocument(Document iDDocument) {
+        this.iDDocument = iDDocument;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     @Override

@@ -79,6 +79,8 @@ public class FormAddDocumentationController implements Initializable {
     private Button btnCancel;
     @FXML
     private CheckBox checkBoxRev;
+    @FXML
+    private TextArea textDescRevision;
 
     /**
      * Initializes the controller class.
@@ -127,15 +129,20 @@ public class FormAddDocumentationController implements Initializable {
     private void btnSavePressed(ActionEvent event) {
         try {
             if (!checkBoxRev.isSelected()) {
-                if (textBoxDesc.getText() != "" && textBoxName.getText() != "" && file != null) {
+                if (textBoxDesc.getText() != "" && textBoxName.getText() != "" && file != null && textDescRevision.getText() != "" ) {
                     byte[] fajl = Files.readAllBytes(Paths.get(file.getPath()));
                     String desc = this.textBoxDesc.getText();
                     String name = this.textBoxName.getText();
                     Calendar cal = Calendar.getInstance();
                     Date date = cal.getTime();
 
+                    String filename = file.getName();
+                    
+                    
                     Document d = new Document(null, name, date, desc);
-                    DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, desc);
+                    DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, textDescRevision.getText());
+        
+                    drev.setFileName(filename);
                     //ProjectHandler prJpa = user.getProjectHandler(); 
                     //prJpa.addDocument(project, d);
                     //treba mi metoda koja vraca zadnji dokument
@@ -150,14 +157,19 @@ public class FormAddDocumentationController implements Initializable {
                 }
 
             } else {
-                if (file != null) {
+                if (file != null && textDescRevision.getText() != "") {
                     TeamOfficeController.DocumentWrapper dw = chooseBoxRevisionOn.getItems().get(chooseBoxRevisionOn.getSelectionModel().getSelectedIndex());
 
                     byte[] fajl = Files.readAllBytes(Paths.get(file.getPath()));
                     //String desc = this.textBoxDesc.getText();
+                    
+                    String filename = file.getName();
+                    
                     Date date = new Date();
                     Document doc = dw.getDocument();
-                    DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, "");
+                    DocumentRevision drev = new DocumentRevision(null, 1, fajl, date, textDescRevision.getText());
+        
+                    drev.setFileName(filename);
                     DocumentHandler docJpa = user.getDocumentHandler();
                     docJpa.addRevision(doc, drev);
                     Stage stage = (Stage) btnSave.getScene().getWindow();
