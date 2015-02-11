@@ -430,9 +430,9 @@ public class JpaTaskHandler implements TaskHandler {
                 throw new EntityDoesNotExistException("User does not exists in database.");
             }
 
-            if (!checkTaskChefPrivileges(task)) {
-                throw new InsuficientPrivilegesException();
-            }
+           // if (!checkTaskChefPrivileges(task)) {
+          //      throw new InsuficientPrivilegesException();
+         //   }
 
             try {
                 em.getTransaction().begin();

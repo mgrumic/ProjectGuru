@@ -40,6 +40,7 @@ import projectguru.controllers.FormFinancesOverviewController;
 import projectguru.controllers.FormReportController;
 import projectguru.controllers.FormSetActiveTaskController;
 import projectguru.controllers.FormUserAccountsController;
+import projectguru.controllers.FormUsersOnProjectController;
 import projectguru.controllers.FormUsersOnTasksController;
 import projectguru.controllers.TeamOfficeController;
 import projectguru.entities.Activity;
@@ -454,6 +455,28 @@ public class FormLoader {
         stage.showAndWait();
         
         return controller.getUser();
+    }
+    
+    public static void loadFormUsersOnProject(LoggedUser loggedUser, Project project) throws IOException{
+        
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormUsersOnProject.fxml"));
+        Parent root = loader.load();
+        
+        FormUsersOnProjectController controller = loader.getController();
+        controller.setLoggedUser(loggedUser);
+        controller.setProject(project);
+        controller.loadMembers();
+        
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setTitle("Корисници на пројекту " + project.getName());
+        stage.setResizable(true);
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.showAndWait();
+        
     }
     
 }

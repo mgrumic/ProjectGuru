@@ -8,31 +8,22 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<<<<<<< HEAD
-<AnchorPane id="AnchorPane" prefHeight="472.0" prefWidth="613.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="projectguru.controllers.FormUsersOnProjectController">
-=======
 <AnchorPane id="AnchorPane" prefHeight="472.0" prefWidth="613.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormUsersOnProjectController">
->>>>>>> 2530000937ebcbe38626fdb438d57ab86f62516c
     <stylesheets>
         <URL value="@/projectguru/css/formusersonproject.css" />
     </stylesheets>
    <children>
-      <ListView layoutX="33.0" layoutY="66.0" prefHeight="367.0" prefWidth="240.0" />
+      <ListView fx:id="listMembers" layoutX="33.0" layoutY="66.0" prefHeight="367.0" prefWidth="240.0" />
       <Label layoutX="33.0" layoutY="43.0" prefHeight="17.0" prefWidth="240.0" text="Чланови:" />
       <Label layoutX="326.0" layoutY="66.0" prefHeight="17.0" prefWidth="233.0" text="Име:" />
-      <TextField editable="false" layoutX="326.0" layoutY="88.0" prefHeight="25.0" prefWidth="233.0" />
-      <ComboBox layoutX="326.0" layoutY="288.0" prefHeight="25.0" prefWidth="218.0" />
+      <TextField fx:id="tfFirstName" editable="false" layoutX="326.0" layoutY="88.0" prefHeight="25.0" prefWidth="233.0" />
+      <ComboBox fx:id="cbPrivileges" layoutX="326.0" layoutY="288.0" prefHeight="25.0" prefWidth="218.0" />
       <Label layoutX="326.0" layoutY="119.0" prefHeight="17.0" prefWidth="233.0" text="Презиме:" />
-      <TextField editable="false" layoutX="326.0" layoutY="237.0" prefHeight="25.0" prefWidth="233.0" />
-<<<<<<< HEAD
-      <Button layoutX="327.0" layoutY="408.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="Промјени" />
-      <Button layoutX="459.0" layoutY="408.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="Излаз" />
-=======
-      <Button defaultButton="true" layoutX="327.0" layoutY="408.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="Промјени" />
-      <Button cancelButton="true" layoutX="459.0" layoutY="408.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="Излаз" />
->>>>>>> 2530000937ebcbe38626fdb438d57ab86f62516c
+      <TextField fx:id="tfUsername" editable="false" layoutX="326.0" layoutY="237.0" prefHeight="25.0" prefWidth="233.0" />
+      <Button fx:id="btnChangePrivileges" defaultButton="true" layoutX="327.0" layoutY="408.0" mnemonicParsing="false" onAction="#btnChangePrivilegesPressed" prefHeight="25.0" prefWidth="108.0" text="Промјени" />
+      <Button fx:id="btnExit" cancelButton="true" layoutX="459.0" layoutY="408.0" mnemonicParsing="false" onAction="#btnExitPressed" prefHeight="25.0" prefWidth="108.0" text="Излаз" />
       <Label layoutX="326.0" layoutY="212.0" prefHeight="17.0" prefWidth="233.0" text="Корисничко име:" />
       <Label layoutX="326.0" layoutY="271.0" prefHeight="17.0" prefWidth="233.0" text="Привилегије:" />
-      <TextField editable="false" layoutX="326.0" layoutY="142.0" prefHeight="25.0" prefWidth="233.0" />
+      <TextField fx:id="tfLastName" editable="false" layoutX="326.0" layoutY="142.0" prefHeight="25.0" prefWidth="233.0" />
    </children>
 </AnchorPane>

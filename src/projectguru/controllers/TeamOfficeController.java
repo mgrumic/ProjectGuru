@@ -157,7 +157,9 @@ public class TeamOfficeController {
     private Button btnCurrentTask;
     @FXML
     private Button btnUsersOnTask;
-
+    @FXML
+    private Button btnProjectMembers;
+            
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
 
@@ -336,7 +338,21 @@ public class TeamOfficeController {
             FormLoader.showExtendedInformationDialog("Активни задатак", "Задатак: " + activeTask.getName(), activeTask.getDescription());
         }
     }
-
+    
+    @FXML
+    void btnProjectMembersPressed(ActionEvent event) {
+        ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
+        if(item != null){
+            Project project = item.getProject();
+            try {
+                FormLoader.loadFormUsersOnProject(user, project);
+                loadMembers(project);
+            } catch (IOException ex) {
+                FormLoader.showErrorDialog("Грешка", "Грешка приликом отварања форме");
+            }
+        }
+    }
+    
     @FXML
     void btnUsersOnTaskPressed(ActionEvent event) {
         TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
@@ -400,6 +416,8 @@ public class TeamOfficeController {
                 .getResourceAsStream("/projectguru/images/active_task.png"))));
         btnUsersOnTask.setGraphic(new ImageView(new Image(TeamOfficeController.class
                 .getResourceAsStream("/projectguru/images/members.png"))));
+        btnProjectMembers.setGraphic(new ImageView(new Image(TeamOfficeController.class
+                .getResourceAsStream("/projectguru/images/members_small.png"))));
 
         projectListMenu = new ContextMenu();
         final MenuItem refreshProjectList = new MenuItem("Учитај све пројекте");
@@ -753,6 +771,7 @@ public class TeamOfficeController {
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
                         btnUsersOnTask.setVisible(true);
+                        btnProjectMembers.setVisible(true);
                         lblProjectCompleted.setText("Шеф пројекта");
                     } else if (ph.checkMemberPrivileges(project)) {
                         btnAddMember.setDisable(true);
@@ -763,6 +782,7 @@ public class TeamOfficeController {
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
                         btnUsersOnTask.setVisible(false);
+                        btnProjectMembers.setVisible(false);
                         lblProjectCompleted.setText("Члан пројекта");
                     } else if (ph.checkInsightPrivileges(project)) {
                         btnAddMember.setDisable(true);
@@ -773,6 +793,7 @@ public class TeamOfficeController {
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
                         btnUsersOnTask.setVisible(false);
+                        btnProjectMembers.setVisible(false);
                         lblProjectCompleted.setText("Надзор");
                     } else if (ph.checkExternPrivileges(project)) {
                         btnAddMember.setDisable(true);
@@ -783,6 +804,7 @@ public class TeamOfficeController {
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
                         btnUsersOnTask.setVisible(false);
+                        btnProjectMembers.setVisible(false);
                         lblProjectCompleted.setText("Екстерни члан");
                     } else {
                         btnAddMember.setDisable(true);
@@ -793,6 +815,7 @@ public class TeamOfficeController {
                         btnGetReport.setVisible(false);
                         btnDocuments.setVisible(false);
                         btnUsersOnTask.setVisible(false);
+                        btnProjectMembers.setVisible(false);
                         lblProjectCompleted.setText("Немате привилегија");
                     }
                 }
