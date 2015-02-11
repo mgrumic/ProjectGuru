@@ -212,9 +212,9 @@
             </SplitPane>
          </center>
          <top>
-            <BorderPane prefHeight="71.0" prefWidth="675.0" BorderPane.alignment="CENTER">
+            <BorderPane prefHeight="82.0" prefWidth="1237.0" BorderPane.alignment="CENTER">
                <top>
-                  <MenuBar BorderPane.alignment="CENTER">
+                  <MenuBar prefHeight="16.0" prefWidth="1237.0" BorderPane.alignment="CENTER">
                     <menus>
                       <Menu mnemonicParsing="false" text="Апликација">
                         <items>
@@ -231,19 +231,19 @@
                   </MenuBar>
                </top>
                <center>
-                  <AnchorPane fx:id="anchorHeader" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                  <AnchorPane fx:id="anchorHeader" prefHeight="100.0" prefWidth="1237.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label fx:id="lblTime" layoutX="724.0" layoutY="10.0" text="00:00:00" AnchorPane.rightAnchor="14.0">
+                        <Label fx:id="lblTime" layoutX="1151.0" layoutY="15.0" text="00:00:00" AnchorPane.rightAnchor="14.0">
                            <font>
                               <Font name="System Bold" size="18.0" />
                            </font>
                         </Label>
-                        <Label layoutX="14.0" layoutY="10.0" text="Пројекат Гуру" AnchorPane.leftAnchor="14.0">
+                        <Label layoutX="14.0" layoutY="15.0" text="Пројекат Гуру" AnchorPane.leftAnchor="14.0">
                            <font>
                               <Font name="System Bold" size="18.0" />
                            </font>
                         </Label>
-                        <Button fx:id="btnCurrentTask" layoutX="1017.0" layoutY="11.0" mnemonicParsing="false" onAction="#btnCurrentTaskPressed" prefHeight="25.0" prefWidth="171.0" text="Активни задатак" AnchorPane.rightAnchor="108.0" />
+                        <Button fx:id="btnCurrentTask" layoutX="958.0" layoutY="16.0" mnemonicParsing="false" onAction="#btnCurrentTaskPressed" prefHeight="25.0" prefWidth="171.0" text="Активни задатак" AnchorPane.rightAnchor="108.0" />
                      </children>
                   </AnchorPane>
                </center>

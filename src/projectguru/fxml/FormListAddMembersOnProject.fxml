@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="483.0" prefWidth="364.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormListAddMembersOnProjectController">
+    <stylesheets>
+        <URL value="@/projectguru/css/formsetactivetask.css" />
+    </stylesheets>
+   <children>
+      <ListView fx:id="listMembers" layoutX="42.0" layoutY="58.0" prefHeight="295.0" prefWidth="265.0" />
+      <Button fx:id="btnAddMember" layoutX="42.0" layoutY="378.0" mnemonicParsing="false" onAction="#btnAddMemberPressed" prefHeight="25.0" prefWidth="265.0" text="Додај на пројекат" />
+      <Button fx:id="btnExit" layoutX="42.0" layoutY="416.0" mnemonicParsing="false" onAction="#btnExitPressed" prefHeight="25.0" prefWidth="265.0" text="Излаз" />
+      <Label layoutX="42.0" layoutY="38.0" prefHeight="17.0" prefWidth="265.0" text="Чланови који нису на пројекту:" />
+   </children>
+</AnchorPane>

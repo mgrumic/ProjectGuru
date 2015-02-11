@@ -5,6 +5,7 @@
  */
 package projectguru.controllers;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -67,6 +68,21 @@ public class FormUsersOnProjectController implements Initializable {
     private Button btnChangePrivileges;
 
     @FXML
+    private Button btnAddMembers;
+    
+    @FXML
+    void btnAddMembersPressed(ActionEvent event) {
+        if(project != null){
+            try {
+                FormLoader.loadFormListAddMembersOnProject(project, user);
+                loadMembers();
+            } catch (IOException ex) {
+                Logger.getLogger(FormUsersOnProjectController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    @FXML
     void btnChangePrivilegesPressed(ActionEvent event) {
         UserWrapper item = listMembers.getSelectionModel().getSelectedItem();
         if (item != null) {
@@ -97,6 +113,7 @@ public class FormUsersOnProjectController implements Initializable {
                     FormLoader.showErrorDialog("Грешка", "Грешка са базом");
                 }
             }
+            loadMembers();
         }
     }
 
@@ -105,6 +122,7 @@ public class FormUsersOnProjectController implements Initializable {
         ((Stage) btnExit.getScene().getWindow()).close();
     }
 
+    
     /**
      * Moje varijable
      */
@@ -162,10 +180,6 @@ public class FormUsersOnProjectController implements Initializable {
 
     public void loadMembers() {
         if (project != null) {
-            try {
-                project = user.getProjectHandler().getUpdatedProject(project);
-            } catch (EntityDoesNotExistException ex) {
-            }
             members = FXCollections.observableArrayList(
                     user.getProjectHandler().getAllMembers(project)
                     .stream()

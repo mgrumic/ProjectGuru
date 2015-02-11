@@ -13,7 +13,7 @@
         <URL value="@/projectguru/css/formusersonproject.css" />
     </stylesheets>
    <children>
-      <ListView fx:id="listMembers" layoutX="33.0" layoutY="66.0" prefHeight="367.0" prefWidth="240.0" />
+      <ListView fx:id="listMembers" layoutX="33.0" layoutY="66.0" prefHeight="317.0" prefWidth="240.0" />
       <Label layoutX="33.0" layoutY="43.0" prefHeight="17.0" prefWidth="240.0" text="Чланови:" />
       <Label layoutX="326.0" layoutY="66.0" prefHeight="17.0" prefWidth="233.0" text="Име:" />
       <TextField fx:id="tfFirstName" editable="false" layoutX="326.0" layoutY="88.0" prefHeight="25.0" prefWidth="233.0" />
@@ -25,5 +25,6 @@
       <Label layoutX="326.0" layoutY="212.0" prefHeight="17.0" prefWidth="233.0" text="Корисничко име:" />
       <Label layoutX="326.0" layoutY="271.0" prefHeight="17.0" prefWidth="233.0" text="Привилегије:" />
       <TextField fx:id="tfLastName" editable="false" layoutX="326.0" layoutY="142.0" prefHeight="25.0" prefWidth="233.0" />
+      <Button fx:id="btnAddMembers" layoutX="53.0" layoutY="408.0" mnemonicParsing="false" onAction="#btnAddMembersPressed" prefHeight="25.0" prefWidth="192.0" text="Додај нове чланове" />
    </children>
 </AnchorPane>

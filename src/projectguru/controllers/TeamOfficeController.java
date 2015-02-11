@@ -224,10 +224,11 @@ public class TeamOfficeController {
     @FXML
     void btnAddMemberPressed(ActionEvent event) {
         try {
-            FormLoader.loadFormAddMembersOnProjects(user,
-                    listProjects.getSelectionModel().getSelectedItem().getProject(),
-                    this
-            );
+            ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
+            if (item != null) {
+                FormLoader.loadFormListAddMembersOnProject(item.getProject(), user);
+                loadMembers(item.getProject());
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -347,8 +348,9 @@ public class TeamOfficeController {
             try {
                 FormLoader.loadFormUsersOnProject(user, project);
                 loadMembers(project);
+                setOverviewTab();
             } catch (IOException ex) {
-                FormLoader.showErrorDialog("Грешка", "Грешка приликом отварања форме");
+                FormLoader.showErrorDialog("Грешка", "Грешка приликом asd отварања форме");
             }
         }
     }
@@ -374,7 +376,7 @@ public class TeamOfficeController {
     private ContextMenu deactivateMenu;
     private ContextMenu notMembersMenu;
     private ContextMenu noPrivilegesMenu;
-            
+
     private ContextMenu projectListMenu;
     private long time = System.currentTimeMillis();
     private Timeline clockTimeline;
@@ -453,12 +455,11 @@ public class TeamOfficeController {
 
         activateMenu = new ContextMenu();
         deactivateMenu = new ContextMenu();
-        notMembersMenu = new ContextMenu();    
+        notMembersMenu = new ContextMenu();
 
       //  activateMenu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask, manageMembers);
-       // deactivateMenu.getItems().addAll(addSubtask, addActivity, editSubtask, deactivateTask, manageMembers);
-     //   notMembersMenu.getItems().addAll(addSubtask, addActivity, editSubtask, manageMembers);
-       
+        // deactivateMenu.getItems().addAll(addSubtask, addActivity, editSubtask, deactivateTask, manageMembers);
+        //   notMembersMenu.getItems().addAll(addSubtask, addActivity, editSubtask, manageMembers);
         treeColumnTasks.setCellFactory(new Callback<TreeTableColumn<TaskNode, TaskNode>, TreeTableCell<TaskNode, TaskNode>>() {
             @Override
             public TreeTableCell<TaskNode, TaskNode> call(TreeTableColumn<TaskNode, TaskNode> param) {
@@ -568,16 +569,16 @@ public class TeamOfficeController {
                         }));
     }
 
-    private ContextMenu getContextMenuForTask(Task task){
-        
+    private ContextMenu getContextMenuForTask(Task task) {
+
         final MenuItem addSubtask = new MenuItem("Додај подзадатак");
         final MenuItem addActivity = new MenuItem("Додај активност");
         final MenuItem editSubtask = new MenuItem("Прикажи задатак");
         final MenuItem activateTask = new MenuItem("Започни задатак");
         final MenuItem deactivateTask = new MenuItem("Заврши задатак");
         final MenuItem manageMembers = new MenuItem("Чланови задатка");
-        
-                addSubtask.setOnAction(new EventHandler<ActionEvent>() {
+
+        addSubtask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 btnAddSubtaskPressed(event);
@@ -602,7 +603,7 @@ public class TeamOfficeController {
                 activateTask();
             }
         });
-        
+
         deactivateTask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -615,19 +616,20 @@ public class TeamOfficeController {
                 btnUsersOnTaskPressed(event);
             }
         });
-        
+
         ContextMenu menu = new ContextMenu();
-        if(user.getTaskHandler().checkTaskChefPrivileges(task)){
-            if(task.getStartDate() == null){
+        if (user.getTaskHandler().checkTaskChefPrivileges(task)) {
+            if (task.getStartDate() == null) {
                 menu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask, manageMembers);
-            }else {
-                 menu.getItems().addAll(addSubtask, addActivity, editSubtask, deactivateTask, manageMembers);
+            } else {
+                menu.getItems().addAll(addSubtask, addActivity, editSubtask, deactivateTask, manageMembers);
             }
-        }else {
-             menu.getItems().addAll(addSubtask, addActivity, editSubtask, manageMembers);
+        } else {
+            menu.getItems().addAll(addSubtask, addActivity, editSubtask, manageMembers);
         }
         return menu;
     }
+
     public void setGUIForUser() {
         int privileges = user.getUser().getAppPrivileges();
         if (privileges == Privileges.NO_PRIVILEGES.ordinal()) {
@@ -966,29 +968,30 @@ public class TeamOfficeController {
                         FormLoader.showErrorDialog("Грешка", "Грешка са базом");
                     }
                 }
-            } 
+            }
         }
     }
 
-    private void finishTask(){
-         TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
+    private void finishTask() {
+        TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
         if (taskNode != null) {
             Task task = taskNode.getValue().getTask();
-             boolean result;
-                try {
-                    result = user.getTaskHandler().endTask(task);
-                    if (result != true) {
-                        FormLoader.showInformationDialog("Oбавјештење", "Неуспјех приликом завршетка задатка! ");
-                    }
-                } catch (EntityDoesNotExistException ex) {
-                    FormLoader.showErrorDialog("Грешка", "Објекат не постоји у бази");
-                } catch (InsuficientPrivilegesException ex) {
-                    FormLoader.showErrorDialog("Грешка", "Немате довољно привилегија");
-                } catch (StoringException ex) {
-                    FormLoader.showErrorDialog("Грешка", "Грешка са базом");
+            boolean result;
+            try {
+                result = user.getTaskHandler().endTask(task);
+                if (result != true) {
+                    FormLoader.showInformationDialog("Oбавјештење", "Неуспјех приликом завршетка задатка! ");
                 }
+            } catch (EntityDoesNotExistException ex) {
+                FormLoader.showErrorDialog("Грешка", "Објекат не постоји у бази");
+            } catch (InsuficientPrivilegesException ex) {
+                FormLoader.showErrorDialog("Грешка", "Немате довољно привилегија");
+            } catch (StoringException ex) {
+                FormLoader.showErrorDialog("Грешка", "Грешка са базом");
+            }
         }
     }
+
     /**
      * Moje private Wrapper klase
      */

@@ -38,7 +38,7 @@ import projectguru.controllers.FormAddableMembersController;
 import projectguru.controllers.FormDocumentationController;
 import projectguru.controllers.FormFinancesOverviewController;
 import projectguru.controllers.FormReportController;
-import projectguru.controllers.FormSetActiveTaskController;
+import projectguru.controllers.FormListAddMembersOnProjectController;
 import projectguru.controllers.FormUserAccountsController;
 import projectguru.controllers.FormUsersOnProjectController;
 import projectguru.controllers.FormUsersOnTasksController;
@@ -318,21 +318,23 @@ public class FormLoader {
 
     }
 
-    public static void loadFormSetActiveTask(Task task, LoggedUser user) throws IOException {
+    public static void loadFormListAddMembersOnProject(Project project, LoggedUser user) throws IOException {
 
-        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormSetActiveTask.fxml"));
+        FXMLLoader loader = new FXMLLoader(FormLoader.class.getResource("/projectguru/fxml/FormListAddMembersOnProject.fxml"));
         Parent root = loader.load();
-        FormSetActiveTaskController controller = loader.getController();
-        controller.setUserAndTask(user, task);
+        FormListAddMembersOnProjectController controller = loader.getController();
+        controller.setUserAndProject(user, project);
+        controller.loadMembers();
+        
         Scene scene = new Scene(root);
         Stage stage = new Stage();
         stage.setScene(scene);
-        stage.setTitle("Активирај задатак " + task.getName());
+        stage.setTitle("Додај на пројекат: " + project.getName());
         stage.setResizable(false);
 
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.show();
+        stage.showAndWait();
     }
 
     public static void showInformationDialog(String title, String message) {
@@ -471,7 +473,7 @@ public class FormLoader {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Корисници на пројекту " + project.getName());
-        stage.setResizable(true);
+        stage.setResizable(false);
 
         stage.initModality(Modality.APPLICATION_MODAL);
 
