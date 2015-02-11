@@ -63,7 +63,7 @@
                <children>
                   <Button fx:id="btnAddMember" layoutX="14.0" layoutY="27.0" mnemonicParsing="false" onAction="#btnAddMember_OnAction" prefHeight="25.0" prefWidth="139.0" text="Додај члана" />
                   <Button fx:id="btnDeleteMember" layoutX="184.0" layoutY="27.0" mnemonicParsing="false" onAction="#btnDeleteMember_OnAction" prefHeight="25.0" prefWidth="153.0" text="Обриши члана" />
-                  <Button fx:id="btnViewTimetable" layoutX="371.0" layoutY="27.0" mnemonicParsing="false" onAction="#btnViewTimetable_OnAction" prefHeight="25.0" prefWidth="159.0" text="Преглед сатница" />
+                  <Button fx:id="btnViewTimetable" layoutX="371.0" layoutY="27.0" mnemonicParsing="false" onAction="#btnViewTimetable_OnAction" prefHeight="25.0" prefWidth="159.0" text="Преглед сатница" visible="false" />
                </children>
             </AnchorPane>
             <Label fx:id="lblStatus" text="Статус задатка" GridPane.columnIndex="1" />
