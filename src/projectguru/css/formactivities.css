@@ -1,0 +1,9 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.mainFxmlClass {
+    #gridForm {
+        border: activeborder solid 2px;
+    }
+}

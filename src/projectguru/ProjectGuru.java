@@ -1,52 +1,49 @@
- /*
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package projectguru;
 
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import java.io.IOException;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import projectguru.controllers.TeamOfficeController;
+import projectguru.handlers.LoggedUser;
 
 /**
  *
- * @author marko
+ * @author ZM
  */
-public class ProjectGuru extends Application {
+public class ProjectGuru {
     
-    @Override
-    public void start(Stage primaryStage) {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
+    
+    public void start(Stage primaryStage, LoggedUser user) throws IOException
+    {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/projectguru/fxml/TeamOffice.fxml"));
         
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
+        Parent root = loader.load();
         
-        Scene scene = new Scene(root, 300, 250);
+        TeamOfficeController controller = (TeamOfficeController)loader.getController();
+        controller.setUser(user);
+        controller.load();
         
-        primaryStage.setTitle("Hello World!");
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(this.getClass().getResource("/projectguru/css/projectguru.css").toExternalForm());
+        
+        primaryStage.setTitle("Пројекат Гуру");
+        primaryStage.getIcons().add(new Image(Login.class.getResourceAsStream("/projectguru/images/icon.png")));
         primaryStage.setScene(scene);
+        primaryStage.initStyle(StageStyle.DECORATED);
+        
+        primaryStage.setMaximized(true);
         primaryStage.show();
+       
+        controller.startActiveTask();
+        
     }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
 }

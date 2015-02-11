@@ -1,0 +1,34 @@
+#treeTask .tree-cell {
+    -fx-shape: null;
+    -fx-background-color: blue;
+    -fx-background-image: url("/projectguru/images/root.png");
+}
+#treeTask .tree-cell:expanded .tree-disclosure-node .arrow {
+    -fx-shape: null;
+    -fx-background-color: red;
+    -fx-background-image: url("/projectguru/images/root.png");
+}
+
+#treeTask {
+    -fx-background-color: red;
+    -fx-border-color: red;
+}
+
+.titled-pane {
+    -fx-font-size: 13px;
+}
+
+.progress-bar { -fx-box-border: goldenrod; }
+
+.green-bar  { -fx-accent: green;  }
+.yellow-bar { -fx-accent: yellow; }
+.orange-bar { -fx-accent: orange; }
+.red-bar    { -fx-accent: red;    }
+.blue-bar   { -fx-accent: blue;   }
+
+.pie-chart-worked { -fx-pie-color: green }
+.pie-chart-left   { -fx-pie-color: red }
+
+.default-color0.chart-pie { -fx-pie-color: green }
+.default-color1.chart-pie { -fx-pie-color: red }
+.default-color2.chart-pie { -fx-pie-color: yellow }

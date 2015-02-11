@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="608.0" prefWidth="594.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="projectguru.controllers.FormAddMembersOnProjectController">
+   <children>
+      <BorderPane fx:id="borderPane" layoutX="62.0" layoutY="141.0" prefHeight="536.0" prefWidth="413.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <bottom>
+            <AnchorPane prefHeight="54.0" prefWidth="380.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="btnAdd" layoutX="358.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="135.0" text="Додај чланове" AnchorPane.rightAnchor="133.0" />
+                  <Button fx:id="btnHelp" layoutX="498.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="78.0" text="Помоћ" AnchorPane.rightAnchor="36.0" />
+                  <Separator layoutX="31.0" layoutY="11.0" prefHeight="1.0" prefWidth="520.0" AnchorPane.rightAnchor="36.0" />
+               </children>
+            </AnchorPane>
+         </bottom>
+         <center>
+            <AnchorPane BorderPane.alignment="CENTER" />
+         </center>
+         <top>
+            <Pane prefHeight="41.0" prefWidth="433.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label layoutX="14.0" layoutY="10.0" text="Чланови на пројекту:">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
+         </top>
+      </BorderPane>
+   </children>
+</AnchorPane>
