@@ -40,15 +40,16 @@ public class JpaDocumentHandler implements DocumentHandler {
         this.user = user;
     }
 //TODO
+
     @Override
     public boolean checkPrivileges(Document document) {
 
-        if(document.getIDProject() == null){
+        if (document.getIDProject() == null) {
             throw new Error("NAJBEM SE MAME");
         }
-        
+
         return user.getProjectHandler().checkMemberPrivileges(document.getIDProject());
-       
+
     }
 
     @Override
@@ -89,8 +90,31 @@ public class JpaDocumentHandler implements DocumentHandler {
         return true;
     }
 
+    private boolean addRevisionPrivate(Document original, DocumentRevision revision, EntityManager em) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException {
+        if (original.getId() == null || (original = em.find(Document.class, original.getId())) == null) {
+            throw new EntityDoesNotExistException("Original document does not exist.");
+        }
+        if (!checkPrivileges(original)) {
+            throw new InsuficientPrivilegesException();
+        }
+
+        if (revision.getId() == null || (revision = em.find(DocumentRevision.class, revision.getId())) == null) {
+            revision.setIDDocument(original);
+            em.persist(revision);
+            em.flush();
+        }
+
+        revision.setIDDocument(original);
+        original.getDocumentRevisionList().add(revision);
+
+        em.getTransaction().commit();
+        em.refresh(original);
+        em.refresh(revision);
+        return true;
+    }
+
     @Override
-    public boolean addDocument(Project project, Document document) throws InsuficientPrivilegesException, StoringException {
+    public boolean addDocument(Project project, Document document, DocumentRevision revision) throws InsuficientPrivilegesException, StoringException {
 
         if (!user.getProjectHandler().checkMemberPrivileges(project)) {
             throw new InsuficientPrivilegesException();
@@ -101,18 +125,18 @@ public class JpaDocumentHandler implements DocumentHandler {
 
             em.getTransaction().begin();
 
-            if(project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null){
+            if (project.getId() == null || (project = em.find(project.getClass(), project.getId())) == null) {
                 throw new EntityDoesNotExistException("Project does not exist.");
             }
-       
+
             document.setIDProject(project);
 
             em.persist(document);
             em.getTransaction().commit();
             em.refresh(document);
             em.refresh(project);
-           // System.out.println(document);
-            return true;
+            // System.out.println(document);
+            return addRevisionPrivate(document, revision, em);
 
         } catch (Exception ex) {
             if (em.getTransaction().isActive()) {
@@ -125,7 +149,7 @@ public class JpaDocumentHandler implements DocumentHandler {
             em.close();
         }
     }
-    
+
     @Override
     public boolean editDocument(Document document) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException {
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
@@ -186,15 +210,14 @@ public class JpaDocumentHandler implements DocumentHandler {
 
     @Override
     public List<DocumentRevision> getRevisions(Document document) throws EntityDoesNotExistException {
-        
+
         EntityManagerFactory emf = ((JpaAccessManager) AccessManager.getInstance()).getFactory();
         EntityManager em = emf.createEntityManager();
-        
-        if(document.getId() == null || (document = em.find(Document.class, document.getId())) == null)
-        {
+
+        if (document.getId() == null || (document = em.find(Document.class, document.getId())) == null) {
             throw new EntityDoesNotExistException("Document doesn't exist in database !");
         }
-        
+
         return document.getDocumentRevisionList();
     }
 

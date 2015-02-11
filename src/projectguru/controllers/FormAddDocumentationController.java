@@ -148,8 +148,8 @@ public class FormAddDocumentationController implements Initializable {
                     //treba mi metoda koja vraca zadnji dokument
                     DocumentHandler docJpa = user.getDocumentHandler();
 
-                    docJpa.addDocument(project, d);
-                    docJpa.addRevision(d, drev);
+                    docJpa.addDocument(project, d,drev);
+                    
                     Stage stage = (Stage) btnSave.getScene().getWindow();
                     stage.close();
                 } else {

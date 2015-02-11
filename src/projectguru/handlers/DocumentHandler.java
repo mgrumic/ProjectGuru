@@ -23,8 +23,8 @@ public interface DocumentHandler {
 
     public boolean addRevision(Document original, DocumentRevision revision) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
 
-    public boolean addDocument(Project project, Document document) throws InsuficientPrivilegesException, StoringException;
-    
+    public boolean addDocument(Project project, Document document, DocumentRevision revision) throws InsuficientPrivilegesException, StoringException;
+
     public boolean editDocument(Document document) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
 
     public boolean editRevision(DocumentRevision revision) throws EntityDoesNotExistException, InsuficientPrivilegesException, StoringException;
