@@ -5,6 +5,7 @@
  */
 package projectguru.jpa.handlers;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -1058,6 +1059,9 @@ public class JpaTaskHandler implements TaskHandler {
 
                 }
 
+                Date now = Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant());
+                task.setEndDate(now);
+                em.merge(task);
                 em.getTransaction().commit();
                 if (prnt1 != null) {
                     em.refresh(prnt1);
