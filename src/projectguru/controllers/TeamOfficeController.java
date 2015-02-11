@@ -100,7 +100,7 @@ public class TeamOfficeController {
     @FXML
     private TreeTableView<TaskNode> treeTasks;
     @FXML
-    private TreeTableColumn<TaskNode, String> treeColumnTasks;
+    private TreeTableColumn<TaskNode, TaskNode> treeColumnTasks;
     @FXML
     private TreeTableColumn<TaskNode, String> treeColumnDescription;
     @FXML
@@ -159,7 +159,7 @@ public class TeamOfficeController {
     private Button btnUsersOnTask;
     @FXML
     private Button btnProjectMembers;
-            
+
     @FXML
     void btnAddSubtaskPressed(ActionEvent event) {
 
@@ -338,11 +338,11 @@ public class TeamOfficeController {
             FormLoader.showExtendedInformationDialog("Активни задатак", "Задатак: " + activeTask.getName(), activeTask.getDescription());
         }
     }
-    
+
     @FXML
     void btnProjectMembersPressed(ActionEvent event) {
         ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
-        if(item != null){
+        if (item != null) {
             Project project = item.getProject();
             try {
                 FormLoader.loadFormUsersOnProject(user, project);
@@ -352,7 +352,7 @@ public class TeamOfficeController {
             }
         }
     }
-    
+
     @FXML
     void btnUsersOnTaskPressed(ActionEvent event) {
         TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
@@ -370,7 +370,11 @@ public class TeamOfficeController {
     private static LoggedUser user;
     private ObservableList<ProjectWrapper> projects;
     private ObservableList<UserWrapper> members;
-    private ContextMenu rootContextMenu;
+    private ContextMenu activateMenu;
+    private ContextMenu deactivateMenu;
+    private ContextMenu notMembersMenu;
+    private ContextMenu noPrivilegesMenu;
+            
     private ContextMenu projectListMenu;
     private long time = System.currentTimeMillis();
     private Timeline clockTimeline;
@@ -447,72 +451,27 @@ public class TeamOfficeController {
             }
         });
 
-        rootContextMenu = new ContextMenu();
+        activateMenu = new ContextMenu();
+        deactivateMenu = new ContextMenu();
+        notMembersMenu = new ContextMenu();    
 
-        final MenuItem addSubtask = new MenuItem("Додај подзадатак");
-        final MenuItem addActivity = new MenuItem("Додај активност");
-        final MenuItem editSubtask = new MenuItem("Прикажи задатак");
-        final MenuItem activateTask = new MenuItem("Aктивирај задатак");
-        final MenuItem manageMembers = new MenuItem("Чланови задатка");
-
-        addSubtask.setOnAction(new EventHandler<ActionEvent>() {
+      //  activateMenu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask, manageMembers);
+       // deactivateMenu.getItems().addAll(addSubtask, addActivity, editSubtask, deactivateTask, manageMembers);
+     //   notMembersMenu.getItems().addAll(addSubtask, addActivity, editSubtask, manageMembers);
+       
+        treeColumnTasks.setCellFactory(new Callback<TreeTableColumn<TaskNode, TaskNode>, TreeTableCell<TaskNode, TaskNode>>() {
             @Override
-            public void handle(ActionEvent event) {
-                btnAddSubtaskPressed(event);
-            }
-        });
-        editSubtask.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-//                btnAddSubtaskPressed(event);
-                actionOnEditTask();
-            }
-        });
-        addActivity.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                btnAddActivityPressed(event);
-            }
-        });
-        activateTask.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                activateOrFinishTask();
-            }
-        });
-
-        manageMembers.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                btnUsersOnTaskPressed(event);
-            }
-        });
-        rootContextMenu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask, manageMembers);
-
-        treeColumnTasks.setCellFactory(new Callback<TreeTableColumn<TaskNode, String>, TreeTableCell<TaskNode, String>>() {
-            @Override
-            public TreeTableCell<TaskNode, String> call(TreeTableColumn<TaskNode, String> param) {
-                TreeTableCell<TaskNode, String> cell = new TreeTableCell<TaskNode, String>() {
+            public TreeTableCell<TaskNode, TaskNode> call(TreeTableColumn<TaskNode, TaskNode> param) {
+                TreeTableCell<TaskNode, TaskNode> cell = new TreeTableCell<TaskNode, TaskNode>() {
                     @Override
-                    protected void updateItem(String t, boolean bln) {
+                    protected void updateItem(TaskNode t, boolean bln) {
                         super.updateItem(t, bln);
                         if (bln) {
                             setText(null);
                             setContextMenu(null);
                         } else if (t != null) {
-                            setText(t);
-                            TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
-                            if (taskNode != null) {
-                            TaskNode node = taskNode.getValue();
-                            if (node != null && user.getTaskHandler().checkTaskChefPrivileges(node.getTask())) {
-                                if (node.getTask().getStartDate() != null) {
-                                    activateTask.setText("Заврши задатак");
-                                } else {
-                                    activateTask.setText("Активирај задатак");
-                                }
-                                setContextMenu(rootContextMenu);
-                            }
-                        }
+                            setText(t.getTask().getName());
+                            setContextMenu(getContextMenuForTask(t.getTask()));
                         }
 
                     }
@@ -545,8 +504,8 @@ public class TeamOfficeController {
             }
         });
         treeColumnTasks.setCellValueFactory(
-                (TreeTableColumn.CellDataFeatures<TaskNode, String> param)
-                -> new ReadOnlyStringWrapper(param.getValue().getValue().getTask().getName())
+                (TreeTableColumn.CellDataFeatures<TaskNode, TaskNode> param)
+                -> new ReadOnlyObjectWrapper<TaskNode>(param.getValue().getValue())
         );
         treeColumnDescription.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<TaskNode, String> param)
@@ -609,6 +568,66 @@ public class TeamOfficeController {
                         }));
     }
 
+    private ContextMenu getContextMenuForTask(Task task){
+        
+        final MenuItem addSubtask = new MenuItem("Додај подзадатак");
+        final MenuItem addActivity = new MenuItem("Додај активност");
+        final MenuItem editSubtask = new MenuItem("Прикажи задатак");
+        final MenuItem activateTask = new MenuItem("Започни задатак");
+        final MenuItem deactivateTask = new MenuItem("Заврши задатак");
+        final MenuItem manageMembers = new MenuItem("Чланови задатка");
+        
+                addSubtask.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                btnAddSubtaskPressed(event);
+            }
+        });
+        editSubtask.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+//                btnAddSubtaskPressed(event);
+                actionOnEditTask();
+            }
+        });
+        addActivity.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                btnAddActivityPressed(event);
+            }
+        });
+        activateTask.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                activateTask();
+            }
+        });
+        
+        deactivateTask.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                finishTask();
+            }
+        });
+        manageMembers.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                btnUsersOnTaskPressed(event);
+            }
+        });
+        
+        ContextMenu menu = new ContextMenu();
+        if(user.getTaskHandler().checkTaskChefPrivileges(task)){
+            if(task.getStartDate() == null){
+                menu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask, manageMembers);
+            }else {
+                 menu.getItems().addAll(addSubtask, addActivity, editSubtask, deactivateTask, manageMembers);
+            }
+        }else {
+             menu.getItems().addAll(addSubtask, addActivity, editSubtask, manageMembers);
+        }
+        return menu;
+    }
     public void setGUIForUser() {
         int privileges = user.getUser().getAppPrivileges();
         if (privileges == Privileges.NO_PRIVILEGES.ordinal()) {
@@ -781,29 +800,29 @@ public class TeamOfficeController {
                         btnFinances.setVisible(true);
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
-                        btnUsersOnTask.setVisible(false);
+                        btnUsersOnTask.setVisible(true);
                         btnProjectMembers.setVisible(false);
                         lblProjectCompleted.setText("Члан пројекта");
                     } else if (ph.checkInsightPrivileges(project)) {
                         btnAddMember.setDisable(true);
                         btnAddSubtask.setVisible(false);
-                        btnAddActivity.setVisible(false);
+                        btnAddActivity.setVisible(true);
                         btnEditProject.setVisible(false);
                         btnFinances.setVisible(true);
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
-                        btnUsersOnTask.setVisible(false);
+                        btnUsersOnTask.setVisible(true);
                         btnProjectMembers.setVisible(false);
                         lblProjectCompleted.setText("Надзор");
                     } else if (ph.checkExternPrivileges(project)) {
                         btnAddMember.setDisable(true);
                         btnAddSubtask.setVisible(false);
-                        btnAddActivity.setVisible(false);
+                        btnAddActivity.setVisible(true);
                         btnEditProject.setVisible(false);
                         btnFinances.setVisible(false);
                         btnDocuments.setVisible(true);
                         btnGetReport.setVisible(true);
-                        btnUsersOnTask.setVisible(false);
+                        btnUsersOnTask.setVisible(true);
                         btnProjectMembers.setVisible(false);
                         lblProjectCompleted.setText("Екстерни члан");
                     } else {
@@ -931,7 +950,7 @@ public class TeamOfficeController {
         activeTask = check;
     }
 
-    private void activateOrFinishTask() {
+    private void activateTask() {
         TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
         if (taskNode != null) {
             Task task = taskNode.getValue().getTask();
@@ -947,8 +966,15 @@ public class TeamOfficeController {
                         FormLoader.showErrorDialog("Грешка", "Грешка са базом");
                     }
                 }
-            } else {
-                boolean result;
+            } 
+        }
+    }
+
+    private void finishTask(){
+         TreeItem<TaskNode> taskNode = treeTasks.getSelectionModel().getSelectedItem();
+        if (taskNode != null) {
+            Task task = taskNode.getValue().getTask();
+             boolean result;
                 try {
                     result = user.getTaskHandler().endTask(task);
                     if (result != true) {
@@ -960,13 +986,9 @@ public class TeamOfficeController {
                     FormLoader.showErrorDialog("Грешка", "Немате довољно привилегија");
                 } catch (StoringException ex) {
                     FormLoader.showErrorDialog("Грешка", "Грешка са базом");
-
                 }
-
-            }
         }
     }
-
     /**
      * Moje private Wrapper klase
      */

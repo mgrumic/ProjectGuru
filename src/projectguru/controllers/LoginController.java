@@ -59,15 +59,14 @@ public class LoginController implements Initializable {
      * Moje varijable
      */
     private Stage stage;
-    private EventHandler<KeyEvent> enterLogin = new EventHandler<KeyEvent>() {
-        @Override
-        public void handle(KeyEvent arg0) {
-            if (arg0.getCode() == KeyCode.ENTER) {
-                login();
-            }
-        }
-    };
-
+   // private EventHandler<KeyEvent> enterLogin = new EventHandler<KeyEvent>() {
+  //      @Override
+  //      public void handle(KeyEvent arg0) {
+   //         if (arg0.getCode() == KeyCode.ENTER) {
+   //             login();
+  //          }
+  //      }
+  //  };
     /**
      * FXML functions
      */
@@ -88,9 +87,9 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         lblWarning.setVisible(false);
         imgViewLogo.setImage(new Image(getClass().getResourceAsStream("/projectguru/images/pg.png")));
-        tfUsername.setOnKeyPressed(enterLogin);
-        tbPassword.setOnKeyPressed(enterLogin);
-        btnLogin.setOnKeyPressed(enterLogin);
+       // tfUsername.setOnKeyPressed(enterLogin);
+       // tbPassword.setOnKeyPressed(enterLogin);
+        //btnLogin.setOnKeyPressed(enterLogin);
         btnExit.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent arg0) {
