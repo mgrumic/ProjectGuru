@@ -23,7 +23,7 @@ public enum ReportType {
     private static final String q1 = "";
     private static final String q2 = "select * from rashodi";
     private static final String q3 = "select * from prihodi";
-    private static final String q4 = "";
+    private static final String q4 = "select * from aktivnosti";
     
     public static ReportType getType(String str){
         if(null != str)
