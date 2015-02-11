@@ -457,7 +457,7 @@ public class TeamOfficeController {
         deactivateMenu = new ContextMenu();
         notMembersMenu = new ContextMenu();
 
-      //  activateMenu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask, manageMembers);
+        //  activateMenu.getItems().addAll(addSubtask, addActivity, editSubtask, activateTask, manageMembers);
         // deactivateMenu.getItems().addAll(addSubtask, addActivity, editSubtask, deactivateTask, manageMembers);
         //   notMembersMenu.getItems().addAll(addSubtask, addActivity, editSubtask, manageMembers);
         treeColumnTasks.setCellFactory(new Callback<TreeTableColumn<TaskNode, TaskNode>, TreeTableCell<TaskNode, TaskNode>>() {
@@ -582,13 +582,20 @@ public class TeamOfficeController {
             @Override
             public void handle(ActionEvent event) {
                 btnAddSubtaskPressed(event);
+                ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
+                if (item != null) {
+                    loadTaskTree(item.getProject());
+                }
             }
         });
         editSubtask.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-//                btnAddSubtaskPressed(event);
                 actionOnEditTask();
+                ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
+                if (item != null) {
+                    loadTaskTree(item.getProject());
+                }
             }
         });
         addActivity.setOnAction(new EventHandler<ActionEvent>() {
@@ -601,6 +608,10 @@ public class TeamOfficeController {
             @Override
             public void handle(ActionEvent event) {
                 activateTask();
+                ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
+                if (item != null) {
+                    loadTaskTree(item.getProject());
+                }
             }
         });
 
@@ -608,6 +619,10 @@ public class TeamOfficeController {
             @Override
             public void handle(ActionEvent event) {
                 finishTask();
+                ProjectWrapper item = listProjects.getSelectionModel().getSelectedItem();
+                if (item != null) {
+                    loadTaskTree(item.getProject());
+                }
             }
         });
         manageMembers.setOnAction(new EventHandler<ActionEvent>() {
@@ -962,6 +977,7 @@ public class TeamOfficeController {
                 if (result == true) {
                     try {
                         user.getTaskHandler().startTask(task);
+                        
                     } catch (EntityDoesNotExistException ex) {
                         FormLoader.showErrorDialog("Грешка", "Објекат не постоји у бази");
                     } catch (StoringException ex) {
