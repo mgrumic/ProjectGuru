@@ -120,7 +120,6 @@ public class FormAddableMembersController implements Initializable {
         );
         
         lstAddableUsers.setItems(addableUsers);
-        lstAddableUsers.getSelectionModel().select(0);
         
     }
     

@@ -285,7 +285,8 @@ public class FormAddTaskController implements Initializable {
                 .collect(Collectors.toList())
             );
             
-            btnNext.setDisable(true);
+            btnNext.setVisible(false);
+            btnBack.setVisible(false);
             
         }else{
             selectedMembers = FXCollections.observableArrayList(new ArrayList());

@@ -190,7 +190,7 @@ public class FormAddProjectController implements Initializable {
                 } catch (EntityDoesNotExistException ex) {
                     FormLoader.showInformationDialog("Грешка", "Пројекат не посотји");
                 }
-                
+
             } else {
                 newProject = new Project();
             }
@@ -297,6 +297,9 @@ public class FormAddProjectController implements Initializable {
         if (project != null) {
             
             edit = true;
+            
+            btnNext.setVisible(false);
+            btnBack.setVisible(false);
             
             paneRootTaskAdditions.setVisible(false);
             
