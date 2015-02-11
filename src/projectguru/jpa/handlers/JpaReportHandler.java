@@ -103,10 +103,14 @@ public class JpaReportHandler implements ReportHandler{
             .pageFooter(Components.pageNumber().setStyle(boldCenteredStyle), Components.currentDate().setStyle(boldStyle).setHorizontalAlignment(HorizontalAlignment.RIGHT))
             .setColumnTitleStyle(columnTitleStyle)
             .setHighlightDetailEvenRows(Boolean.TRUE);
-        String query = "";
-        if(type == ReportType.FINANSIJSKI_PREGLED_PRIHODA_REPORT || type == ReportType.FINANSIJSKI_PREGLED_RASHODA_REPORT)
-            query = type.getQuerry()+ " where ID = " + project.getId();
-        report.setDataSource(query, connection);
+        String query = type.getQuerry();
+        if(type == ReportType.FINANSIJSKI_PREGLED_PRIHODA_REPORT || type == ReportType.FINANSIJSKI_PREGLED_RASHODA_REPORT){
+            query = query + " where ProjectID = " + project.getId();
+            report.setDataSource(query, connection);
+        }else{
+            query = query + " where IDProject = " + project.getId();
+            report.setDataSource(query, connection);
+        }
     }
     
     private void fillColumns(ReportType type){
@@ -123,6 +127,9 @@ public class JpaReportHandler implements ReportHandler{
                 TextColumnBuilder<String> descriptionColumn = 
                         Columns.column("Опис", "Description", DataTypes.stringType());
                 
+                TextColumnBuilder<String> idColumn = 
+                        Columns.column("ИД", "ID", DataTypes.stringType());
+                
                 TextColumnBuilder<Integer> rowNumberColumn = 
                         DynamicReports.col.reportRowNumberColumn("Бр.")
                         .setFixedColumns(3)
@@ -130,6 +137,11 @@ public class JpaReportHandler implements ReportHandler{
                 
                 PercentageColumnBuilder pricePercColumn = Columns.percentageColumn("Количина [%]", ammountColumn)
                 .setHorizontalAlignment(HorizontalAlignment.RIGHT);
+                
+                Bar3DChartBuilder ammountChart = DynamicReports.cht.bar3DChart()
+                .setTitle(type==ReportType.FINANSIJSKI_PREGLED_PRIHODA_REPORT ? "Приходи по ИД" : "Расходи по ИД")
+                .setCategory(idColumn)
+                .addSerie(DynamicReports.cht.serie(ammountColumn));
                 
             report.columns(
                         rowNumberColumn,
@@ -141,9 +153,44 @@ public class JpaReportHandler implements ReportHandler{
                                 .setHorizontalAlignment(HorizontalAlignment.RIGHT),
                      pricePercColumn
                                 .setHorizontalAlignment(HorizontalAlignment.RIGHT)        
-            );
+            ).summary(ammountChart);
             report.subtotalsAtSummary(DynamicReports.sbt.sum(ammountColumn).setStyle(boldStyle.setForegroundColor(
                     type == ReportType.FINANSIJSKI_PREGLED_PRIHODA_REPORT? Color.GREEN : Color.RED)));
+        } else if(type == ReportType.PREGLED_AKTIVNOSTI_REPORT){
+            TextColumnBuilder<String> idColumn = 
+                        Columns.column("ИД", "ID", DataTypes.stringType());
+            
+            TextColumnBuilder<String> nameColumn = 
+                        Columns.column("Назив", "Name", DataTypes.stringType());
+            
+            TextColumnBuilder<String> dateColumn = 
+                        Columns.column("Датум креирања", "CreationDate", DataTypes.stringType());
+            
+            TextColumnBuilder<String> remarkColumn = 
+                        Columns.column("Коментар", "Remark", DataTypes.stringType());
+            
+            TextColumnBuilder<String> descriptionColumn = 
+                        Columns.column("Опис", "Description", DataTypes.stringType());
+            
+            TextColumnBuilder<String> usernameColumn = 
+                        Columns.column("Корисник", "Username", DataTypes.stringType());
+            
+            TextColumnBuilder<String> taskNameColumn = 
+                        Columns.column("Назив задатка", "ZadatakName", DataTypes.stringType());
+        
+            report.columns(
+                        idColumn,
+                        nameColumn,
+                        //        .setHorizontalAlignment(HorizontalAlignment.LEFT),
+                        dateColumn
+                                .setHorizontalAlignment(HorizontalAlignment.RIGHT),
+                        remarkColumn
+                                .setHorizontalAlignment(HorizontalAlignment.RIGHT),
+                     descriptionColumn
+                                .setHorizontalAlignment(HorizontalAlignment.RIGHT),
+                     usernameColumn,
+                     taskNameColumn
+            );
         }
     }
 }
