@@ -77,6 +77,9 @@ public class FormAddExpenseOrIncomeController implements Initializable {
     void btnAddPressed(ActionEvent event) {
         if (checkFields()) {
             addFinance();
+            if(controller != null){
+                controller.loadFinances();
+            }
         }
     }
 

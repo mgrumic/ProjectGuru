@@ -36,6 +36,7 @@ import projectguru.handlers.LoggedUser;
 import projectguru.handlers.exceptions.EntityDoesNotExistException;
 import projectguru.handlers.exceptions.StoringException;
 import projectguru.utils.FormLoader;
+import projectguru.utils.ProjectGuruUtilities;
 
 /**
  * FXML Controller class
@@ -282,7 +283,7 @@ public class FormUserAccountsController implements Initializable {
         boolean result = false;
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPassword(pfPassword.getText());
+        newUser.setPassword(ProjectGuruUtilities.pass2sha1(pfPassword.getText()));
         newUser.setAppPrivileges(cbPrivileges.getValue().getValue());
         newUser.setActivated(checkAccountActive.isSelected());
         newUser.setFirstName(tfFirstName.getText());
@@ -315,7 +316,7 @@ public class FormUserAccountsController implements Initializable {
             return false;
         }
         boolean result = false;
-        selected.setPassword(pfPassword.getText());
+        selected.setPassword(ProjectGuruUtilities.pass2sha1(pfPassword.getText()));
         selected.setAppPrivileges(cbPrivileges.getValue().getValue());
         selected.setActivated(checkAccountActive.isSelected());
         selected.setFirstName(tfFirstName.getText());

@@ -6,6 +6,9 @@
 package projectguru.utils;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  *
@@ -13,6 +16,17 @@ import java.math.BigDecimal;
  */
 public class ProjectGuruUtilities {
 
+     public static String pass2sha1(String password){
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.update(password.getBytes(), 0, password.length());
+            return new BigInteger(1, md.digest()).toString(16);
+        } catch (NoSuchAlgorithmException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+     
     public static boolean tryParseInt(String s) {
         boolean retVal = false;
         try {

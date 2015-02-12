@@ -289,7 +289,8 @@ public class FormLoader {
         controller.setProjectAndActivity(project, activity);
         controller.setUser(user);
         controller.setType(type);
-
+        controller.setOverviewController(overviewContr);
+        
         String title = "";
         if (type == true) {
             title = "Приходи пројекта " + project.getName();
@@ -314,7 +315,7 @@ public class FormLoader {
         }
         stage.initModality(Modality.APPLICATION_MODAL);
 
-        stage.show();
+        stage.showAndWait();
 
     }
 

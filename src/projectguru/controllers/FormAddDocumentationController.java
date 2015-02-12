@@ -16,6 +16,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -95,7 +97,13 @@ public class FormAddDocumentationController implements Initializable {
 
     public void loadDocum() {
         checkBoxRev.setDisable(false);
-        List<Document> listAll = project.getDocumentList();
+        List<Document> listAll = new ArrayList<>();
+        try {
+            listAll = user.getProjectHandler().getAllDocuments(project);
+        } catch (EntityDoesNotExistException ex) {
+            Logger.getLogger(FormDocumentationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         List<TeamOfficeController.DocumentWrapper> dwList = new ArrayList<TeamOfficeController.DocumentWrapper>();
         for (int i = 0; i < listAll.size(); i++) {
             dwList.add(new TeamOfficeController.DocumentWrapper(listAll.get(i)));

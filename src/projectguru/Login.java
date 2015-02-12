@@ -48,7 +48,7 @@ public class Login extends Application {
         
         JpaAccessManager jam = new JpaAccessManager("ProjectGuruPU");
         AccessManager.setInstance(jam);
-        AccessManager.getInstance().logUserIn("-", "-");
+        AccessManager.getInstance().logUserIn("*|*", "*|*");
         
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/projectguru/fxml/Login.fxml"));
         

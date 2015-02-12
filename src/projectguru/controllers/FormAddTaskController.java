@@ -146,12 +146,10 @@ public class FormAddTaskController implements Initializable {
                 return;
             }
             Integer intMenHours = (new Integer(strMenHours));
-            Date startDate;
+            Date startDate = null;
             Date endDate = null;
 
-            if (startLDate == null) {
-                startDate = new Date();
-            } else {
+            if (startLDate != null) {
                 startDate = Date.from(startLDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
             }
             if (endLDate != null) {

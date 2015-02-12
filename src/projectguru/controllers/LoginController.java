@@ -29,6 +29,7 @@ import javafx.stage.Stage;
 import projectguru.AccessManager;
 import projectguru.ProjectGuru;
 import projectguru.handlers.LoggedUser;
+import projectguru.utils.ProjectGuruUtilities;
 
 /**
  * FXML Controller class
@@ -87,9 +88,6 @@ public class LoginController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         lblWarning.setVisible(false);
         imgViewLogo.setImage(new Image(getClass().getResourceAsStream("/projectguru/images/pg.png")));
-       // tfUsername.setOnKeyPressed(enterLogin);
-       // tbPassword.setOnKeyPressed(enterLogin);
-        //btnLogin.setOnKeyPressed(enterLogin);
         btnExit.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent arg0) {
@@ -113,7 +111,7 @@ public class LoginController implements Initializable {
                 lblWarning.setVisible(false);
 
                 String username = tfUsername.getText();
-                String password = tbPassword.getText();
+                String password = ProjectGuruUtilities.pass2sha1(tbPassword.getText()); //pass to sha1
 
                 AccessManager access = AccessManager.getInstance();
                 LoggedUser user = access.logUserIn(username, password);
