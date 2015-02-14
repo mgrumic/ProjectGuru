@@ -249,7 +249,7 @@ public class FormAddTaskController implements Initializable {
 
         start.setConverter(new SerbianLocalDateStringConverter());
         ends.setConverter(new SerbianLocalDateStringConverter());
-        
+        dedline.setConverter(new SerbianLocalDateStringConverter());
 
     }
 

@@ -102,7 +102,7 @@
                                                             <Cursor fx:constant="DEFAULT" />
                                                          </cursor>
                                                       </TextArea>
-                                                      <Label fx:id="lblProjectName" layoutX="43.0" layoutY="14.0" prefHeight="27.0" prefWidth="196.0" AnchorPane.leftAnchor="43.0" AnchorPane.topAnchor="14.0">
+                                                      <Label fx:id="lblProjectName" layoutX="43.0" layoutY="14.0" prefHeight="27.0" prefWidth="408.0" AnchorPane.leftAnchor="43.0" AnchorPane.topAnchor="14.0">
                                                          <font>
                                                             <Font name="System Bold" size="18.0" />
                                                          </font>

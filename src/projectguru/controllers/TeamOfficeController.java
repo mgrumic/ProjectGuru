@@ -8,6 +8,7 @@ package projectguru.controllers;
 import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -79,6 +80,8 @@ import projectguru.utils.FormLoader;
  */
 public class TeamOfficeController {
 
+    private static DecimalFormat decimalFormat = new DecimalFormat("0.00"); 
+    
     @FXML
     private ResourceBundle resources;
     @FXML
@@ -527,7 +530,7 @@ public class TeamOfficeController {
                             setText(null);
                         } else if (t != null) {
                             setAlignment(Pos.CENTER);
-                            setText(Math.floor(t) + " h");
+                            setText(decimalFormat.format(t));
                         }
 
                     }
@@ -547,7 +550,7 @@ public class TeamOfficeController {
                             setText(null);
                         } else if (t != null) {
                             setAlignment(Pos.CENTER);
-                            setText(Math.floor(t) + " h");
+                            setText(decimalFormat.format(t));
                         }
 
                     }

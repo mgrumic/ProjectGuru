@@ -122,6 +122,7 @@ public class FormActivitiesController implements Initializable {
     @FXML
     void btnReject_OnAction(ActionEvent event) {
         ActivityWrapper aw = tblActivities.getSelectionModel().getSelectedItem();
+        changeMode(false);
         setFormData(aw);
     }
 
@@ -337,6 +338,9 @@ public class FormActivitiesController implements Initializable {
             txtTaskName.setText(task.getName());
             dpDate.setValue(LocalDate.now(ZoneId.systemDefault()));
             dpDate.setDisable(false);
+            dpDate.setEditable(true);
+            btnReject.setDisable(false);
+            btnSaveChanges.setDisable(false);
         }else{
             dpDate.setEditable(false);
         }
@@ -344,6 +348,7 @@ public class FormActivitiesController implements Initializable {
         btnReject.setVisible(true);
         btnSaveChanges.setVisible(true);
         this.newMode = newMode;
+        
     }
     
     private void addActivity(){

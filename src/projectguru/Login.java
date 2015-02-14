@@ -80,9 +80,6 @@ public class Login extends Application {
     public static void main(String[] args) throws Exception{
 
         launch(args);
-        //PersistanceTests test = new PersistanceTests();
-        //test.taskHandlerTests();
-        //test.projectHandlerTests();
    
     }
     
