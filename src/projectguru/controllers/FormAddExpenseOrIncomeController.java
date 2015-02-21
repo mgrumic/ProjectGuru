@@ -214,6 +214,9 @@ public class FormAddExpenseOrIncomeController implements Initializable {
                     if (result == true) {
                         listFinances.getItems().add(new FinanceWrapper(income, type));
                         project.getIncomeList().add(income);
+                        if(controller != null){
+                            controller.loadFinances();
+                        }
                     }
                 } catch (StoringException ex) {
                     FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа у базу.");
@@ -241,6 +244,9 @@ public class FormAddExpenseOrIncomeController implements Initializable {
                         System.out.println("Tu sam, kod dodavanja liste");
                         listFinances.getItems().add(new FinanceWrapper(exp, type));
                         project.getExpenseList().add(exp);
+                        if(controller != null){
+                            controller.loadFinances();
+                        }
                     }
                 } catch (StoringException ex) {
                     FormLoader.showErrorDialog("Грешка", "Грешка приликом уписа у базу.");

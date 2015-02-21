@@ -102,13 +102,6 @@ public class FormFinancesOverviewController implements Initializable {
         }
     }
     public void loadFinances(){
-
-        try {
-            project = user.getProjectHandler().getUpdatedProject(project);
-        } catch (EntityDoesNotExistException ex) {
-            FormLoader.showErrorDialog("Грешка", "Такав пројекат не постоји");
-            ((Stage)lblBudget.getScene().getWindow()).close();
-        }
         
         lblProjectName.setText(project.getName());
         lblBudget.setText(project.getBudget().toString());
